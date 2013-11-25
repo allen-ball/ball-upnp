@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="iprotium-upnp" basedir="." default="jar"
+         xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+  <description>
+    iprotium-upnp.jar
+    ---------------------------
+    UPnP Implementation Classes
+
+    $Id$
+  </description>
+
+  <property environment="env"/>
+  <property name="build.properties.file" location="build.properties"/>
+  <property file="${build.properties.file}"/>
+  <property name="build.sysclasspath"   value="ignore"/>
+  <available classname="${build.compiler.adapter}"
+             property="build.compiler" value="${build.compiler.adapter}"/>
+
+  <property name="src.dir"              location="src"/>
+
+  <property name="target.dir"           location="target"/>
+  <property name="target.classes.dir"   location="${target.dir}/classes"/>
+
+  <property name="vendor"               value="iprotium.com"/>
+
+  <path id="build.classpath">
+    <pathelement location="${target.classes.dir}"/>
+    <fileset dir="${target.dir}" includes="**/*.jar"/>
+    <path refid="compile.classpath"/>
+  </path>
+
+  <target name="clean"
+          description="--> Removes compilation files and directories."
+          depends="">
+    <delete dir="${target.dir}"/>
+  </target>
+
+  <target name="depend"
+          description="--> Set-up dependencies.">
+    <artifact:pom id="pom" file="pom.xml"/>
+    <artifact:dependencies
+        pomRefId="pom" useScope="compile" type="jar"
+        pathId="compile.classpath"/>
+    <artifact:dependencies
+        pomRefId="pom" useScope="runtime" type="jar"
+        pathId="runtime.classpath"/>
+    <artifact:dependencies
+        pomRefId="pom" useScope="runtime"
+        filesetId="runtime.fileset" versionsId="runtime.versions"/>
+    <property name="artifact"
+              value="${pom.artifactId}-${pom.version}.jar"/>
+  </target>
+
+  <target name="buildnumber" unless="buildnumber">
+    <tstamp>
+      <format property="buildnumber.date" pattern="yyyyMMdd"/>
+      <format property="buildnumber.time" pattern="HHmm"/>
+    </tstamp>
+    <property name="buildnumber"
+              value="${buildnumber.date}${buildnumber.time}"/>
+    <echo>${buildnumber}</echo>
+  </target>
+
+  <target name="classes"
+          description="--> Compile Java source."
+          depends="depend">
+    <mkdir dir="${target.classes.dir}"/>
+    <filter token="POM.ARTIFACTID" value="${pom.artifactId}"/>
+    <filter token="VENDOR" value="${vendor}"/>
+    <copy filtering="true" preservelastmodified="true"
+          todir="${target.classes.dir}">
+      <fileset dir="${src.dir}/main/resources"/>
+    </copy>
+    <javac destdir="${target.classes.dir}">
+      <compilerarg compiler="modern" value="-Xlint"/>
+      <compilerarg compiler="modern" value="-g:source,lines,vars"/>
+      <classpath>
+        <path refid="build.classpath"/>
+      </classpath>
+      <src path="${src.dir}/main/java"/>
+    </javac>
+    <taskdef classpathref="build.classpath"
+             resource="iprotium/util/ant/defaults.properties"/>
+    <jaxb-indexes-for classpathref="build.classpath"
+                      basedir="${target.classes.dir}"/>
+  </target>
+
+  <target name="jar"
+          description="--> Construct iprotium-upnp.jar."
+          depends="buildnumber,classes">
+    <jar destfile="${target.dir}/${artifact}">
+      <fileset dir="${target.classes.dir}"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <section name="iprotium/upnp/">
+          <attribute name="Extension-Name" value="iprotium.upnp"/>
+          <attribute name="Specification-Title" value="${pom.artifactId}"/>
+          <attribute name="Specification-Version" value="${pom.version}"/>
+          <attribute name="Specification-Vendor" value="${vendor}"/>
+          <attribute name="Implementation-Title" value="iprotium.upnp"/>
+          <attribute name="Implementation-Version"
+                     value="${pom.version}.${buildnumber.date}"/>
+          <attribute name="Implementation-Vendor" value="${vendor}"/>
+          <attribute name="Sealed" value="true"/>
+        </section>
+        <section name="iprotium/upnp/ant/taskdefs/">
+          <attribute name="Sealed" value="true"/>
+        </section>
+        <section name="iprotium/upnp/ssdp/">
+          <attribute name="Sealed" value="true"/>
+        </section>
+      </manifest>
+    </jar>
+    <jarlib-display file="${target.dir}/${artifact}"/>
+  </target>
+
+  <target name="install"
+          description="--> Installs pom.xml and artifacts to local repository."
+          depends="jar">
+    <artifact:install file="${target.dir}/${artifact}">
+      <pom refid="pom"/>
+    </artifact:install>
+  </target>
+
+  <target name="ssdp-discover"
+          description="--> Invokes &lt;ssdp-discover/&gt; task."
+          depends="classes">
+    <taskdef classpathref="build.classpath"
+             resource="iprotium/upnp/ant/defaults.properties"/>
+    <ssdp-discover/>
+  </target>
+
+</project>

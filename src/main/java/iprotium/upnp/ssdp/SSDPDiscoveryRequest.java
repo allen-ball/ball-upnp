@@ -1,0 +1,34 @@
+/*
+ * $Id$
+ *
+ * Copyright 2013 Allen D. Ball.  All rights reserved.
+ */
+package iprotium.upnp.ssdp;
+
+import org.apache.http.HttpHeaders;
+
+/**
+ * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
+ *
+ * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @version $Revision$
+ */
+public class SSDPDiscoveryRequest extends SSDPRequest {
+
+    /**
+     * {@link SSDPRequest} method name ({@value #METHOD})
+     */
+    public static final String METHOD = "M-SEARCH";
+
+    /**
+     * Sole constructor.
+     */
+    public SSDPDiscoveryRequest() {
+        super(METHOD);
+
+        addHeader(HttpHeaders.HOST, toString(ADDRESS));
+        addHeader(MAN, "\"ssdp:discover\"");
+        addHeader(MX, String.valueOf(120));
+        addHeader(ST, "ssdp:all");
+    }
+}
