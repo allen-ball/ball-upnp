@@ -52,16 +52,6 @@
               value="${pom.artifactId}-${pom.version}.jar"/>
   </target>
 
-  <target name="buildnumber" unless="buildnumber">
-    <tstamp>
-      <format property="buildnumber.date" pattern="yyyyMMdd"/>
-      <format property="buildnumber.time" pattern="HHmm"/>
-    </tstamp>
-    <property name="buildnumber"
-              value="${buildnumber.date}${buildnumber.time}"/>
-    <echo>${buildnumber}</echo>
-  </target>
-
   <target name="classes"
           description="--> Compile Java source."
           depends="depend">
@@ -88,30 +78,10 @@
 
   <target name="jar"
           description="--> Construct iprotium-upnp.jar."
-          depends="buildnumber,classes">
-    <jar destfile="${target.dir}/${artifact}">
+          depends="classes">
+    <zip destfile="${target.dir}/${artifact}">
       <fileset dir="${target.classes.dir}"/>
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <section name="iprotium/upnp/">
-          <attribute name="Extension-Name" value="iprotium.upnp"/>
-          <attribute name="Specification-Title" value="${pom.artifactId}"/>
-          <attribute name="Specification-Version" value="${pom.version}"/>
-          <attribute name="Specification-Vendor" value="${vendor}"/>
-          <attribute name="Implementation-Title" value="iprotium.upnp"/>
-          <attribute name="Implementation-Version"
-                     value="${pom.version}.${buildnumber.date}"/>
-          <attribute name="Implementation-Vendor" value="${vendor}"/>
-          <attribute name="Sealed" value="true"/>
-        </section>
-        <section name="iprotium/upnp/ant/taskdefs/">
-          <attribute name="Sealed" value="true"/>
-        </section>
-        <section name="iprotium/upnp/ssdp/">
-          <attribute name="Sealed" value="true"/>
-        </section>
-      </manifest>
-    </jar>
+    </zip>
     <jarlib-display file="${target.dir}/${artifact}"/>
   </target>
 

@@ -1,5 +1,8 @@
 2013-11-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* Annotated packages with @ManifestSection and use
+	ManifestSectionProcessor to generate JAR MANIFEST.MF.
+
 	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryCache.java:
 	Process send events to capture "local" changes.
 
