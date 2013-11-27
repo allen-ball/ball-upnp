@@ -64,8 +64,8 @@ public class SSDPDiscoverTask extends AbstractClasspathTask
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryRequest request) {
-        log(String.valueOf(request));
+    public void sendEvent(SSDPMessage message) {
+        log(String.valueOf(message));
     }
 
     @Override
