@@ -32,6 +32,7 @@ public class SSDPDiscoveryThread extends Thread {
      */
     public SSDPDiscoveryThread(int interval) throws SocketException {
         super();
+
         if (interval > 0) {
             this.interval = interval;
         } else {
@@ -130,9 +131,9 @@ public class SSDPDiscoveryThread extends Thread {
         /**
          * Callback made just before sending a {@link SSDPDiscoveryRequest}.
          *
-         * @param       request         The {@link SSDPDiscoveryRequest}.
+         * @param       message         The {@link SSDPMessage}.
          */
-        public void sendEvent(SSDPDiscoveryRequest request);
+        public void sendEvent(SSDPMessage message);
 
         /**
          * Callback made after receiving a {@link SSDPMessage}.

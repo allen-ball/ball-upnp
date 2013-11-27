@@ -1,5 +1,9 @@
 2013-11-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryThread.java:
+	Changed Listener.sendEvent(SSDPDiscoveryRequest) interface method
+	to sendEvent(SSDPMessage).
+
 	* src/main/java/iprotium/upnp/ssdp/SSDPNotifyRequest.java:
 	Initial writing.
 
