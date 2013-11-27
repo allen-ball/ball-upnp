@@ -37,6 +37,8 @@ public interface SSDPMessage extends HttpMessage {
     public static final String
         MAN = "MAN",
         MX = "MX",
+        NT = "NT",
+        NTS = "NTS",
         ST = "ST",
         USN = "USN";
 
