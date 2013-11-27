@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sms="urn:schemas-upnp-org:dm:sms" targetNamespace="urn:schemas-upnp-org:dm:sms" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2-20120216">
+	<xs:simpleType name="ActionName">
+		<xs:annotation>
+			<xs:documentation>UPnP action name.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token"/>
+	</xs:simpleType>
+	<xs:simpleType name="FilterExpression">
+		<xs:annotation>
+			<xs:documentation>ACL filter expression.  Syntax is based on XPath 1.0.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="RoleName">
+		<xs:annotation>
+			<xs:documentation>DeviceProtection role name.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token"/>
+	</xs:simpleType>
+	<xs:complexType name="ACL">
+		<xs:annotation>
+			<xs:documentation>ACL Data.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ACL" type="sms:ACLEntry" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ACLEntry">
+		<xs:annotation>
+			<xs:documentation>ACL entry.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Action" type="sms:ActionName"/>
+			<xs:choice>
+				<xs:element name="Filter" type="sms:FilterExpression"/>
+				<xs:element name="DUID"/>
+				<xs:element name="EUID"/>
+			</xs:choice>
+			<xs:element name="Roles">
+				<xs:simpleType>
+					<xs:list itemType="sms:RoleName"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ACL" type="sms:ACL">
+		<xs:annotation>
+			<xs:documentation>GetACLData() result</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

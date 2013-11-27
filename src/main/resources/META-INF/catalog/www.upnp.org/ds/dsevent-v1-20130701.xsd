@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:ds:dsevent" xmlns:dsevent="urn:schemas-upnp-org:ds:dsevent" targetNamespace="urn:schemas-upnp-org:ds:dsevent" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20130703">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        DataStoreInfo schema for UPnP DataStore service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="StateEvent">
+    <xsd:complexType>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="create" minOccurs="0">
+          <xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:element name="datastoretable" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="tableGUID" type="xsd:string" use="required"/>
+                  <xsd:attribute name="tableURN" type="xsd:string" use="required"/>
+                  <xsd:attribute name="updateID" type="xsd:integer" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="datastoregroup" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="groupName" type="xsd:string" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:group ref="dsevent:events.vx.group"/>
+            </xsd:choice>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="update" minOccurs="0">
+          <xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:element name="datastoretable" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="tableGUID" type="xsd:string" use="required"/>
+                  <xsd:attribute name="tableURN" type="xsd:string" use="required"/>
+                  <xsd:attribute name="updateType" type="xsd:string" use="required"/>
+                  <xsd:attribute name="updateID" type="xsd:integer" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:group ref="dsevent:events.vx.group"/>
+            </xsd:choice>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="delete" minOccurs="0">
+          <xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:element name="datastoretable" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="tableGUID" type="xsd:string" use="required"/>
+                  <xsd:attribute name="tableURN" type="xsd:string" use="required"/>
+                  <xsd:attribute name="updateID" type="xsd:integer" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:element name="datastoregroup" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="groupName" type="xsd:string" use="required"/>
+                </xsd:complexType>
+              </xsd:element>
+              <xsd:group ref="dsevent:events.vx.group"/>
+            </xsd:choice>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:group ref="dsevent:events.vx.group"/>
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:group name="events.vx.group">
+    <xsd:choice>
+      <xsd:any namespace="##other"/>
+    </xsd:choice>
+  </xsd:group>
+</xsd:schema>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:schemas-upnp-org:phone:mms" xmlns:mms="urn:schemas-upnp-org:phone:mms" xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified">
+    
+    <simpleType name="mediaCapabilityFormatType">
+        <restriction base="string">
+            <enumeration value="SDP" />
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="mediaSessionStatusValueType">
+        <restriction base="string">
+            <enumeration value="Started" />
+            <enumeration value="Stopped" />
+        </restriction>
+    </simpleType>
+    
+    <simpleType name="mediaSessionStatusReasonType">
+        <restriction base="string">
+            <enumeration value="Modified" />
+            <enumeration value="ModifyFailed" />
+            <enumeration value="Error" />
+        </restriction>
+    </simpleType>
+    
+    <complexType name="mediaSessionInfoType">
+        <sequence>
+            
+            <element name="mediaSessionID" form="unqualified" type="string" />
+            
+            <element name="mediaSessionStatus" form="unqualified" nillable="true">
+                <complexType>
+                    <simpleContent>
+                        <extension base="mms:mediaSessionStatusValueType">
+                            <attribute name="reason" form="unqualified" type="mms:mediaSessionStatusReasonType" use="optional" />
+                        </extension>
+                    </simpleContent>
+                </complexType>
+            </element>
+            
+            <element name="mediaCapability" form="unqualified" nillable="true">
+                <complexType>
+                    <simpleContent>
+                        <extension base="string">
+                            <attribute name="format" form="unqualified" type="mms:mediaCapabilityFormatType" use="required" />
+                        </extension>
+                    </simpleContent>
+                </complexType>
+            </element>
+            
+        </sequence>
+    </complexType>
+    
+    <complexType name="contentSharingCapabilityType">
+        <sequence>
+            <element name="protocolInfo" type="string" minOccurs="0" />
+            <element name="URI" type="anyURI" minOccurs="0" />
+            <element name="sharingType" minOccurs="0" >
+                <simpleType>
+                    <restriction base="string">
+                        <enumeration value="transfer" />
+                        <enumeration value="streaming" />
+                    </restriction>
+                </simpleType>
+            </element>
+        </sequence>
+    </complexType>
+    
+    <element name="mediaCapabilityInfo">
+        <complexType>        
+            <sequence>
+                <element name="mediaCapability" form="unqualified" nillable="true">
+                    <complexType>
+                        <simpleContent>
+                            <extension base="string">
+                                <attribute name="format" form="unqualified" type="mms:mediaCapabilityFormatType" use="required" />
+                            </extension>
+                        </simpleContent>
+                    </complexType>
+                </element>   
+                <element name="contentSharingCapability" type="mms:contentSharingCapabilityType" minOccurs="0" />
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="mediaSessionInfo" type="mms:mediaSessionInfoType" />
+    
+    <element name="mediaSessionInfoList">
+        <complexType>
+            <choice maxOccurs="unbounded">
+                <element name="mediaSessionInfo" form="unqualified" type="mms:mediaSessionInfoType"/>
+            </choice>
+            
+        </complexType>
+    </element>
+    
+</schema>

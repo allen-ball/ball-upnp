@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:ds:drecs" targetNamespace="urn:schemas-upnp-org:ds:drecs" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        Sensor DataRecord schema for UPnP DataStore and SensorTransportGeneric services, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="DataRecords">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="datarecord">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="field">
+                <xsd:complexType>
+                  <xsd:simpleContent>
+                    <xsd:extension base="xsd:string">
+                      <xsd:attribute name="name" type="xsd:string" use="required"/>
+                      <xsd:attribute name="type" type="dataitem_types_allowed" use="optional"/>
+                      <xsd:attribute name="encoding" type="dataitem_encodings_allowed" use="optional"/>
+                      <xsd:attribute name="namespace" type="xsd:string" use="optional"/>
+                    </xsd:extension>
+                  </xsd:simpleContent>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <!-- DataItem Type Ontologies (DataItem type= attribute)-->
+  <xsd:simpleType name="dataitem_types_allowed_xsd">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="xsd:string"/>
+      <xsd:enumeration value="xsd:boolean"/>
+      <xsd:enumeration value="xsd:decimal"/>
+      <xsd:enumeration value="xsd:float"/>
+      <xsd:enumeration value="xsd:double"/>
+      <xsd:enumeration value="xsd:dutation"/>
+      <xsd:enumeration value="xsd:dateTime"/>
+      <xsd:enumeration value="xsd:time"/>
+      <xsd:enumeration value="xsd:date"/>
+      <xsd:enumeration value="xsd:gYearMonth"/>
+      <xsd:enumeration value="xsd:gYear"/>
+      <xsd:enumeration value="xsd:gMonthDay"/>
+      <xsd:enumeration value="xsd:gDay"/>
+      <xsd:enumeration value="xsd:gMonth"/>
+      <xsd:enumeration value="xsd:hexBinary"/>
+      <xsd:enumeration value="xsd:base64Binary"/>
+      <xsd:enumeration value="xsd:anyURI"/>
+      <xsd:enumeration value="xsd:QName"/>
+      <xsd:enumeration value="xsd:NOTATION"/>
+      <xsd:enumeration value="xsd:normalizedString"/>
+      <xsd:enumeration value="xsd:token"/>
+      <xsd:enumeration value="xsd:language"/>
+      <xsd:enumeration value="xsd:NMTOKEN"/>
+      <xsd:enumeration value="xsd:NMTOKENS"/>
+      <xsd:enumeration value="xsd:Name"/>
+      <xsd:enumeration value="xsd:NCName"/>
+      <xsd:enumeration value="xsd:ID"/>
+      <xsd:enumeration value="xsd:IDREF"/>
+      <xsd:enumeration value="xsd:IDREFS"/>
+      <xsd:enumeration value="xsd:ENTITY"/>
+      <xsd:enumeration value="xsd:ENTITIES"/>
+      <xsd:enumeration value="xsd:integer"/>
+      <xsd:enumeration value="xsd:nonPositiveInteger"/>
+      <xsd:enumeration value="xsd:negativeInteger"/>
+      <xsd:enumeration value="xsd:long"/>
+      <xsd:enumeration value="xsd:int"/>
+      <xsd:enumeration value="xsd:short"/>
+      <xsd:enumeration value="xsd:byte"/>
+      <xsd:enumeration value="xsd:nonNegativeInteger"/>
+      <xsd:enumeration value="xsd:unsignedLong"/>
+      <xsd:enumeration value="xsd:unsignedInt"/>
+      <xsd:enumeration value="xsd:unsignedShort"/>
+      <xsd:enumeration value="xsd:unsignedByte"/>
+      <xsd:enumeration value="xsd:positveInteger"/>
+      <xsd:enumeration value="xsd:yearMonthDuration"/>
+      <xsd:enumeration value="xsd:dayTimeDuration"/>
+      <xsd:enumeration value="xsd:dateTimeStamp"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_uda">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="uda:ui1"/>
+      <xsd:enumeration value="uda:ui2"/>
+      <xsd:enumeration value="uda:ui4"/>
+      <xsd:enumeration value="uda:i1"/>
+      <xsd:enumeration value="uda:i2"/>
+      <xsd:enumeration value="uda:i4"/>
+      <xsd:enumeration value="uda:int"/>
+      <xsd:enumeration value="uda:r4"/>
+      <xsd:enumeration value="uda:r8"/>
+      <xsd:enumeration value="uda:number"/>
+      <xsd:enumeration value="uda:fixed.14.4"/>
+      <xsd:enumeration value="uda:float"/>
+      <xsd:enumeration value="uda:char"/>
+      <xsd:enumeration value="uda:string"/>
+      <xsd:enumeration value="uda:date"/>
+      <xsd:enumeration value="uda:dateTime"/>
+      <xsd:enumeration value="uda:dateTime.tz"/>
+      <xsd:enumeration value="uda:time"/>
+      <xsd:enumeration value="uda:time.tz"/>
+      <xsd:enumeration value="uda:boolean"/>
+      <xsd:enumeration value="uda:bin.base64"/>
+      <xsd:enumeration value="uda:bin.hex"/>
+      <xsd:enumeration value="uda:uri"/>
+      <xsd:enumeration value="uda:uuid"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_upnp">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="upnp:urn:schemas-upnp-org:service:.+:.+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_xml">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="xml:.+:.$"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_mds">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="mds:MDSAttributes"/>
+      <xsd:enumeration value="mds:MOCMetricAttributes"/>
+      <xsd:enumeration value="mds:MDSObservation"/>
+      <xsd:enumeration value="mds:AbsoluteTime"/>
+      <xsd:enumeration value="mds:RelativeTime"/>
+      <xsd:enumeration value="mds:HighResRelativeTime"/>
+      <xsd:enumeration value="mds:PmSegmentEntryMap"/>
+      <xsd:enumeration value="mds:SegmentElement"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_csv">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="(((xsd:[^,]+)|(uda:[^,]+)|(upnp:[^,]+)|(xml:[^,]+)|(mds:[^,]+)),)+((xsd:[^,]+)|(uda:[^,]+)|(upnp:[^,]+)|(xml:[^,]+)|(mds:.*)){1}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed_other">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value=""/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="dataitem_types_allowed">
+    <xsd:union  memberTypes="dataitem_types_allowed_xsd dataitem_types_allowed_uda dataitem_types_allowed_upnp dataitem_types_allowed_xml dataitem_types_allowed_mds dataitem_types_allowed_csv dataitem_types_allowed_other" />
+  </xsd:simpleType>
+  <!-- DataItem Encodings (DataItem encoding= attribute)-->
+  <xsd:simpleType name="dataitem_encodings_allowed">
+    <xsd:restriction base="xsd:token">
+      <xsd:enumeration value="ascii"/>
+      <xsd:enumeration value="utf-8"/>
+      <xsd:enumeration value="base64"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>
+
+

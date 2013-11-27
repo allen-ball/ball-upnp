@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-upnp-org:qos:ListOfQphPolicyRule.xsd" xmlns:pr="urn:schemas-upnp-org:qos:QphPolicyRule.xsd" targetNamespace="urn:schemas-upnp-org:qos:ListOfQphPolicyRule.xsd" elementFormDefault="qualified" id="ListOfQphPolicyRulev1.xsd">
+  
+  <xs:import namespace="urn:schemas-upnp-org:qos:QphPolicyRule.xsd" schemaLocation="http://www.upnp.org/schemas/qos/QphPolicyRule-v3.xsd"/>
+  
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+		 LisOfQphPolicyRule.
+		 This is for version 3.0 of UPnP QoS specification
+		 Copyright 2004-2007 Contributing Members of the UPnP Forum.  All rights reserved.
+		 Schema Location: "http://www.upnp.org/schemas/qos/ListOfQphPolicyRule-v3.xsd"
+	   </xs:documentation>
+  </xs:annotation>
+  
+  <xs:element name="ListOfQphPolicyRule" type="ListOfQphPolicyRuleType"/>
+  
+  <xs:complexType name="ListOfQphPolicyRuleType">
+    <xs:sequence>
+      <xs:element name="NumberQphPolicyRule" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="QphPolicyList" type="QphPolicyListType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="QphPolicyListType">
+    <xs:sequence>
+      <xs:element name="QphPolicyRule" type="pr:QphPolicyRuleType"/>
+      <xs:element name="PolicyHandle" type="xs:nonNegativeInteger"/>
+      <xs:element name="Position" type="xs:nonNegativeInteger"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>

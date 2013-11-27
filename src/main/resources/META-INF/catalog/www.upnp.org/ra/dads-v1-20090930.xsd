@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:schemas-upnp-org:ra:dads" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:dads="urn:schemas-upnp-org:ra:dads">
+
+    <complexType name="dads.type">
+        <choice>
+        	<element name="systemInfo" type="dads:systemInfo.type"></element>
+        	<element name="deviceInfoList"
+        		type="dads:deviceInfoList.type">
+        	</element>
+            <element name="filterList" type="dads:filterList.type"></element>
+            <any namespace="##other" processContents="lax" minOccurs="0"
+        		maxOccurs="unbounded">
+        	</any>
+        </choice>
+        <anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <element name="dads" type="dads:dads.type"></element>
+
+    <complexType name="systemInfo.type">
+    	<sequence>
+    		<group ref="dads:networks.group"></group>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<attribute name="updateID" type="int" use="required"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="deviceInfoList.type">
+    	<sequence>
+    		<element name="deviceInfo" type="dads:listDeviceInfo.type" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+    
+
+    <group name="networks.group">
+    	<sequence>
+    		<element name="localNetwork" type="dads:localNetwork.type" maxOccurs="1" minOccurs="1"></element>
+    		<element name="remoteNetwork" type="dads:remoteNetwork.type" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </group>
+
+    <complexType name="localNetwork.type">
+    	<sequence>
+    		<element name="rada" type="dads:localRADAInfo.type" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="remoteNetwork.type">
+    	<sequence>
+    		<element name="rata" type="dads:rataInfo.type" maxOccurs="1"
+    			minOccurs="1">
+    		</element>
+    		<element name="rada" type="dads:remoteRADAInfo.type"
+    			maxOccurs="1" minOccurs="1">
+    		</element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="radaInfo.type" abstract="true">
+    	<sequence>
+    		<element name="deviceInfo" type="dads:radaDeviceInfo.type"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    	</sequence>
+    	<attribute name="uuid" type="string" use="required"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="rataInfo.type">
+    	<sequence>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<attribute name="credentialID" type="string" use="required"></attribute>
+    	<attribute name="connected" type="boolean" use="required"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <attributeGroup name="radaRemote.attributes">
+    	<attribute name="dddLocation" type="anyURI"></attribute>
+    	<attribute name="importControlMode"
+    		type="dads:accessControlMode.values">
+    	</attribute>
+    	<attribute name="heartbeat" type="int"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </attributeGroup>
+
+
+    <simpleType name="accessControlMode.values">
+    	<restriction base="token">
+    		<enumeration value="allowList"></enumeration>
+    		<enumeration value="denyList"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="remoteRADAInfo.type">
+    	<complexContent>
+    		<extension base="dads:radaInfo.type">    			<sequence>    				<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    			</sequence>
+    			<attribute name="dddLocation" type="anyURI"
+    				use="required">
+    			</attribute>
+    			<attribute name="importControlMode"
+    				type="dads:accessControlMode.values" use="required">
+    			</attribute>
+    			<attribute name="heartbeat" type="int" use="required"></attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="localRADAInfo.type">
+    	<complexContent>
+    		<extension base="dads:radaInfo.type">
+    			<sequence>
+                    <any namespace="##other" processContents="lax"
+    					minOccurs="0" maxOccurs="unbounded">
+    				</any>
+    			</sequence>
+    			<attribute name="exportControlMode"
+    				type="dads:accessControlMode.values" use="required">
+    			</attribute>
+    		</extension>
+    	</complexContent>
+    </complexType>
+    
+    <complexType name="accessControl.type">
+    	<sequence>
+    		<element name="access" type="dads:access.type"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="access.type">
+    	<sequence>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="1"></any>
+    	</sequence>
+    	<attribute name="credentialID" type="string"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+
+    <complexType name="radaDeviceInfo.type">
+    	<complexContent>
+            <restriction base="dads:deviceInfo.type">
+    			<sequence>
+    				<element name="accessControl" type="dads:accessControl.type" maxOccurs="1" minOccurs="1">
+    				</element>    			</sequence>
+
+    			<attribute name="cache-control" type="int" use="required">
+    			</attribute>
+    			<attribute name="descriptionDocument" type="anyURI" use="required">
+    			</attribute>
+    			<attribute name="server" type="string" use="required"></attribute>
+    		</restriction>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="filterList.type">
+    	<sequence>
+    		<element name="filter" type="dads:filter.type"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="filter.type">
+    	<sequence>
+    		<element name="deviceInfo" type="dads:filterDeviceInfo.type" maxOccurs="unbounded" minOccurs="0"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<attribute name="target" type="string" use="required"></attribute>
+    	<attribute name="controlMode" type="dads:accessControlMode.values" use="required"></attribute>
+    	<attribute name="updateType" type="dads:updateType.values" use="required"></attribute>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <simpleType name="updateType.values">
+    	<restriction base="token">
+    		<enumeration value="add"></enumeration>
+    		<enumeration value="edit"></enumeration>
+    		<enumeration value="delete"></enumeration>
+    	</restriction>
+    </simpleType>
+
+
+    <complexType name="filterDeviceInfo.type">
+    	<complexContent>
+    		<restriction base="dads:deviceInfo.type">
+    			<sequence>
+    				<element name="accessControl" type="dads:accessControl.type" maxOccurs="1" minOccurs="1"></element>
+    			</sequence>
+    			<attribute name="cache-control" type="int"
+    				use="prohibited">
+    			</attribute>
+    			<attribute name="descriptionDocument" type="anyURI"
+    				use="prohibited">
+    			</attribute>
+    			<attribute name="server" type="string"
+    				use="prohibited">
+    			</attribute>
+    		</restriction>
+    	</complexContent>
+    </complexType>
+
+    <complexType name="deviceInfo.type">
+
+    	<sequence>
+    		<element name="accessControl" type="dads:accessControl.type"
+    			maxOccurs="1" minOccurs="0">
+    		</element>
+
+    		<any namespace="##other" processContents="lax" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</any>
+    	</sequence>
+    	<attribute name="uuid" type="string" use="required"></attribute>
+    	<attribute name="cache-control" type="int" use="optional"></attribute>
+    	<attribute name="descriptionDocument" type="anyURI"
+    		use="optional">
+    	</attribute>
+    	<attribute name="server" type="string" use="optional"></attribute>    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+    
+    <complexType name="listDeviceInfo.type">
+    	<complexContent>
+    		<restriction base="dads:deviceInfo.type">
+    			<sequence>
+    				<element name="accessControl" type="dads:accessControl.type" maxOccurs="0" minOccurs="0"></element>
+    			</sequence>
+    			<attribute name="cache-control" type="int"
+    				use="required">
+    			</attribute>
+    			<attribute name="descriptionDocument" type="anyURI"
+    				use="required">
+    			</attribute>
+    			<attribute name="server" type="string"
+    				use="required">
+    			</attribute>
+    		</restriction>
+    	</complexContent>
+    </complexType>    
+    
+</schema>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Swade (x) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-upnp-org:qos:AdmitTrafficQosExtendedResult" xmlns:at="urn:schemas-upnp-org:qos:AdmitTrafficQosExtendedResult" targetNamespace="urn:schemas-upnp-org:qos:AdmitTrafficQosExtendedResult" elementFormDefault="qualified" id="AdmitTrafficQosExtendedResult">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+		  This file describes the schema for the AdmitTrafficQosExtendedResults
+		  This is for Version 3.0 of the UPnP QoS specification
+	          Copyright 2007-2008 Contributing Members of the UPnP Forum. All rights reserved.
+
+		  Schema Location: "http://www.upnp.org/schemas/qos/AdmitTrafficQosExtendedResult-v3.xsd"
+		</xs:documentation>
+	</xs:annotation>
+	<!-- Root element -->
+	<xs:element name="AdmitTrafficQosExtendedResult" type="AdmitTrafficQosExtendedResultType"/>
+	<!-- Root element definition -->
+	<xs:complexType name="AdmitTrafficQosExtendedResultType">
+		<xs:sequence>
+			<xs:element name="TrafficHandle" type="xs:string"/>
+			<xs:choice>
+				<xs:element name="AdmissionStatusNet" type="AdmissionStatusNetType"/>
+				<xs:element name="AdmissionStatusDev" type="AdmissionStatusDevType"/>
+			</xs:choice>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- End of definition for root element AdmitTrafficQosExtendedResultType -->
+	<xs:complexType name="AdmissionStatusNetType">
+		<xs:sequence>
+			<xs:element name="Reason" type="xs:string"/>
+			<xs:element name="ListOfLayer2StreamIds" type="ListOfLayer2StreamIdsType" minOccurs="0"/>
+			<xs:element name="AllocatedResources" type="AllocatedResourcesType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AdmissionStatusDevType">
+		<xs:sequence>
+			<xs:element name="DeviceId" type="xs:string"/>
+			<xs:element name="Reason" type="xs:string"/>
+			<xs:element name="ListOfLayer2StreamIds" type="ListOfLayer2StreamIdsType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ListOfLayer2StreamIdsType">
+		<xs:sequence>
+			<xs:element name="NumberOfLayer2StreamIds" type="xs:integer"/>
+			<xs:element name="Layer2Stream" type="Layer2StreamIdType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Layer2StreamIdType">
+		<xs:sequence>
+			<xs:element name="Layer2StreamId" type="Layer2StreamId64Type"/>
+			<xs:element name="TrafficDescriptorAvailable" type="xs:boolean"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AllocatedResourcesType">
+		<xs:sequence>
+			<!-- End to end allocations go here. Here's an example -->
+			<xs:element name="MaxCommittedDelay" type="xs:unsignedInt" minOccurs="0"/>
+			<xs:element name="MaxCommittedJitter" type="xs:unsignedInt" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="v4type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="Layer2StreamId64Type">
+		<xs:restriction base="xs:string">
+			<xs:length value="64" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

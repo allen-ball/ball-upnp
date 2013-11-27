@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:tns="urn:schemas-upnp-org:phone:AddressBook" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:peer="urn:schemas-upnp-org:phone:peer" targetNamespace="urn:schemas-upnp-org:phone:AddressBook" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+    <import namespace="urn:schemas-upnp-org:phone:peer" schemaLocation="http://www.upnp.org/schemas/phone/peer-v2.xsd"/>
+    <element name="incomingRequest"> 
+        <annotation>
+            <documentation>Corresponding state variable: IncomingRequest</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element name="request" type="tns:request" minOccurs="0" />
+            </sequence>
+        </complexType>
+    </element>
+    <element name="incomingRequests">
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_IncomingRequests</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element name="request" type="tns:request" minOccurs="0" maxOccurs="unbounded" />
+            </sequence>
+        </complexType>
+    </element>
+    <element name="sharedContacts">
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_SharedContacts</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element name="contact" type="peer:peerType" minOccurs="1" maxOccurs="unbounded" />
+            </sequence>
+        </complexType>
+    </element>
+    <element name="sharedInfo" type="string">
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_SharedInfo</documentation>
+        </annotation>
+    </element>
+    <element name="targetContacts">
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_TargetContacts</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element name="contact" type="peer:peerType" minOccurs="1" maxOccurs="unbounded" />
+            </sequence>
+        </complexType>
+    </element>
+    <element name="reqID" type="string" >
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_ReqID</documentation>
+        </annotation>
+    </element>
+    <element name="networkAddressBookID" type="string">
+        <annotation>
+            <documentation>Corresponding state variable: A_ARG_TYPE_NetworkAddressBookID</documentation>
+        </annotation>
+    </element>
+    <complexType name="request">
+        <sequence>
+            <element name="type" type="string" />
+            <element name="reqID" type="string" />
+            <element name="fromcontactid" type="tns:fromcontactid" />
+            <element name="status" type="tns:status" />
+            <element name="note" type="string" minOccurs="0"></element>
+            <element name="sharedinformationURL" type="string" minOccurs="0" />
+        </sequence>
+    </complexType>
+    <complexType name="fromcontactid">
+        <sequence>
+            <element name="id" type="peer:id" />
+        </sequence>
+    </complexType>
+    <simpleType name="status">
+        <restriction base="string">
+            <enumeration value="Pending"></enumeration>
+            <enumeration value="Accepted"></enumeration>
+            <enumeration value="Rejected"></enumeration>
+        </restriction>
+    </simpleType>
+</schema>

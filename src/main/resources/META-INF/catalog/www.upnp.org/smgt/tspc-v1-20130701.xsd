@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:smgt:tspc" targetNamespace="urn:schemas-upnp-org:smgt:tspc" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20130701">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        Sensor TransportConnections schema for UPnP SensorTransportGeneric service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="TransportConnections">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="transportconnection" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:attribute name="sensorID" use="required"/>
+            <xsd:attribute name="transportConnectionID" use="required"/>
+            <xsd:attribute name="transportURL" use="required"/>
+            <xsd:attribute name="sensorClientID" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
+
+
+
+

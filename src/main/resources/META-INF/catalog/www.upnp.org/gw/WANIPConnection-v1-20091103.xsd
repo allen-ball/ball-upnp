@@ -1,0 +1,25 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="urn:schemas-upnp-org:gw:WANIPConnection"
+ xmlns="urn:schemas-upnp-org:gw:WANIPConnection"
+ elementFormDefault="qualified">
+  <xs:element name="PortMappingList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="PortMappingEntry" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="NewRemoteHost" type="xs:string" /> 
+              <xs:element name="NewExternalPort" type="xs:unsignedShort" /> 
+              <xs:element name="NewProtocol" type="xs:string" /> 
+              <xs:element name="NewInternalPort" type="xs:unsignedShort" /> 
+              <xs:element name="NewInternalClient" type="xs:string" /> 
+              <xs:element name="NewEnabled" type="xs:string" /> 
+              <xs:element name="NewDescription" type="xs:string" /> 
+              <xs:element name="NewLeaseTime" type="xs:unsignedInt" /> 
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 U (http://www.altova.com) by Vlad Stirbu (Nokia) -->
+<schema targetNamespace="urn:schemas-upnp-org:ra:tacfg:ipsec" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ipsec="urn:schemas-upnp-org:ra:tacfg:ipsec">
+	<complexType name="configuration.type">
+		<sequence>
+			<element name="policy" type="ipsec:policy.type" />
+			<element name="ike" type="ipsec:ike.type" />
+		</sequence>
+		<attribute name="configurationType" type="ipsec:configurationType.value" use="required"></attribute>
+	</complexType>
+	<complexType name="ike.type">
+		<sequence>
+			<element name="remoteAddress" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						IP address or the FQDN of the RAS. Must be
+						present in any instance if the configurationType
+						attribute of ipsecCFG is "client".
+					</documentation>
+				</annotation>
+			</element>
+			<element name="sendNotification" type="boolean" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+						Determine if the peer sends IKE notification
+						messages when error occurs. Set the value to
+						TRUE to make troublkeshooting easier.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="idType" type="ipsec:idType.value" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+						Determines how the RAC identifies itself to the
+						RAS.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="useIPsecExpire" type="boolean" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+						Determine the IPsec SAs expiration policy: TRUE
+						when the IKE SA that used to negotiate them
+						expires or is deleted, and FALSE accordind to
+						their lifetime.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="useReplayDetection" type="boolean" maxOccurs="1" minOccurs="1"/>
+			<element name="useInternalAddress" type="boolean" minOccurs="0">
+				<annotation>
+					<documentation>
+						Determines whether the RAC aquires an IP address
+						from the hone network address pool making it
+						virtually part of the home network. Default
+						value is TRUE. Must be present in any instance
+						if the configurationType attribute of ipsecCFG
+						is "client".
+					</documentation>
+				</annotation>
+			</element>
+			<element name="useNATProbe" type="boolean" minOccurs="0">
+				<annotation>
+					<documentation>
+						Use the functionality defined in RFC 3947 for
+						IKEv1 or RFC 4306 for IKEv2. Must be present in
+						any instance if the configurationType attribute
+						of ipsecCFG is "client".
+					</documentation>
+				</annotation>
+			</element>
+			<element name="dpdHeartbeat" type="integer" minOccurs="0">
+				<annotation>
+					<documentation>
+						Determines how often the RAC uses the Dead Peer
+						Detection (DPD) feature defined in RFC 3706.
+						Must be present in any instance if the
+						configurationType attribute of ipsecCFG is
+						"client".
+					</documentation>
+				</annotation>
+			</element>
+			<element name="natKeepalive" type="integer" minOccurs="0">
+				<annotation>
+					<documentation>
+						Determines how often the RAC sends an empty UDP
+						packet to port 4500 of the RAS. Must be present
+						in any instance if the configurationType
+						attribute of ipsecCFG is "client".
+					</documentation>
+				</annotation>
+			</element>
+			<element name="rekeyingThreshold" type="integer" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+						Starts the IKE SA rekeying when the specified
+						percentage of the IKE SA expiration timeout is
+						reached. Accepted percentage values are in the
+						range of 70 to 95.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="proposal" type="ipsec:ikeProposal.type" maxOccurs="unbounded"/>
+			<element name="authenticationMethod" type="ipsec:authenticationMethod.value" maxOccurs="1" minOccurs="1"/>
+			<element name="credentialID" type="integer" maxOccurs="1" minOccurs="1"/>
+		</sequence>
+		<attribute name="version" type="ipsec:keyExchangeProtocolVersion.value" use="required"/>
+	</complexType>
+	<simpleType name="authenticationMethod.value">
+		<annotation>
+			<documentation>
+				Allowed authentication methods values are defined in
+				RFC4306 and other RFCs and should be checked with IANA.
+			</documentation>
+		</annotation>
+		<restriction base="token">
+			<enumeration value="RSA Digital Signature"/>
+			<enumeration value="Shared Key Message Integrity Code"/>
+			<enumeration value="DSS Digital Signature"/>
+			<enumeration value="EAP"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="encryptionAlgorithm.value">
+		<annotation>
+			<documentation>
+        		Allowed encryption algorithms values are defined in
+        		RFC4306 and other RFCs and should be checked with IANA.
+        	</documentation>
+		</annotation>
+		<restriction base="token">
+			<enumeration value="DES_IV64"/>
+			<enumeration value="DES"/>
+			<enumeration value="3DES"/>
+			<enumeration value="RC5"/>
+			<enumeration value="IDEA"/>
+			<enumeration value="CAST"/>
+			<enumeration value="BLOWFISH"/>
+			<enumeration value="3IDEA"/>
+			<enumeration value="DES_IV32"/>
+			<enumeration value="NULL"/>
+			<enumeration value="AES_CBC"/>
+			<enumeration value="AES_CTR"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="authenticationAlgorithm.value">
+		<restriction base="token"/>
+	</simpleType>
+	<simpleType name="groupDescription.value">
+		<restriction base="token"/>
+	</simpleType>
+	<complexType name="lifetime.type">
+		<sequence>
+			<element name="seconds" type="integer"/>
+			<element name="kBytes" type="integer" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<simpleType name="groupType.value">
+		<restriction base="token"/>
+	</simpleType>
+	<complexType name="policy.type">
+		<annotation>
+			<documentation>
+        		Determines if IKE initiates a new Diffie-Helman exchange
+        		to obtain new master key keying material for each new
+        		session key that IPsec SAs require.
+        	</documentation>
+		</annotation>
+		<sequence>
+			<element name="perfectForwardSecrecy" type="boolean" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+        				Determines if IKE initiates a new Diffie-Hellman
+        				echange to obtain new master key keying material
+        				for each new session key that IPsec SAs require.
+        			</documentation>
+				</annotation>
+			</element>
+			<element name="replayWindowLength" type="positiveInteger" minOccurs="1" maxOccurs="1">
+				<annotation>
+					<documentation>
+        				Determine if the antireplay service for the
+        				IPsec SA is used. The maximum supported value is
+        				32.
+        			</documentation>
+				</annotation>
+			</element>
+			<element name="remoteIdentity" type="string" maxOccurs="1" minOccurs="1">
+				<annotation>
+					<documentation>
+        				Determines the identity of the remote host.
+        			</documentation>
+				</annotation>
+			</element>
+			<element name="proposal" type="ipsec:espProposal.type" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<element name="ipsecCFG" type="ipsec:configuration.type">
+		<annotation>
+			<documentation>
+    			This is the root element of an IPsec configuration
+    			datastructure. The aim is to be able to configure ESP
+    			with IKEv1 or IKEv2 for UPnP Remote Access.
+    		</documentation>
+		</annotation>
+	</element>
+	<simpleType name="idType.value">
+		<restriction base="token">
+			<enumeration value="ID_IPV4_ADDR"/>
+			<enumeration value="ID_FQDN"/>
+			<enumeration value="ID_RFC822_ADDR"/>
+			<enumeration value="ID_IPV6_ADDR"/>
+			<enumeration value="ID_DER_ASN1_DN"/>
+			<enumeration value="ID_DER_ASN1_GN"/>
+			<enumeration value="ID_KEY_ID"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="pseudoRandomFunction.value">
+		<annotation>
+			<documentation>
+        		Allowed pseudo-random functions values are defined in
+        		RFC4306 and other RFCs and should be checked with IANA.
+        	</documentation>
+		</annotation>
+		<restriction base="token">
+			<enumeration value="HMAC_MD5"/>
+			<enumeration value="HMAC_SHA1"/>
+			<enumeration value="HMAC_TIGER"/>
+			<enumeration value="AES128_XCBC"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="integrityAlgorithm.value">
+		<annotation>
+			<documentation>
+        		Allowed integrity algorithms values are defined in
+        		RFC4306 and other RFCs and should be checked with IANA.
+        	</documentation>
+		</annotation>
+		<restriction base="token">
+			<enumeration value="HMAC_MD5_96"/>
+			<enumeration value="HMAC_SHA1_96"/>
+			<enumeration value="DES_MAC"/>
+			<enumeration value="KPDK_MD5"/>
+			<enumeration value="AES_XCBC_96"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="encryptionKeyLength.value">
+		<restriction base="integer"/>
+	</simpleType>
+	<complexType name="proposal.type">
+		<sequence>
+			<element name="encryptionAlgorithm" type="ipsec:encryptionAlgorithm.type" maxOccurs="1" minOccurs="0"/>
+			<element name="integrityAlgorithm" type="ipsec:integrityAlgorithm.value" minOccurs="0"/>
+			<element name="pseudoRandomFunction" type="ipsec:pseudoRandomFunction.value" minOccurs="0"/>
+			<element name="groupDescription" type="ipsec:groupDescription.value" minOccurs="0"/>
+			<element name="groupType" type="ipsec:groupType.value" minOccurs="0"/>
+			<element name="lifetime" type="ipsec:lifetime.type" maxOccurs="1" minOccurs="0"/>
+		</sequence>
+		<attribute name="protocol" type="token"/>
+	</complexType>
+	<simpleType name="credentialEncoding.value">
+		<restriction base="token">
+			<enumeration value="PKCS #7 wrapped X.509 certificate"/>
+			<enumeration value="PGP Certificate"/>
+			<enumeration value="DNS Signed Key"/>
+			<enumeration value="X.509 Certificate - Signature"/>
+			<enumeration value="Kerberos Token"/>
+			<enumeration value="Certificate Revocation List (CRL)"/>
+			<enumeration value="Authority Revocation List (ARL)"/>
+			<enumeration value="SPKI Certificate"/>
+			<enumeration value="X.509 Certificate - Attribute"/>
+			<enumeration value="Raw RSA Key"/>
+			<enumeration value="Hash and URL of X.509 certificate"/>
+			<enumeration value="Hash and URL of X.509 bundle"/>
+			<enumeration value="Pre-Shared Key"/>
+		</restriction>
+	</simpleType>
+	<element name="ipsecOPT" type="ipsec:option.type"/>
+	<complexType name="option.type">
+		<sequence>
+			<element name="encryptionAlgorithm" maxOccurs="unbounded" type="ipsec:encryptionAlgorithm.type"></element>
+			<element name="authenticationAlgorithm" type="ipsec:authenticationAlgorithm.value" maxOccurs="unbounded"/>
+			<element name="integrityAlgorithm" type="ipsec:integrityAlgorithm.value" maxOccurs="unbounded"/>
+			<element name="pseudoRandomFunction" type="ipsec:pseudoRandomFunction.value" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="authenticationMethod" type="ipsec:authenticationMethod.value" use="required"/>
+		<attribute name="credentialEncoding" type="ipsec:credentialEncoding.value" use="required"/>
+		<attribute name="keyExchangeProtocol" type="ipsec:keyExchangeProtocolVersion.value" use="required"/>
+	</complexType>
+	<simpleType name="keyExchangeProtocolVersion.value">
+		<restriction base="token">
+			<enumeration value="IKEv1"/>
+			<enumeration value="IKEv2"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="configurationType.value">
+		<restriction base="token">
+			<enumeration value="client"></enumeration>
+			<enumeration value="server"></enumeration>
+		</restriction>
+	</simpleType>
+
+
+	<complexType name="encryptionAlgorithm.type">
+		<simpleContent>
+			<extension base="ipsec:encryptionAlgorithm.value">
+				<attribute name="keyLength"
+					type="ipsec:encryptionKeyLength.value">
+				</attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<complexType name="espProposal.type">
+		<complexContent>
+            <restriction base="ipsec:proposal.type">
+				<sequence>
+					<element name="encryptionAlgorithm" type="ipsec:encryptionAlgorithm.type" maxOccurs="1" minOccurs="1" />
+					<element name="integrityAlgorithm" type="ipsec:integrityAlgorithm.value" minOccurs="0" maxOccurs="0"/>
+					<element name="pseudoRandomFunction" type="ipsec:pseudoRandomFunction.value" minOccurs="0" maxOccurs="0"/>
+					<element name="groupDescription" type="ipsec:groupDescription.value" minOccurs="0" maxOccurs="0"/>
+					<element name="groupType" type="ipsec:groupType.value" minOccurs="0" maxOccurs="0"/>
+					<element name="lifetime" type="ipsec:lifetime.type" maxOccurs="1" minOccurs="1" />
+				</sequence>
+			</restriction>
+		</complexContent>
+	</complexType>
+
+	<complexType name="ikeProposal.type">
+    	<complexContent>
+            <restriction base="ipsec:proposal.type">
+            	<sequence>
+            		<element name="encryptionAlgorithm" type="ipsec:encryptionAlgorithm.type" maxOccurs="1" minOccurs="1"/>
+					<element name="integrityAlgorithm" type="ipsec:integrityAlgorithm.value" minOccurs="1" maxOccurs="1"/>
+					<element name="pseudoRandomFunction" type="ipsec:pseudoRandomFunction.value" minOccurs="1" maxOccurs="1"/>
+					<element name="groupDescription" type="ipsec:groupDescription.value" minOccurs="1" maxOccurs="1"/>
+					<element name="groupType" type="ipsec:groupType.value" minOccurs="1" maxOccurs="1"/>
+					<element name="lifetime" type="ipsec:lifetime.type" maxOccurs="1" minOccurs="1"/>
+            	</sequence>
+            </restriction>
+    	</complexContent>
+    </complexType>
+</schema>

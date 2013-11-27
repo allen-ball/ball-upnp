@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="urn:schemas-upnp-org:gw:DeviceProtection"
+    xmlns:tns="urn:schemas-upnp-org:gw:DeviceProtection" elementFormDefault="qualified">
+    <xs:simpleType name="Alias">
+        <xs:annotation>
+            <xs:documentation>Alias name</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="CPName">
+        <xs:annotation>
+            <xs:documentation>CP name</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Introduced">
+        <xs:annotation>
+            <xs:documentation>Boolean restricted to 0|1</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:boolean">
+            <xs:pattern value="0"/>
+            <xs:pattern value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="IntroductionProtocol">
+        <xs:annotation>
+            <xs:documentation>Introduction protocol</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:pattern value="WPS"/>
+            <xs:pattern value="\w+"/>
+            <xs:pattern value="\w[\w\.]*:\w+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="LoginProtocol">
+        <xs:annotation>
+            <xs:documentation>Login protocol</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:pattern value="PKCS5"/>
+            <xs:pattern value="\w+"/>
+            <xs:pattern value="\w[\w\.]*:\w+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="RoleName">
+        <xs:annotation>
+            <xs:documentation>Role name</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:maxLength value="64"/>
+            <xs:pattern value="\w+"/>
+            <xs:pattern value="\w+:\w+"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="UserName">
+        <xs:annotation>
+            <xs:documentation>User name</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token"/>
+    </xs:simpleType>
+    <xs:simpleType name="UUID">
+        <xs:annotation>
+            <xs:documentation>UUID without leading "uuid:"</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:pattern
+                value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+            />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element name="SupportedProtocols">
+        <xs:annotation>
+            <xs:documentation>SupportedProtocols state variable</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" name="Introduction">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="tns:IntroductionProtocol"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Login" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="tns:LoginProtocol"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+            </xs:sequence>
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ACL">
+        <xs:annotation>
+            <xs:documentation>A_ARG_TYPE_ACL state variable</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Identities">
+                    <xs:complexType>
+                        <xs:choice maxOccurs="unbounded" minOccurs="0">
+                            <xs:element name="User">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Name" type="tns:UserName"/>
+                                        <xs:element name="RoleList">
+                                            <xs:simpleType>
+                                                <xs:list itemType="tns:RoleName"/>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                                    </xs:sequence>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="CP">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Name" type="tns:CPName"/>
+                                        <xs:element minOccurs="0" name="Alias" type="tns:Alias"/>
+                                        <xs:element name="ID" type="tns:UUID"/>
+                                        <xs:element name="RoleList">
+                                            <xs:simpleType>
+                                                <xs:list itemType="tns:RoleName"/>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                                    </xs:sequence>
+                                    <xs:attribute default="0" name="introduced"
+                                        type="tns:Introduced"> </xs:attribute>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:choice>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Roles">
+                    <xs:complexType>
+                        <xs:sequence maxOccurs="unbounded" minOccurs="1">
+                            <xs:element name="Role">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Name" type="tns:RoleName"/>
+                                        <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                                    </xs:sequence>
+                                    <xs:anyAttribute namespace="##other" processContents="lax"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+            </xs:sequence>
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:complexType>
+        <xs:key name="RoleName">
+            <xs:selector xpath="tns:Roles/tns:Role"/>
+            <xs:field xpath="tns:Name"/>
+        </xs:key>
+        <!--
+        <xs:keyref name="UserRole" refer="tns:RoleName">
+            <xs:annotation>
+                <xs:documentation>Doesn't seem to be working (because is list?) so commented out</xs:documentation>
+            </xs:annotation>
+            <xs:selector xpath="tns:Identities/tns:User"/>
+            <xs:field xpath="tns:RoleList"/>
+        </xs:keyref>
+        -->
+        <!--
+        <xs:keyref name="CPRole" refer="tns:RoleName">
+            <xs:annotation>
+                <xs:documentation>Doesn't seem to be working (because is a list?) so commented out</xs:documentation>
+            </xs:annotation>
+            <xs:selector xpath="tns:Identities/tns:CP"/>
+            <xs:field xpath="tns:RoleList"/>
+        </xs:keyref>
+        -->
+    </xs:element>
+    <xs:element name="Identities">
+        <xs:annotation>
+            <xs:documentation>A_ARG_TYPE_IdentityList state variable</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                <xs:element name="User">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="tns:UserName"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="CP">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="tns:CPName"/>
+                            <xs:element minOccurs="0" name="Alias" type="tns:Alias"/>
+                            <xs:element name="ID" type="tns:UUID"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:attribute default="0" name="introduced" type="tns:Introduced"> </xs:attribute>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Identity">
+        <xs:annotation>
+            <xs:documentation>A_ARG_TYPE_Identity state variable</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:choice>
+                <xs:element name="User">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Name" type="tns:UserName"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="CP">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="ID" type="tns:UUID"/>
+                            <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+                        </xs:sequence>
+                        <xs:anyAttribute namespace="##other" processContents="lax"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:any minOccurs="0" namespace="##other" processContents="lax"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

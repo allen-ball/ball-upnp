@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" 
+	targetNamespace="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" 
+	elementFormDefault="qualified" id="TrafficDescriptorv1.xsd">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+		 TrafficDescriptor.
+		 This is for version 2.0 of UPnP QoS specification
+		 Copyright 2004-2006 Contributing Members of the UPnP Forum.  All rights reserved.
+		 Schema Location: "http://www.upnp.org/schemas/qos/TrafficDescriptor-v2.xsd"
+	   </xs:documentation>
+	</xs:annotation>
+	<xs:element name="TrafficDescriptor" type="TrafficDescriptorType"/>
+	<xs:complexType name="TrafficDescriptorType">
+		<xs:sequence>
+			<xs:element name="TrafficHandle" type="xs:string" minOccurs="0"/>
+			<xs:element name="TrafficId">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SourceAddress" type="IpAddress"/>
+						<xs:element name="SourcePort" type="IpPortNumber" minOccurs="0"/>
+						<xs:element name="DestinationAddress" type="IpAddress"/>
+						<xs:element name="DestinationPort" type="IpPortNumber" minOccurs="0"/>
+						<xs:element name="IpProtocol" type="IpProtocolType" minOccurs="0"/>
+						<xs:element name="v2TrafficId" type="v2TrafficIdType" minOccurs="0"/>
+						<!-- allow any element except those from target namespace -->
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:any namespace="##other" processContents="lax"/>
+							<xs:any namespace="##local" processContents="lax"/>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AvailableOrderedTspecList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Tspec" type="TrafficSpecification" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ActiveTspecIndex" type="xs:integer" minOccurs="0"/>
+			<xs:element name="TrafficImportanceNumber" type="TrafficImportance" default="0" minOccurs="0"/>
+			<xs:element name="QosBoundarySourceAddress" type="IpAddress" minOccurs="0"/>
+			<xs:element name="QosBoundaryDestinationAddress" type="IpAddress" minOccurs="0"/>
+			<xs:element name="MediaServerConnectionId" type="xs:integer" minOccurs="0"/>
+			<xs:element name="MediaRendererConnectionId" type="xs:integer" minOccurs="0"/>
+			<xs:element name="TrafficLeaseTime" type="xs:integer" minOccurs="0"/>
+			<xs:element name="v2" type="v2ExtensionType" minOccurs="0"/>
+			<!-- allow any element except those from target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+			<xs:element name="OptionalPolicyParams" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="UserName" type="xs:string" minOccurs="0"/>
+						<xs:element name="CpName" type="xs:string" minOccurs="0"/>
+						<xs:element name="VendorApplicationName" type="xs:string" minOccurs="0"/>
+						<xs:element name="PortName" type="xs:string" minOccurs="0"/>
+						<xs:element name="ServiceProviderServiceName" type="xs:string" minOccurs="0"/>
+						<xs:element name="v2OptionalParams" type="v2OptionalParamsType" minOccurs="0"/>
+						<!-- allow any element except those from target namespace -->
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:any namespace="##other" processContents="lax"/>
+							<xs:any namespace="##local" processContents="lax"/>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TrafficSpecification">
+		<xs:sequence>
+			<xs:element name="TspecIndex" type="xs:integer"/>
+			<xs:element name="AvTransportUri" type="xs:string" minOccurs="0"/>
+			<xs:element name="AvTransportInstanceId" type="xs:integer" minOccurs="0"/>
+			<xs:element name="TrafficClass" type="TrafficClass" minOccurs="0"/>
+			<xs:element name="v2TrafficSpecification" type="v2TrafficSpecificationType" minOccurs="0"/>
+			<!-- allow any element except those from target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TrafficClass">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NetworkControl"/>
+			<xs:enumeration value="StreamingControl"/>
+			<xs:enumeration value="Voice"/>
+			<xs:enumeration value="AV"/>
+			<xs:enumeration value="Data"/>
+			<xs:enumeration value="Audio"/>
+			<xs:enumeration value="Image"/>
+			<xs:enumeration value="Gaming"/>
+			<xs:enumeration value="Other"/>
+			<xs:enumeration value="Background"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TrafficImportance">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="7"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IpPortNumber">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IpProtocolType">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IPv6Address">
+		<xs:restriction base="xs:hexBinary">
+			<xs:length value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IPv4Address">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PrefixLength">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="128"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="IpAddress">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="Ipv4" type="IPv4Address"/>
+				<xs:element name="Ipv6" type="IPv6Address"/>
+			</xs:choice>
+			<xs:element name="PrefixLength" type="PrefixLength" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v2ExtensionType">
+		<xs:sequence>
+			<xs:element name="PolicyHolderId" type="xs:string" minOccurs="0"/>
+			<xs:element name="PolicyLastModified" type="xs:string" minOccurs="0"/>
+			<xs:element name="PolicyModifyingUserName" type="xs:string" minOccurs="0"/>
+			<xs:element name="PolicyHolderConfigUrl" type="xs:string" minOccurs="0"/>
+			<xs:element name="v3" type="v3ExtensionType" minOccurs="0"/>
+			<!-- allow any element except those from (v2) target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v3ExtensionType">
+		<xs:sequence>
+			<xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v2TrafficIdType">
+		<xs:sequence>
+			<xs:element name="v3TrafficId" type="v3TrafficIdType" minOccurs="0"/>
+			<!-- allow any element except those from (v2) target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v3TrafficIdType">
+		<xs:sequence>
+			<xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v2OptionalParamsType">
+		<xs:sequence>
+			<xs:element name="v3OptionalParams" type="v3OptionalParamsType" minOccurs="0"/>
+			<!-- allow any element except those from (v2) target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v3OptionalParamsType">
+		<xs:sequence>
+			<xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v2TrafficSpecificationType">
+		<xs:sequence>
+			<xs:element name="v3TrafficSpecification" type="v3TrafficSpecificationType" minOccurs="0"/>
+			<!-- allow any element except those from (v2) target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:complexType name="v3TrafficSpecificationType">
+		<xs:sequence>
+			<xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+</xs:schema>

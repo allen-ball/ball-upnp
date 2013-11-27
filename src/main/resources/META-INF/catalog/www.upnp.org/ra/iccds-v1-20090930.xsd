@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:schemas-upnp-org:ra:iccds" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:iccds="urn:schemas-upnp-org:ra:iccds">
+
+    <complexType name="iccds.type">
+    	<choice>
+    		<element name="dynamicDNSConfig" type="iccds:dynamicDNSConfig.type"></element>
+    		<element name="networkTopologyInfo" type="iccds:networkTopologyInfo.type"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</choice>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <element name="iccds" type="iccds:iccds.type"></element>
+
+    <complexType name="networkTopologyInfo.type">
+    	<sequence>
+            <element name="supportedTopology" type="boolean"></element>
+            <element name="hostName" type="iccds:hostName.type"></element>
+    		<element name="natType" type="iccds:natType.value"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0"
+    			maxOccurs="unbounded">
+    		</any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <simpleType name="natType.value">
+    	<restriction base="token">
+    		<enumeration value="none"></enumeration>
+    		<enumeration value="fullCone"></enumeration>
+    		<enumeration value="restricted"></enumeration>
+    		<enumeration value="portRestricted"></enumeration>
+    		<enumeration value="symmetric"></enumeration>
+    	</restriction>
+    </simpleType>
+
+
+
+    <complexType name="hostName.type">
+    	<simpleContent>
+    		<extension base="string">
+    			<attribute name="nameSystem" type="token" use="required"></attribute>
+    			<attribute name="lastUpdate" type="dateTime" use="optional"></attribute>
+    			<attribute name="v4" type="boolean" use="optional"></attribute>
+    			<attribute name="v6" type="boolean" use="optional"></attribute>
+    			<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    		</extension>
+    	</simpleContent>
+    </complexType>
+
+    <complexType name="dynamicDNSConfig.type">
+    	<sequence>
+    		<element name="dynDNSProtocol" type="string"></element>
+    		<element name="updateConfiguration" type="iccds:updateConfiguration.type"></element>
+    		<element name="policy" type="iccds:policy.type"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="updateConfiguration.type">
+    	<sequence>
+    		<element name="server" type="string"></element>
+    		<element name="username" type="string"></element>
+    		<element name="password" type="string"></element>
+    		<element name="domain" type="string"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+
+    <complexType name="policy.type">
+    	<sequence>
+    		<element name="slaURI" type="anyURI"></element>
+    		<element name="forceUpdate" type="duration"></element>
+    		<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"></any>
+    	</sequence>
+    	<anyAttribute namespace="##other" processContents="lax"></anyAttribute>
+    </complexType>
+</schema>

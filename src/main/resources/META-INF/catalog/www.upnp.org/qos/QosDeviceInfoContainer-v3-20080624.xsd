@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.upnp.org/schemas/qos/QosDeviceInfoContainer-v3.xsd -->
+<xs:schema xmlns="urn:schemas-upnp-org:qos:QosDeviceInfoContainer" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:qdi="http://www.upnp.org/schemas/QosDeviceInfo.xsd" targetNamespace="urn:schemas-upnp-org:qos:QosDeviceInfoContainer" elementFormDefault="qualified" attributeFormDefault="unqualified" id="QosDeviceInfoContainer">
+	<xs:import namespace="http://www.upnp.org/schemas/QosDeviceInfo.xsd" schemaLocation="http://www.upnp.org/schemas/qos/QosDeviceInfo-v3.xsd"/>
+	<xs:element name="QosDeviceInfoContainer" type="QosDeviceInfoContainerType"/>
+	<xs:complexType name="QosDeviceInfoContainerType">
+		<xs:sequence>
+			<xs:element name="QosDeviceInfo" type="qdi:QosDeviceInfoType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v4type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-upnp-org:qos:PreemptingTrafficInfo" xmlns:td="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" targetNamespace="urn:schemas-upnp-org:qos:PreemptingTrafficInfo" elementFormDefault="qualified" id="PreemptingTrafficInfo">
+	<!-- 06/04/07 Swade Omitted "-v3" from namespace -->
+	<xs:import namespace="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" schemaLocation="TrafficDescriptor-v3.xsd"/>
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+		  This file describes the schema for the PreemptingTrafficInfo
+		  This is for Version 3.0 of the UPnP QoS specification
+	          Copyright 2007-2008 Contributing Members of the UPnP Forum. All rights reserved.
+
+		  Schema Location: "http://www.upnp.org/schemas/qos/PreemptingTrafficInfo-v3.xsd"
+		</xs:documentation>
+	</xs:annotation>
+	<xs:element name="PreemptingTrafficInfo" type="PreemptingTrafficInfoType"/>
+	<xs:complexType name="PreemptingTrafficInfoType">
+		<xs:sequence>
+			<xs:element name="ReleaseCausedByPreemption" type="xs:boolean"/>
+			<xs:element name="PreemptingTrafficDescriptor" type="td:TrafficDescriptorType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<!-- allow any element except those from v1 target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v4type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>

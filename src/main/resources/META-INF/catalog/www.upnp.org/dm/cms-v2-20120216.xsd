@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE CMS-XSD [
+	<!ENTITY Numeric "([0-9]|([1-9][0-9]+))">
+	<!ENTITY Wildchar "#">
+	<!ENTITY Slash "/">
+	<!ENTITY NodeName "([\i-[:-]][\c-[:\.-]]*)">
+	<!ENTITY LeafName "&NodeName;">
+	<!ENTITY SingleInstanceNodeName "(&NodeName;&Slash;)">
+	<!ENTITY MultiInstanceNodeName "(&NodeName;&Slash;)">
+	<!ENTITY Instance "(&Numeric;&Slash;)">
+	<!ENTITY InstanceAlias "(&Wildchar;&Slash;)">
+	<!ENTITY InternalNode "(&SingleInstanceNodeName;|(&MultiInstanceNodeName;&Instance;))">
+	<!ENTITY InternalAlias "(&SingleInstanceNodeName;|(&MultiInstanceNodeName;&InstanceAlias;))">
+	<!ENTITY RootPath "&Slash;">
+	<!ENTITY ParameterPath "(&RootPath;&InternalNode;*&LeafName;)">
+	<!ENTITY SingleInstancePath "(&RootPath;|(&RootPath;&InternalNode;*&SingleInstanceNodeName;))">
+	<!ENTITY MultiInstancePath "(&RootPath;&InternalNode;*&MultiInstanceNodeName;)">
+	<!ENTITY InstancePath "(&RootPath;&InternalNode;*&MultiInstanceNodeName;&Instance;)">
+	<!ENTITY InstanceAliasPath "(&RootPath;&InternalAlias;*&LeafName;?)">
+]>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cms="urn:schemas-upnp-org:dm:cms" targetNamespace="urn:schemas-upnp-org:dm:cms" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2-20120216">
+	<xs:simpleType name="Path">
+		<xs:restriction base="xs:token"/>
+	</xs:simpleType>
+	<xs:simpleType name="RootPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&RootPath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ParameterPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&ParameterPath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SingleInstancePath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&SingleInstancePath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MultiInstancePath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&MultiInstancePath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="InstancePath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&InstancePath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ParameterOrMultiInstancePath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&ParameterPath;"/>
+			<xs:pattern value="&MultiInstancePath;"/>
+			<xs:pattern value="&InstancePath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PartialPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&RootPath;"/>
+			<xs:pattern value="&SingleInstancePath;"/>
+			<xs:pattern value="&MultiInstancePath;"/>
+			<xs:pattern value="&InstancePath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ContentPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&RootPath;"/>
+			<xs:pattern value="&SingleInstancePath;"/>
+			<xs:pattern value="&MultiInstancePath;"/>
+			<xs:pattern value="&InstancePath;"/>
+			<xs:pattern value="&ParameterPath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StructurePath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&RootPath;(&InternalAlias;)*&LeafName;?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ParameterInitializationPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&SingleInstanceNodeName;*&LeafName;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ACLDataPath">
+		<xs:restriction base="cms:Path">
+			<xs:pattern value="&RootPath;"/>
+			<xs:pattern value="&ParameterPath;"/>
+			<xs:pattern value="&SingleInstancePath;"/>
+			<xs:pattern value="&MultiInstancePath;"/>
+			<xs:pattern value="&InstancePath;"/>
+			<xs:pattern value="&InstanceAliasPath;"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="RoleList">
+		<xs:simpleContent>
+			<xs:extension base="xs:token">
+				<xs:attribute name="Factorized" type="xs:boolean" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="Value">
+		<xs:simpleContent>
+			<xs:extension base="xs:anySimpleType"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="NodeAttribute">
+		<xs:annotation>
+			<xs:documentation>Defines the possible list of attributes associated to a NodeAttributePath. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="NodeAttributePath" type="cms:ParameterOrMultiInstancePath"/>
+			<xs:element name="Type" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:token">
+						<xs:enumeration value="string"/>
+						<xs:enumeration value="int"/>
+						<xs:enumeration value="long"/>
+						<xs:enumeration value="unsignedInt"/>
+						<xs:enumeration value="unsignedLong"/>
+						<xs:enumeration value="boolean"/>
+						<xs:enumeration value="dateTime"/>
+						<xs:enumeration value="base64"/>
+						<xs:enumeration value="hexBinary"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Access" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:token">
+						<xs:enumeration value="readWrite"/>
+						<xs:enumeration value="readOnly"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Version" type="xs:unsignedInt" minOccurs="0"/>
+			<xs:element name="EventOnChange" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="MIMEType" type="xs:token" minOccurs="0"/>
+			<xs:element name="AlarmOnChange" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="StructurePathList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of StructurePaths.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="StructurePath" type="cms:StructurePath"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ParameterValueList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of Parameter elements. Each Parameter element is a ParameterPath-Value pair.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Parameter">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ParameterPath" type="cms:ParameterPath"/>
+							<xs:element name="Value" type="cms:Value"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NodeAttributeValueList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of Node elements. Each Node contains the NodeAttributePath (type: ParameterOrMultiInstancePath) element and values for its associated attributes.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Node" type="cms:NodeAttribute"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ParameterInitialValueList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of Node elements. Each Node element is a ParameterInitializationPath-Value pair.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="Node">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ParameterInitializationPath" type="cms:ParameterInitializationPath"/>
+							<xs:element name="Value" type="cms:Value"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SupportedDataModels">
+		<xs:annotation>
+			<xs:documentation>Defines a list of SubTree elements. Each SubTree element contains information about a supported data model.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element name="SubTree">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="URI" type="xs:anyURI"/>
+							<xs:element name="Location" type="cms:SingleInstancePath"/>
+							<xs:element name="URL" type="xs:anyURI" minOccurs="0"/>
+							<xs:element name="Description" type="xs:string" minOccurs="0"/>
+							<xs:element name="SourceLocation" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="InstancePathList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of InstancePaths.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="InstancePath" type="cms:InstancePath"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ContentPathList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of ContentPaths.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="ContentPath" type="cms:ContentPath"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="NodeAttributePathList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of NodeAttributePath (type: ParameterOrMultiInstancePath) nodes used to retrieve attribute values.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="NodeAttributePath" type="cms:ParameterOrMultiInstancePath"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ACLDataPathList">
+		<xs:annotation>
+			<xs:documentation>Defines a list of ACLDataPath (type: ACLDataPath) nodes used to retrieve ACL values from data model parameters.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="ACLDataPath" type="cms:ACLDataPath"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ACL">
+		<xs:annotation>
+			<xs:documentation>Defines a list of ACL associating the permissions list to ACLDataPaths.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="ACLEntry">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ACLDataPath" type="cms:ACLDataPath"/>
+							<xs:element name="List" type="cms:RoleList" minOccurs="0"/>
+							<xs:element name="Read" type="cms:RoleList" minOccurs="0"/>
+							<xs:element name="Write" type="cms:RoleList" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

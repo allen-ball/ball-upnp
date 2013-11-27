@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="urn:schemas-upnp-org:cs" xmlns:cs="urn:schemas-upnp-org:cs" xmlns:av="urn:schemas-upnp-org:av:av" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20071008">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+			For UPnP Content Synchronization service
+		</xsd:documentation>
+  </xsd:annotation>
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2005/08/xml.xsd" />
+  <xsd:import namespace="urn:schemas-upnp-org:av:av" schemaLocation="http://www.upnp.org/schemas/av/av-v1.xsd" />
+  <!--===========================================================
+		'ContentSync' is the root element of ContentSync documents.
+	============================================================-->
+  <xsd:element name="ContentSync" type="cs:rootType" />
+  <xsd:complexType name="rootType">
+    <xsd:sequence>
+      <xsd:element ref="cs:syncRelationship" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--==========================================================================
+		'syncRelationship' is the root element of a synchronization relationship.
+	============================================================================-->
+  <xsd:element name="syncRelationship">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="title" type="xsd:string" />
+        <xsd:element ref="cs:partnership" />
+      </xsd:sequence>
+      <xsd:attributeGroup ref="cs:syncAttr" />
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:attributeGroup name="syncAttr">
+    <xsd:attribute name="id" type="cs:sync.id.type" use="required" />
+    <xsd:attribute name="active" type="xsd:boolean" use="required" />
+  </xsd:attributeGroup>
+  <!--==========================================================================
+		'partnership' is the sub element of a synchronization relationship.
+	============================================================================-->
+  <xsd:element name="partnership">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="partner" type="cs:partner.type" />
+        <xsd:element name="policy" type="cs:policy.type" />
+        <xsd:element ref="cs:pairgroup" />
+      </xsd:sequence>
+      <xsd:attributeGroup ref="cs:syncAttr" />
+      <xsd:attribute name="updateID" type="xsd:unsignedInt" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+  <!--==========================================================================
+		'partner' is the sub element of a synchronization partner
+	============================================================================-->
+  <xsd:complexType name="partner.type">
+    <xsd:sequence>
+      <xsd:element name="deviceUDN" type="av:UDN" />
+      <xsd:element name="serviceID" type="av:serviceId" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--==========================================================================
+		'pairgroup' is the sub element of a synchronization relationship.
+	============================================================================-->
+  <xsd:element name="pairgroup">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="policy" type="cs:policy.type" />
+      </xsd:sequence>
+      <xsd:attributeGroup ref="cs:syncAttr" />
+      <xsd:attribute name="updateID" type="xsd:unsignedInt" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+  <!--==========================================================================
+		'policy' is the root element of a synchronization policy
+	============================================================================-->
+  <xsd:complexType name="policy.type">
+    <xsd:sequence>
+      <xsd:element name="syncType">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="replace" />
+            <xsd:enumeration value="merge" />
+            <xsd:enumeration value="blend" />
+            <xsd:enumeration value="tracking" />
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="priorityPartnerID" type="xsd:string" />
+      <xsd:element name="delProtection" type="xsd:boolean" />
+      <xsd:element name="autoObjAdd" type="xsd:boolean" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--===========================================================
+		'SyncStausUpdate' is the root element of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:element name="SyncStatusUpdate">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="syncRelationship" type="cs:sync.status.relationship.level.type" />
+      </xsd:sequence>
+      <xsd:attribute name="id" type="cs:sync.id.type" />
+    </xsd:complexType>
+  </xsd:element>
+  <!--===========================================================
+		'syncRelationship' element type of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:complexType name="sync.status.relationship.level.type">
+    <xsd:sequence>
+      <xsd:element name="status" type="cs:sync.status.type" />
+      <xsd:element name="partnership" type="cs:sync.status.partnership.level.type" />
+    </xsd:sequence>
+    <xsd:attribute name="id" type="cs:sync.id.type" use="required" />
+  </xsd:complexType>
+  <!--===========================================================
+		'status' element type of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:complexType name="sync.status.type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="numberOfTotalObjects" type="xsd:unsignedInt" use="required" />
+        <xsd:attribute name="numberOfCompletedObjects" type="xsd:unsignedInt" use="required" />
+        <xsd:attribute name="numberOfFailedObjects" type="xsd:unsignedInt" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!--===========================================================
+		'partnership' element type of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:complexType name="sync.status.partnership.level.type">
+    <xsd:sequence>
+      <xsd:element name="status" type="cs:sync.status.type" />
+      <xsd:element name="pairgroup" type="cs:sync.status.pairgroup.level.type" />
+    </xsd:sequence>
+    <xsd:attribute name="id" type="cs:sync.id.type" use="required" />
+  </xsd:complexType>
+  <!--===========================================================
+		'pairgroup' element type of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:complexType name="sync.status.pairgroup.level.type">
+    <xsd:sequence>
+      <xsd:element name="status" type="cs:sync.status.type" />
+      <!-- Check how to represent <logEntry> can be multiple -->
+      <xsd:element name="logEntry" type="cs:sync.staus.logEntry.type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--===========================================================
+		'logEntry' element type of SyncStatusUpdate documents.
+	============================================================-->
+  <xsd:complexType name="sync.staus.logEntry.type">
+    <xsd:sequence>
+      <xsd:element name="localObjectID" type="av:didl-lite_COLON_at_id.vd.type" />
+      <xsd:element name="remoteObjectID" type="av:didl-lite_COLON_at_id.vd.type" />
+      <xsd:element name="statusCode" type="xsd:unsignedInt" />
+      <xsd:element name="statusDescription" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--===========================================================
+		'SyncChange' state variable schema
+	============================================================-->
+  <xsd:element name="syncChange">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="syncDataUpdate" type="cs:sync.data.update.type" />
+        <xsd:element name="syncObjUpdate" type="cs:sync.object.update.type" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <!--===========================================================
+		'SyncDataUpdate' element of SyncChange document.
+	============================================================-->
+  <xsd:complexType name="sync.data.update.type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="syncID" type="cs:sync.id.type" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!--===========================================================
+		'SyncObjectUpdate' element of SyncChange document.
+	============================================================-->
+  <xsd:complexType name="sync.object.update.type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="objID" type="av:didl-lite_COLON_at_id.vd.type" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!--===========================================================
+		'A_ARG_TYPE_ResetObjectList' schema
+	============================================================-->
+  <xsd:element name="ResetObjectList">
+    <xsd:complexType>
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:string">
+          <xsd:attribute name="id" type="av:didl-lite_COLON_at_id.vd.type" use="required" />
+          <xsd:attribute name="parentID" type="av:didl-lite_COLON_at_id.vd.type" use="required" />
+          <xsd:attribute name="updateID" type="xsd:unsignedInt" use="required" />
+        </xsd:extension>
+      </xsd:simpleContent>
+    </xsd:complexType>
+  </xsd:element>
+  <!--===========================================================
+		'@id' of sync relationship, partnership and pairing
+	============================================================-->
+  <xsd:simpleType name="sync.id.type">
+    <xsd:restriction base="xsd:string">
+      <!-- RFC4122 format here -->
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

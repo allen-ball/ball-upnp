@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema 
+ xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+ xmlns="http://www.upnp.org/schemas/RotameterInformation.xsd" 
+ targetNamespace="http://www.upnp.org/schemas/RotameterInformation.xsd" 
+ elementFormDefault="qualified" id="RotameterInformation.xsd">
+ <xs:annotation>
+   <xs:documentation xml:lang="en">
+     RotameterInformation
+     This is for Version 2.0 of the UPnP QoS specification
+     Copyright 2004-2006 Contributing Members of the UPnP Forum. All rights reserved.
+	 Schema Location: "http://www.upnp.org/schemas/qos/RotameterInformation-v2.xsd"
+   </xs:documentation>
+ </xs:annotation>
+ <xs:element name="RotameterInformation" type="RotameterInformationType"/>
+ <xs:complexType name="RotameterInformationType">
+   <xs:sequence>
+     <xs:element name="LinkReachableMacs" maxOccurs="unbounded">
+       <xs:complexType>
+         <xs:sequence>
+           <xs:element name="LinkId" type="xs:string"/>
+           <xs:element name="BridgeId" type="xs:string" minOccurs="0"/>
+           <xs:element name="MacAddress" type="MacAddressType" minOccurs="0"/>
+           <xs:element name="RotameterObservation" minOccurs="0" maxOccurs="unbounded">
+             <xs:complexType>
+               <xs:sequence>
+                 <xs:element name="RotameterIndex" type="xs:integer"/>
+                 <xs:element name="ROAddr" type="MacAddressType"/>
+                 <xs:element name="ROBits" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits0" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits1" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits2" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits3" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits4" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits5" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits6" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROBits7" type="xs:integer" minOccurs="0"/>
+                 <xs:element name="ROPeriod" type="xs:integer"/>
+                 <xs:element name="ReportingDateTime" type="xs:string"/>
+                 <xs:element name="MonitorResolutionPeriod" type="xs:integer"/>
+                 <!-- allow any element except those from target namespace -->
+                 <xs:choice minOccurs="0" maxOccurs="unbounded">
+                   <xs:any namespace="##other" processContents="lax"/>
+                   <xs:any namespace="##local" processContents="lax"/>
+                 </xs:choice>
+               </xs:sequence>
+             </xs:complexType>
+           </xs:element>
+           <!-- allow any element except those from target namespace -->
+           <xs:choice minOccurs="0" maxOccurs="unbounded">
+             <xs:any namespace="##other" processContents="lax"/>
+             <xs:any namespace="##local" processContents="lax"/>
+           </xs:choice>
+         </xs:sequence>
+       </xs:complexType>
+     </xs:element>
+     <xs:element name="v2" type="v2ExtensionType" minOccurs="0"/>
+     <!-- allow any element except those from target namespace -->
+     <xs:choice minOccurs="0" maxOccurs="unbounded">
+       <xs:any namespace="##other" processContents="lax"/>
+       <xs:any namespace="##local" processContents="lax"/>
+     </xs:choice>
+   </xs:sequence>
+ </xs:complexType>
+ <xs:simpleType name="MacAddressType">
+   <xs:restriction base="xs:string">
+     <xs:pattern value="[0-9a-fA-F]{12}"/>
+   </xs:restriction>
+ </xs:simpleType>
+ <xs:complexType name="v2ExtensionType">
+   <xs:sequence>
+     <xs:element name="v3" type="v3ExtensionType" minOccurs="0"/>
+     <!-- allow any element except those from (v2) target namespace -->
+     <xs:choice minOccurs="0" maxOccurs="unbounded">
+       <xs:any namespace="##other" processContents="lax"/>
+       <xs:any namespace="##local" processContents="lax"/>
+     </xs:choice>
+   </xs:sequence>
+   <xs:anyAttribute/>
+ </xs:complexType>
+ <xs:complexType name="v3ExtensionType">
+   <xs:sequence>
+     <xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:anyAttribute/>
+ </xs:complexType>
+</xs:schema>
+

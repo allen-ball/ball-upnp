@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:smgt:sdmevent" targetNamespace="urn:schemas-upnp-org:smgt:sdmevent" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        Sensor DataModel Event schema for UPnP Sensor ConfigurationManagement service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="SensorEvents">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="sensorevent" minOccurs="0" maxOccurs="unbounded">
+          <xsd:complexType>
+            <xsd:attribute name="collectionID" use="required" type="xsd:string"/>
+            <xsd:attribute name="sensorID" use="required" type="xsd:string"/>
+            <xsd:attribute name="event" use="required" type="xsd:string"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
+
+
+
+

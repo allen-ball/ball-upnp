@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by Sridharan Ramaswamy (Cisco Systems, Inc.) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:openvpn="urn:schemas-upnp-org:ra:tacfg:openvpn" targetNamespace="urn:schemas-upnp-org:ra:tacfg:openvpn" elementFormDefault="qualified">
+	<complexType name="configuration.type">
+		<sequence>
+			<element name="protocol" type="openvpn:protocol.type"/>
+			<element name="sslTls" type="openvpn:sslTls.type"/>
+			<element name="client" type="openvpn:client.type" minOccurs="0"/>
+			<element name="server" type="openvpn:server.type" minOccurs="0"/>
+			<element name="options" type="openvpn:options.type" minOccurs="0"/>
+		</sequence>
+		<attribute name="configurationType" use="required">
+			<simpleType>
+				<annotation>
+					<documentation>
+					. Determines the type of configuration. Possible values are “client” or “server”
+					</documentation>
+				</annotation>
+				<restriction base="token">
+					<enumeration value="client"/>
+					<enumeration value="server"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<complexType name="protocol.type">
+		<sequence>
+			<element name="dev" type="string">
+				<annotation>
+					<documentation>
+						Specifies the type of tunnel. 
+						"tun" will create a routed IP tunnel,
+						"tap" will create an ethernet tunnel.
+						use “tap0" if you are ethernet bridging and have precreated a tap0 virtual interface and bridged it with your ethernet interface.
+					</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="type" use="required">
+			<simpleType>
+				<annotation>
+					<documentation>
+					. Determines if the underlying transport is TCP or UDP. Possible values are “TCP” or “UDP”.
+					</documentation>
+				</annotation>
+				<restriction base="token">
+					<enumeration value="UDP"/>
+					<enumeration value="TCP"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+	</complexType>
+	<complexType name="client.type">
+		<sequence>
+			<element name="resolveRetry">
+				<annotation>
+					<documentation>
+					Specifies the retry timeout for hostname resolution of the remote hostname.  
+					The number of seconds that the OpenVPN client should continue to retry hostname resolution if it fails. 
+					A value of -1 means that the client should continue to retry for an infinite amount of time.
+					</documentation>
+				</annotation>
+				<complexType>
+					<attribute name="seconds" type="int" use="required"/>
+				</complexType>
+			</element>
+			<element name="devNode" minOccurs="0">
+				<annotation>
+					<documentation>
+				    the OpenVPN interface name. MUST be used on Windows.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="httpProxy" minOccurs="0">
+				<annotation>
+					<documentation>
+				    Specifies the usage of an HTTP Proxy to connect to the OpenVPN server
+					</documentation>
+				</annotation>
+				<complexType>
+					<attribute name="proxyIP" type="string" use="required"/>
+					<attribute name="proxyPort" type="int" use="required"/>
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="remoteHost" type="string" use="required"/>
+		<attribute name="remotePort" type="int" use="required"/>
+	</complexType>
+	<complexType name="server.type">
+		<annotation>
+			<documentation>
+			Specifies server specific configuration. MUST be specifid if @configurationtype is “server”. 
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="persistPool" type="string" minOccurs="0"/>
+			<element name="bridge" minOccurs="0">
+				<annotation>
+					<documentation>
+					Configure server mode for ethernet bridging. You must first use your OS's bridging capability to bridge the TAP interface with the Ethernet NIC interface.  Then you must manually set the IP/netmask on the bridge interface. We must set aside an IP range in the specified subnet to allocate to connecting clients.  MUST be specified if the server is configured for ethernet bridging.
+					</documentation>
+				</annotation>
+				<complexType>
+					<attribute name="ip" type="string" use="required"/>
+					<attribute name="netmask" type="string" use="required"/>
+					<attribute name="startingIP" type="string" use="required"/>
+					<attribute name="endingIP" type="string" use="required"/>
+				</complexType>
+			</element>
+			<element name="routedIP" minOccurs="0">
+				<annotation>
+					<documentation>
+					Configure server mode for routed IP, to supply a VPN subnet for OpenVPN to draw client addresses from.
+					The server will take the first IP address for itself., the rest will be made available to clients. Each client will be able to reach the server on that self-allocated IP address.  MUST be specified if the server is configured for routed IP.
+					</documentation>
+				</annotation>
+				<complexType>
+					<attribute name="ip" type="string" use="required"/>
+					<attribute name="netMask" type="string" use="required"/>
+				</complexType>
+			</element>
+			<element name="push" type="openvpn:push.type" minOccurs="0"/>
+			<element name="clientToClient" type="boolean" minOccurs="0"/>
+			<element name="duplicateKeyPairs" type="boolean" minOccurs="0"/>
+			<element name="maxClients" type="int" minOccurs="0"/>
+		</sequence>
+		<attribute name="listeningIP" type="string" use="required"/>
+		<attribute name="listeningPort" type="int" use="required"/>
+	</complexType>
+	<complexType name="options.type">
+		<sequence>
+			<element name="keepAlive" minOccurs="0">
+				<complexType>
+					<attribute name="interval" type="int" use="required"/>
+					<attribute name="timeout" type="int" use="required"/>
+				</complexType>
+			</element>
+			<element name="enableCompression" default="true" minOccurs="0">
+				<complexType>
+					<simpleContent>
+						<extension base="boolean">
+							<attribute name="algorithm" use="optional" default="lzo">
+								<simpleType>
+									<restriction base="string">
+										<enumeration value="lzo"/>
+									</restriction>
+								</simpleType>
+							</attribute>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="status" minOccurs="0">
+				<complexType>
+					<attribute name="update" type="boolean" use="required"/>
+					<attribute name="filename" type="string" use="required"/>
+				</complexType>
+			</element>
+			<element name="log" minOccurs="0">
+				<complexType>
+					<attribute name="enabled" type="boolean" use="required"/>
+					<attribute name="append" type="boolean" use="required"/>
+					<attribute name="filename" type="string" use="required"/>
+					<attribute name="verbosity" use="optional" default="4">
+						<simpleType>
+							<restriction base="int">
+								<minInclusive value="0"/>
+								<maxInclusive value="9"/>
+							</restriction>
+						</simpleType>
+					</attribute>
+					<attribute name="silenceAfter" type="int" use="optional"/>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="push.type">
+		<sequence>
+			<element name="route" minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<attribute name="ip" type="string" use="required"/>
+					<attribute name="subnetMask" type="string" use="required"/>
+				</complexType>
+			</element>
+			<element name="gateway" minOccurs="0" >
+				<complexType>
+					<attribute name="redirect" type="boolean" use="required"/>
+				</complexType>
+			</element>
+			<element name="dhcpOption" minOccurs="0" maxOccurs="unbounded">
+				<complexType>
+					<attribute name="name" type="string" use="required"/>
+					<attribute name="data" type="string" use="required"/>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="sslTls.type">
+		<sequence>
+			<element name="cipher" type="openvpn:cipher.value" minOccurs="0"/>
+			<element name="credentialID" type="string"/>
+		</sequence>
+	</complexType>
+	<simpleType name="cipher.value">
+		<restriction base="token">
+			<enumeration value="BF-CBC"/>
+			<enumeration value="AES-128-CBC"/>
+			<enumeration value="DES-EDE3-CBC"/>
+		</restriction>
+	</simpleType>
+</schema>

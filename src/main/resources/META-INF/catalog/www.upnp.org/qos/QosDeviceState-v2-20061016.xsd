@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema 
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ xmlns="http://www.upnp.org/schemas/QosDeviceState.xsd" 
+ targetNamespace="http://www.upnp.org/schemas/QosDeviceState.xsd" 
+ elementFormDefault="qualified" id="QosDeviceState.xsd">
+ <xs:annotation>
+   <xs:documentation xml:lang="en">
+     QosDeviceState
+     This is for Version 2.0 of the UPnP QoS specification
+     Copyright 2004-2006 Contributing Members of the UPnP Forum. All rights reserved.
+	 Schema Location: "http://www.upnp.org/schemas/qos/QosDeviceState-v2.xsd"
+   </xs:documentation>
+ </xs:annotation>
+ <xs:element name="QosDeviceState" type="QosDeviceStateType"/>
+ <xs:complexType name="QosDeviceStateType">
+   <xs:sequence>
+     <xs:element name="QosStateId" type="xs:string"/>
+     <xs:element name="Interface" maxOccurs="unbounded">
+       <xs:complexType>
+         <xs:sequence>
+           <xs:element name="InterfaceId" type="xs:string"/>
+           <xs:element name="IpAddress" type="IpAddressType" minOccurs="0" maxOccurs="4"/>
+           <xs:element name="InterfaceAvailability">
+             <xs:simpleType>
+               <xs:restriction base="xs:NMTOKEN">
+                 <xs:enumeration value="1"/>
+                 <xs:enumeration value="0"/>
+               </xs:restriction>
+             </xs:simpleType>
+           </xs:element>
+           <xs:element name="v2" type="v2ExtensionType" minOccurs="0"/>
+           <!-- allow any element except those from target namespace -->
+           <xs:choice minOccurs="0" maxOccurs="unbounded">
+             <xs:any namespace="##other" processContents="lax"/>
+             <xs:any namespace="##local" processContents="lax"/>
+           </xs:choice>
+         </xs:sequence>
+       </xs:complexType>
+     </xs:element>
+   </xs:sequence>
+ </xs:complexType>
+ <xs:simpleType name="IPv4Address">
+   <xs:restriction base="xs:string">
+     <xs:pattern value="(([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"/>
+   </xs:restriction>
+ </xs:simpleType>
+ <xs:simpleType name="IPv6Address">
+   <xs:restriction base="xs:hexBinary">
+     <xs:length value="32"/>
+   </xs:restriction>
+ </xs:simpleType>
+ <xs:simpleType name="PrefixLength">
+   <xs:restriction base="xs:positiveInteger">
+     <xs:minInclusive value="1"/>
+     <xs:maxInclusive value="128"/>
+   </xs:restriction>
+ </xs:simpleType>
+ <xs:complexType name="IpAddressType">
+   <xs:sequence>
+     <xs:choice>
+       <xs:element name="Ipv4" type="IPv4Address"/>
+       <xs:element name="Ipv6" type="IPv6Address"/>
+     </xs:choice>
+     <xs:element name="PrefixLength" type="PrefixLength" minOccurs="0"/>
+   </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name="v2ExtensionType">
+   <xs:sequence>
+     <xs:element name="v3" type="v3ExtensionType" minOccurs="0"/>
+     <!-- allow any element except those from (v2) target namespace -->
+     <xs:choice minOccurs="0" maxOccurs="unbounded">
+       <xs:any namespace="##other" processContents="lax"/>
+       <xs:any namespace="##local" processContents="lax"/>
+     </xs:choice>
+   </xs:sequence>
+   <xs:anyAttribute/>
+ </xs:complexType>
+ <xs:complexType name="v3ExtensionType">
+   <xs:sequence>
+     <xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+   </xs:sequence>
+   <xs:anyAttribute/>
+ </xs:complexType>
+</xs:schema>

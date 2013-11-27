@@ -1,0 +1,645 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:bms="urn:schemas-upnp-org:dm:bms" targetNamespace="urn:schemas-upnp-org:dm:bms" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2-20120216">
+  <xs:simpleType name="ActionName">
+    <xs:annotation>
+      <xs:documentation>UPnP action name.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token"/>
+  </xs:simpleType>
+  <xs:simpleType name="Direction">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test data flow direction (as capability and in test spec).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Put"/>
+      <xs:enumeration value="Get"/>
+      <xs:enumeration value="PutEcho"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FilterExpression">
+    <xs:annotation>
+      <xs:documentation>ACL filter expression.  Syntax is based on XPath 1.0.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="IntervalRange">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test interval range of form \d+:\d+.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:pattern value="\d+:\d+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="IPAddress">
+    <xs:annotation>
+      <xs:documentation>IPv4/IPv6 address.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="ProfileName">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="Baseline"/>
+      <xs:enumeration value="BBF"/>
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ProfileNames">
+    <xs:list itemType="bms:ProfileName"/>
+  </xs:simpleType>
+  <xs:simpleType name="ProtocolName">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="HTTP"/>
+      <xs:enumeration value="FTP"/>
+      <xs:enumeration value="Iperf"/>
+      <xs:enumeration value="Echo"/>
+      <xs:enumeration value="EchoPlus"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RoleName">
+    <xs:annotation>
+      <xs:documentation>DeviceProtection role name.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token"/>
+  </xs:simpleType>
+  <xs:complexType name="Empty">
+    <xs:annotation>
+      <xs:documentation>Empty content.</xs:documentation>
+    </xs:annotation>
+  </xs:complexType>
+  <xs:complexType name="Capability">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test capability base type (just "Settable" attribute).</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Settable" type="xs:boolean"/>
+  </xs:complexType>
+  <xs:complexType name="BooleanCapability">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test boolean capability.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="bms:Capability">
+        <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" name="AllowedValueList">
+            <xs:complexType>
+              <xs:sequence maxOccurs="unbounded">
+                <xs:element name="AllowedValue" type="xs:boolean"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NumericCapability">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test numeric capability.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="bms:Capability">
+        <xs:choice minOccurs="0">
+          <xs:element minOccurs="0" name="AllowedValueRange">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Minimum" type="xs:double"/>
+                <xs:element name="Maximum" type="xs:double"/>
+                <xs:element minOccurs="0" name="Step" type="xs:double"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="AllowedValueList">
+            <xs:complexType>
+              <xs:sequence maxOccurs="unbounded">
+                <xs:element name="AllowedValue" type="xs:string"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="StringCapability">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test string capability.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="bms:Capability">
+        <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" name="AllowedValueList">
+            <xs:complexType>
+              <xs:sequence maxOccurs="unbounded">
+                <xs:element name="AllowedValue" type="xs:string"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:attributeGroup name="ProtocolKey">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test protocol unique key attributes.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Name" use="required" type="bms:ProtocolName"/>
+    <xs:attribute default="" name="Version" type="xs:token"/>
+    <xs:attribute name="Profile" use="required" type="bms:ProfileName"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="ResultKey">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test result unique key attributes.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Interval" type="bms:IntervalRange"/>
+    <xs:attribute name="Stream" type="xs:unsignedInt"/>
+  </xs:attributeGroup>
+  <xs:group name="SettingsCaps">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test settings capabilities.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Interface" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Supported IP interface names</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Transport" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>TCP, UDP, ...</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Host" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Supported hosts (more likely, no list, so just indicates that Host is supported)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Port" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:65535]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="TLSPort" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:65535]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="SockBuffBytes" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="AppBuffBytes" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Direction" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Push, Pull, PushPull, PullPush</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="TimeMSecs" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="LengthBytes" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Username" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Supported usernames</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Password" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Supported passwords (more likely, no list, so just indicates that Password is supported)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Path" type="bms:StringCapability">
+        <xs:annotation>
+          <xs:documentation>Supported paths (more likely, no list, so just indicates that Path is supported)</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="BandwidthBytesPerSec" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="DSCP" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:63]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="EthernetPriority" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:7]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="IntervalMSecs" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Threads" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="TCPNoDelay" type="bms:BooleanCapability">
+        <xs:annotation>
+          <xs:documentation>0/1</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="TCPMSS" type="bms:NumericCapability">
+        <xs:annotation>
+          <xs:documentation>[0:]</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="ExitWhenDone" type="bms:BooleanCapability">
+        <xs:annotation>
+          <xs:documentation>0/1</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="ResultsCaps">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test results capabilities.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="TCPSYNTime" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TCPSYNACKTime" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TCPLateACKs" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="ROMTime" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="BOMTime" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="EOMTime" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TestBytesSent" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TestBytesReceived" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TotalBytesSent" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TotalBytesReceived" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TestPacketsSent" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TestPacketsReceived" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TotalPacketsSent" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="TotalPacketsReceived" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="DuplicatePackets" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="LostPackets" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="OutOfSequencePackets" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="ResentPackets" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="LatencyUSecs" type="bms:Empty"/>
+      <xs:element minOccurs="0" name="JitterUSecs" type="bms:Empty"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="FilesCaps">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test files capabilities.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="File">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Path" type="xs:string"/>
+            <xs:element default="1" minOccurs="0" name="RealFile" type="xs:boolean"/>
+            <xs:element minOccurs="0" name="SizeBytes" type="xs:unsignedLong"/>
+            <xs:element minOccurs="0" name="MIMEType" type="xs:token"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="Settings">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test settings.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Interface" type="xs:token"/>
+      <xs:element minOccurs="0" name="Transport">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="TCP"/>
+            <xs:enumeration value="UDP"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Host" type="xs:token"/>
+      <xs:element minOccurs="0" name="Port" type="xs:unsignedShort"/>
+      <xs:element minOccurs="0" name="TLSPort" type="xs:unsignedShort"/>
+      <xs:element minOccurs="0" name="SockBuffBytes" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="AppBuffBytes" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="Direction" type="bms:Direction"/>
+      <xs:element minOccurs="0" name="TimeMSecs" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="LengthBytes" type="xs:unsignedLong"/>
+      <xs:element minOccurs="0" name="Username" type="xs:string"/>
+      <xs:element minOccurs="0" name="Password" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>SHOULD always read back as empty string.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Path" type="xs:string"/>
+      <xs:element minOccurs="0" name="BandwidthBytesPerSec" type="xs:unsignedInt"/>
+      <xs:element default="0" minOccurs="0" name="DSCP">
+        <xs:simpleType>
+          <xs:restriction base="xs:unsignedInt">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="63"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element default="0" minOccurs="0" name="EthernetPriority">
+        <xs:simpleType>
+          <xs:restriction base="xs:unsignedInt">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="7"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element minOccurs="0" name="IntervalMSecs" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="Threads" type="xs:unsignedInt"/>
+      <xs:element default="0" minOccurs="0" name="TCPNoDelay" type="xs:boolean"/>
+      <xs:element minOccurs="0" name="TCPMSS" type="xs:unsignedInt"/>
+      <xs:element default="0" minOccurs="0" name="ExitWhenDone" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="SpecSettings">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test spec settings (top-level settings plus optional endpoint-specific settings).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="bms:Settings"/>
+      <xs:element minOccurs="0" name="Server">
+        <xs:complexType>
+          <xs:group ref="bms:Settings"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Client">
+        <xs:complexType>
+          <xs:group ref="bms:Settings"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="EndpointInfo">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test endpoint (server or client) capabilities and active instances.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="bms:SettingsCaps"/>
+      <xs:group ref="bms:FilesCaps"/>
+      <xs:group ref="bms:ResultsCaps"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Instance">
+        <xs:annotation>
+          <xs:documentation>XXX Was SpecSettings, but Settings is correct?</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group ref="bms:Settings"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="Results">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test results.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="TCPSYNTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="TCPSYNACKTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="TCPLateACKs" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="ROMTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="BOMTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="EOMTime" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="TestBytesSent" type="xs:unsignedLong"/>
+      <xs:element minOccurs="0" name="TestBytesReceived" type="xs:unsignedLong"/>
+      <xs:element minOccurs="0" name="TotalBytesSent" type="xs:unsignedLong"/>
+      <xs:element minOccurs="0" name="TotalBytesReceived" type="xs:unsignedLong"/>
+      <xs:element minOccurs="0" name="TestPacketsSent" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="TestPacketsReceived" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="TotalPacketsSent" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="TotalPacketsReceived" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="DuplicatePackets" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="LostPackets" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="OutOfSequencePackets" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="ResentPackets" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="LatencyUSecs" type="xs:unsignedInt"/>
+      <xs:element minOccurs="0" name="JitterUSecs" type="xs:int"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="NSLookupResult">
+    <xs:annotation>
+      <xs:documentation>NSLookup result (content of NSLookupResult element).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Result" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Results from the most recent invocation of the test, one instance per repetition.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Status">
+              <xs:annotation>
+                <xs:documentation>Result Parameter to represent whether the NS Lookup was successful or not.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="Success"/>
+                  <xs:enumeration value="Error_DNSServerNotAvailable"/>
+                  <xs:enumeration value="Error_HostNameNotResolved"/>
+                  <xs:enumeration value="Error_Timeout"/>
+                  <xs:enumeration value="Error_Other"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="AnswerType">
+              <xs:annotation>
+                <xs:documentation>Result parameter to represent whether the answer is Authoritative or not.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:token">
+                  <xs:enumeration value="None"/>
+                  <xs:enumeration value="Authoritative"/>
+                  <xs:enumeration value="NonAuthoritative"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="HostNameReturned">
+              <xs:annotation>
+                <xs:documentation>Result parameter to represent the fully qualified name for the Host Name in the calling parameter (e.g. HostName.DomainName); if no response was provided, then this parameter is an empty string.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:maxLength value="256"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="IPAddresses">
+              <xs:annotation>
+                <xs:documentation>Result parameter to represent the list of one or more comma-separated IPv4/IPv6 addresses returned by the NS Lookup; if no response was provided, then this parameter is an empty string.</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:maxLength value="256"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:element>
+            <xs:element name="DNSServerIP" type="bms:IPAddress">
+              <xs:annotation>
+                <xs:documentation>Result parameter to represent the actual DNS Server IPv4/IPv6 address that the NS Lookup used.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="ResponseTime" type="xs:unsignedInt">
+              <xs:annotation>
+                <xs:documentation>Response time (for the first response packet) in milliseconds, or 0 if no response was received.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BandwidthTestInfo">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test info (content of BandwidthTestInfo element).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="Protocol">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" name="Server">
+              <xs:complexType>
+                <xs:group ref="bms:EndpointInfo"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="Client">
+              <xs:complexType>
+                <xs:group ref="bms:EndpointInfo"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attributeGroup ref="bms:ProtocolKey"/>
+          <xs:attribute default="" name="BaseProfiles" type="bms:ProfileNames"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BandwidthTestSpec">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test spec (content of BandwidthTestSpec element).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Protocol">
+        <xs:complexType>
+          <xs:group ref="bms:SpecSettings"/>
+          <xs:attributeGroup ref="bms:ProtocolKey"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BandwidthTestResult">
+    <xs:annotation>
+      <xs:documentation>Bandwidth test result (content of BandwidthTestResult element).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Protocol">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Spec">
+              <xs:complexType>
+                <xs:group ref="bms:SpecSettings"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:choice maxOccurs="unbounded" minOccurs="0">
+              <xs:element name="Server">
+                <xs:complexType>
+                  <xs:group ref="bms:Results"/>
+                  <xs:attributeGroup ref="bms:ResultKey"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Client">
+                <xs:complexType>
+                  <xs:group ref="bms:Results"/>
+                  <xs:attributeGroup ref="bms:ResultKey"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attributeGroup ref="bms:ProtocolKey"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACLEntry">
+    <xs:annotation>
+      <xs:documentation>Individual ACL entry.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Action" type="bms:ActionName">
+        <xs:annotation>
+          <xs:documentation>The name of the action to which this ACL entry refers.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Filter" type="bms:FilterExpression">
+        <xs:annotation>
+          <xs:documentation>ACL filter expression that determines whether this entry matches a given action invocation.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Roles">
+        <xs:annotation>
+          <xs:documentation>List of Roles that are permitted to invoke this action if the filter matches.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:list itemType="bms:RoleName"/>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ACL">
+    <xs:annotation>
+      <xs:documentation>ACL data (content of ACL element).</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="ACLEntry" type="bms:ACLEntry"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="NSLookupResult" type="bms:NSLookupResult">
+    <xs:annotation>
+      <xs:documentation>GetNSLookupResult() result.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="BandwidthTestInfo" type="bms:BandwidthTestInfo">
+    <xs:annotation>
+      <xs:documentation>GetBandwidthTestInfo() result.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="BandwidthTestSpec" type="bms:BandwidthTestSpec">
+    <xs:annotation>
+      <xs:documentation>BandwidthTest() argument.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="BandwidthTestResult" type="bms:BandwidthTestResult">
+    <xs:annotation>
+      <xs:documentation>GetBandwidthTestResult() result.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="ACL" type="bms:ACL">
+    <xs:annotation>
+      <xs:documentation>GetACLData() result.</xs:documentation>
+    </xs:annotation>
+    <xs:unique name="ACLEntry">
+      <xs:selector xpath="ACLEntry"/>
+      <xs:field xpath="Action"/>
+      <xs:field xpath="Filter"/>
+    </xs:unique>
+  </xs:element>
+  <xs:element name="Test">
+    <xs:annotation>
+      <xs:documentation>This element is not used by any actions but is useful for test data because a single document can contain any mixture of top-level elements.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded" minOccurs="0">
+        <xs:element name="NSLookupResult" type="bms:NSLookupResult"/>
+        <xs:element name="BandwidthTestInfo" type="bms:BandwidthTestInfo"/>
+        <xs:element name="BandwidthTestSpec" type="bms:BandwidthTestSpec"/>
+        <xs:element name="BandwidthTestResult" type="bms:BandwidthTestResult"/>
+        <xs:element name="ACL" type="bms:ACL"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

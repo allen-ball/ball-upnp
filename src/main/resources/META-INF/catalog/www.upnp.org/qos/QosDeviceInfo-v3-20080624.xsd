@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns="http://www.upnp.org/schemas/QosDeviceInfo.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.upnp.org/schemas/QosDeviceInfo.xsd" elementFormDefault="qualified" id="QosDeviceInfo">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			QoS Device Information schema version 3.0. Copyright	2004,2005 UPnP(tm).	All	rights reserved.		
+  		
+			This schema is used to contain information regarding a traffic stream not a device. The name is something of a misnomer but persists for legacy reasons.
+			
+			Schema Location: "http://www.upnp.org/schemas/qos/QosDeviceInfo-v3.xsd"
+        </xs:documentation>
+	</xs:annotation>
+	<xs:element name="QosDeviceInfo" type="QosDeviceInfoType"/>
+	<xs:complexType name="QosDeviceInfoType">
+		<xs:sequence>
+			<xs:element name="TrafficHandle" type="xs:string"/>
+			<xs:element name="SourcePort" type="IpPortNumber" minOccurs="0"/>
+			<xs:element name="DestinationPort" type="IpPortNumber" minOccurs="0"/>
+			<xs:element name="IpProtocol" type="IpProtocolType"/>
+			<xs:element name="v2" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="v3" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="SourceAddress" type="IpAddressType" minOccurs="0"/>
+									<xs:element name="DestinationAddress" type="IpAddressType" minOccurs="0"/>
+									<xs:element name="v4" type="v4type" minOccurs="0"/>
+									<xs:choice minOccurs="0" maxOccurs="unbounded">
+										<xs:any namespace="##other" processContents="lax"/>
+										<xs:any namespace="##local" processContents="lax"/>
+									</xs:choice>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:any namespace="##other" processContents="lax"/>
+							<xs:any namespace="##local" processContents="lax"/>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!-- allow any element except those from target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<!--- End of root element definition QosDeviceInfo -->
+	<xs:simpleType name="IpPortNumber">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="IpProtocolType">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="v4type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="IPv4Address">
+		<xs:restriction base="xs:string">
+ 			<xs:pattern value="(([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"/>
+ 		</xs:restriction>
+ 	</xs:simpleType>
+	<xs:simpleType name="IPv6Address">
+		<xs:restriction base="xs:hexBinary">
+ 			<xs:length value="16"/>
+ 		</xs:restriction>
+ 	</xs:simpleType>
+	<xs:complexType name="IpAddressType">
+		<xs:sequence>
+			<xs:choice>
+ 				<xs:element name="Ipv4" type="IPv4Address"/>
+ 				<xs:element name="Ipv6" type="IPv6Address"/>
+ 			</xs:choice>
+ 			<xs:element name="PrefixLength" type="PrefixLength" minOccurs="0"/>
+ 		</xs:sequence>
+ 	</xs:complexType>
+	<xs:simpleType name="PrefixLength">
+    		<xs:restriction base="xs:positiveInteger">
+        		<xs:minInclusive value="1"/>
+        		<xs:maxInclusive value="128"/>
+    		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by Swade (Sharp Labs of America) -->
+<!-- http://www.upnp.org/schemas/qos/ListOfAdmittedTraffic-v3.xsd -->
+<xs:schema xmlns="urn:schemas-upnp-org:qos:ListOfAdmittedTraffic" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:td="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" xmlns:at="urn:schemas-upnp-org:qos:AdmitTrafficQosExtendedResult" xmlns:re="urn:schemas-upnp-org:qos:Resource" targetNamespace="urn:schemas-upnp-org:qos:ListOfAdmittedTraffic" elementFormDefault="qualified" attributeFormDefault="unqualified" id="ListOfAdmittedTraffic">
+	<xs:import namespace="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" schemaLocation="http://www.upnp.org/schemas/qos/TrafficDescriptor-v3.xsd"/>
+	<xs:import namespace="urn:schemas-upnp-org:qos:AdmitTrafficQosExtendedResult" schemaLocation="http://www.upnp.org/schemas/qos/AdmitTrafficQosExtendedResult-v3.xsd"/>
+	<xs:import namespace="urn:schemas-upnp-org:qos:Resource" schemaLocation="http://www.upnp.org/schemas/qos/Resource-v3.xsd"/>
+	<xs:annotation>
+		<xs:documentation xml:lang="en">	
+		  This file describes the schema for the ListOfAdmittedTraffic
+		  This is for Version 3.0 of the UPnP QoS specification
+	          Copyright 2007-2008 Contributing Members of the UPnP Forum. All rights reserved.
+
+		  Schema Location: "http://www.upnp.org/schemas/qos/ListOfAdmittedTraffic-v3.xsd"
+		  </xs:documentation>
+	</xs:annotation>
+	<!-- Root element -->
+	<xs:element name="ListOfAdmittedTraffic" type="ListOfAdmittedTrafficType"/>
+	<!-- Definition of root element ListOfAdmittedTrafficType -->
+	<xs:complexType name="ListOfAdmittedTrafficType">
+		<xs:sequence>
+			<xs:element name="NumberOfAdmittedTrafficItems" type="xs:integer"/>
+			<xs:element name="AdmittedTrafficItem" type="AdmittedTrafficItemType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<!-- allow any element except those from v1 target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- End of definition of root element ListOfAdmittedTrafficType -->
+	<xs:complexType name="AdmittedTrafficItemType">
+		<xs:sequence>
+			<xs:element name="TrafficDescriptor" type="td:TrafficDescriptorType"/>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="NetworkResource" type="NetworkResourceType"/>
+				<xs:element name="DeviceResource" type="DeviceResourceType"/>
+			</xs:choice>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="NetworkResourceType">
+		<xs:sequence>
+			<xs:element name="InterfaceId" type="xs:string"/>
+			<xs:element name="QosSegmentId" type="xs:string"/>
+			<xs:element name="LinkId" type="xs:string" minOccurs="0"/>
+			<xs:element name="Layer2StreamId" type="Layer2StreamId64Type" minOccurs="0"/>
+			<xs:element name="AdmissionStatusNet" type="at:AdmissionStatusNetType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DeviceResourceType">
+		<xs:sequence>
+			<xs:element name="DeviceResourceId" type="xs:string"/>
+			<xs:element name="AdmissionStatusDev" type="at:AdmissionStatusDevType" minOccurs="0"/>
+			<xs:element name="v4" type="v4type" minOccurs="0"/>
+			<!-- allow any element except those from v1 target namespace -->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v4type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:any namespace="##other" processContents="lax"/>
+			<xs:any namespace="##local" processContents="lax"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="Layer2StreamId64Type">
+		<xs:restriction base="xs:string">
+			<xs:length value="64" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

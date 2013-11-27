@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:ds:dsinfo" targetNamespace="urn:schemas-upnp-org:ds:dsinfo" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20130701">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        DataStoreInfo schema for UPnP DataStore service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="DataStoreInfo">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="datastoretables" maxOccurs="1" minOccurs="1">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="datastoretable" maxOccurs="unbounded" minOccurs="0">
+                <xsd:complexType>
+                  <xsd:attribute name="tableGUID" type="xsd:string" use="required"/>
+                  <xsd:attribute name="tableURN" type="urn_types_allowed" use="required"/>
+                  <xsd:attribute name="updateID" type="xsd:integer" use="optional"/>
+                </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <!-- URN templates for SensorManagement and DataStore    -->
+  <!-- DataTableInfo                                       -->
+  <!--    (ds-aurn)   - DataTable appliection URN          -->
+  <!-- Sensor Data Model:                                  -->
+  <!--   (smgt-sct)  - SensorCollectionType URN (smgt-sct) -->
+  <!--   (smgt-st)   - SensorType URN                      -->
+  <!--   (smgt-surn) - Sensor DataItem URN                 -->
+  <xsd:simpleType name="urn_types_allowed_smgt-sct">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="urn:upnp-org:smgt-sct:.+:.*:.*:.*:.*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="urn_types_allowed_smgt-st">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="urn:upnp-org:smgt-st:.+:.*:.*:.*:.*:(monitor|status|datafeed|telemetry|setting|control|alarms)"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="urn_types_allowed_smgt-surn">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="urn:upnp-org:smgt-surn:.+:.*:.*:.*:.*:(monitor|status|datafeed|telemetry|setting|control|alarms)"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="urn_types_allowed_ds-aurn">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="urn:upnp-org:ds_aurn:.+:.*:.*:.*:.*"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="urn_types_allowed">
+    <xsd:union memberTypes="urn_types_allowed_smgt-sct urn_types_allowed_smgt-st urn_types_allowed_smgt-surn urn_types_allowed_ds-aurn"/>
+  </xsd:simpleType>
+</xsd:schema>
+
+
+

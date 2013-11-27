@@ -1,0 +1,435 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:avs="urn:schemas-upnp-org:av:avs" xmlns:av="urn:schemas-upnp-org:av:av" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:schemas-upnp-org:av:avs" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3-20130331">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+		Note that all schema supplied by the UPnP Forum AV WC committee are for informational use only and that the 
+		standardized DCPs describe the normative requirements for these schema. Some schema provided do not necessarily
+		embody requirements regarding number of element occurrances allowed or their ordering. 
+		
+		Schema for stateVariableValuePairs in UPnP A/V
+		</xsd:documentation>
+	</xsd:annotation>
+	<xsd:import namespace="urn:schemas-upnp-org:av:av" schemaLocation="http://www.upnp.org/schemas/av/av.xsd"/>
+	<!--============================================================
+
+							Global elements
+	
+	Elements that are allowed as root elements for any document based
+	on this schema.  This schema defines the following XML documents:
+	
+	stateVariableValuePairs - Used by the AVT/RCS:(Get/Set)StateVariables().
+	Features - Used by the CDS:GetFeatureList() action.
+	Capabilities - Used by the CDS:GetFFQCapabilites() action.
+
+    ============================================================-->
+	<xsd:element name="stateVariableValuePairs" type="avs:stateVariableValuePairs.type"/>
+	<xsd:element name="Features" type="avs:Features.type"/>
+	<xsd:element name="Capabilities" type="avs:Capabilities.type"/>
+	<!--============================================================
+
+	'StateVariableValuePairs' is the root element of any UPnP AV
+		document that contains a list of service state variables and
+		their values.
+	It contains 1 or more occurrences of the element 'stateVariable'.
+
+    ============================================================-->
+	<xsd:complexType name="stateVariableValuePairs.type">
+		<xsd:sequence>
+			<xsd:element name="stateVariable" type="avs:stateVariable.type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--============================================================
+
+     'stateVariable' elements identify an individual statevariable name and value.
+
+    ============================================================-->
+	<xsd:complexType name="stateVariable.type">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="variableName" type="xsd:NCName" use="required"/>
+				<xsd:attribute name="channel" type="xsd:string" use="optional"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Schema for UPnP A/V ContentDirectory Service FeatureList
+		</xsd:documentation>
+	</xsd:annotation>
+	<!--============================================================
+
+	'Features' is the root element of any UPnP AV document that
+		contains a list of service-supported features.
+	It contains 0 or more occurrences of the element 'Feature'.
+
+    ============================================================-->
+	<xsd:complexType name="Features.type">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Feature" type="avs:Feature.type"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<!--============================================================
+
+	'Feature' elements signify support for and give other relevant
+		information about an individual feature.
+	Attributes:
+		name		Name of the Feature
+		version		Integer version number of the Feature.
+
+		============================================================-->
+	<xsd:simpleType name="featureNames.base.type">
+		<xsd:restriction base="xsd:NCName"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="featureNames.wc.type">
+		<xsd:restriction base="avs:featureNames.base.type">
+			<xsd:enumeration value="BOOKMARK"/>
+			<xsd:enumeration value="EPG"/>
+			<xsd:enumeration value="TUNER"/>
+			<xsd:enumeration value="FOREIGN_METADATA"/>
+			<xsd:enumeration value="MULTI_STREAM"/>
+			<xsd:enumeration value="SEGMENTATION"/>
+			<xsd:enumeration value="DEVICE_MODE"/>
+			<xsd:enumeration value="CLOCKSYNC"/>
+			<xsd:enumeration value="CONTENT_PROTECTION"/>
+      <xsd:enumeration value="CONTAINER_SHORTCUTS"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="featureNames.vx.type">
+		<xsd:restriction base="avs:featureNames.base.type"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="featureNames.type">
+		<xsd:union memberTypes="avs:featureNames.wc.type avs:featureNames.vx.type"/>
+	</xsd:simpleType>
+	<xsd:complexType name="Feature.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				The existence of a Feature element indicates support for the
+				feature whose name and version are given by the values of the
+				'name' and 'version' attributes, respectively.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:group ref="avs:allowedUnderFeature.wc.group" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="name" type="avs:featureNames.type" use="required"/>
+		<xsd:attribute name="version" type="xsd:unsignedInt" use="required"/>
+	</xsd:complexType>
+	<xsd:group name="allowedUnderFeature.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				All AV Working Committee defined Feature elements MUST contain one or
+				more occurrences of the element 'objectIDs', optionally followed by any
+				vendor-defined elements.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:group ref="avs:allowedUnderFeature.EPGTunerBookmark.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.ForeignMetadata.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.FFQ.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.MultiStream.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.Segmentation.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.DeviceMode.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.ClockSync.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.ContentProtection.wc.group"/>
+      <xsd:group ref="avs:allowedUnderFeature.ContainerShortcuts.wc.group"/>
+			<xsd:group ref="avs:allowedUnderFeature.vx.group" minOccurs="0"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="allowedUnderFeature.EPGTunerBookmark.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				Allowed under an EPG, Tuner, or Bookmark  feature.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="avs:allowedUnderFeature.ObjectList.wc.group"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="allowedUnderFeature.ForeignMetadata.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				Allowed under an “ForeignMetadata" feature.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="type" type="avs:Feature.FM.Type.type"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="allowedUnderFeature.FFQ.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				Allowed under an “FFQ" feature.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:sequence minOccurs="1" maxOccurs="unbounded">
+				<xsd:element name="objectID" type="avs:Feature.FFQ.ObjectID.type"/>
+			</xsd:sequence>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="allowedUnderFeature.ObjectList.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				All AV Working Committee defined Feature elements MAY contain one or
+				more occurrences of the element 'objectIDs', optionally followed by any
+				vendor-defined elements.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="objectIDs" type="av:csv.0_.string.len.1_"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="Feature.FM.Type.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				Foreign Metadata 'type' element
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="id" type="xsd:string" use="required"/>
+				<xsd:attribute name="provider" type="xsd:string" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="Feature.FFQ.ObjectID.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				Free-Form Query 'objectID' element
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="av:didl-lite_COLON_at_id.vd.type">
+				<xsd:attribute name="level" type="xsd:string" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--============================================================
+	MultiStream Capability Elements
+		<feature name="MULTI_STREAM" version="1">
+			<componentCreate compResCreate="0 | 1" />
+		</feature>
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.MultiStream.wc.group">
+		<xsd:choice>
+			<xsd:element name="componentCreate" minOccurs="0">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attribute name="compResCreate" type="xsd:boolean" use="required"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+	<!--============================================================
+	 Segmentation Capability Elements
+		<feature name="SEGMENTATION" version="1">
+			<segmentCreate protocolInfo="..." >
+				<additionalInfoRequired>byte</additionalInfoRequired>
+				<additionalInfoRequired>frame</additionalInfoRequired>
+			</segmentCreate>
+		</feature>
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.Segmentation.wc.group">
+		<xsd:choice>
+			<xsd:element name="segmentCreate" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="additionalInfoRequired" minOccurs="0" maxOccurs="unbounded">
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:enumeration value="frame"/>
+									<xsd:enumeration value="byte"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="protocolInfo" type="xsd:string" use="required"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+	<!--============================================================
+	 DeviceMode Capability Elements
+		<feature name="DEVICE_MODE" version="1">
+			<dmType id="ActionBurst" CPRequested="0 | 1">
+				<actionNameProcessing support="0 | 1" enforce="0 | 1" / >
+			</dmType>
+			<dmType id="ExclusiveOwnership" CPRequested="0 | 1">
+				<resourceID type="Device" />
+			</dmType>
+		</feature>
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.DeviceMode.wc.group">
+		<xsd:choice>
+			<xsd:element name="dmType" type="avs:Feature.DeviceMode.Type.type"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:complexType name="Feature.DeviceMode.Type.type">
+		<xsd:choice>
+			<xsd:element name="actionNameProcessing">
+				<xsd:complexType>
+					<xsd:attribute name="support" type="xsd:boolean" use="required"/>
+					<xsd:attribute name="enforce" type="xsd:boolean" use="required"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="resourceID">
+				<xsd:complexType>
+					<xsd:attribute name="type" use="required">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="Device"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+		<xsd:attribute name="id" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="ActionBurst"/>
+					<xsd:enumeration value="ExclusiveOwnership"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="CPRequested" type="xsd:boolean" use="required"/>
+	</xsd:complexType>
+	<!--============================================================
+	 ClockSync Capability Elements
+		<feature name="CLOCKSYNC" version="1" />
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.ClockSync.wc.group">
+		<xsd:choice/>
+	</xsd:group>
+	<!--============================================================
+	 ContentProtection Capability Elements
+		<feature name="CONTENT_PROTECTION" version="1" />
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.ContentProtection.wc.group">
+		<xsd:choice/>
+	</xsd:group>
+
+<!--============================================================  
+	 ClockSync Capability Elements
+		<feature name="CONTAINER_SHORTCUTS" version="1" />
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.ContainerShortcuts.wc.group">
+		<xsd:choice>
+			<xsd:element name="shortcutlist">
+				<xsd:complexType>
+				<xsd:sequence>
+			      		<xsd:element name="shortcut" maxOccurs="unbounded">
+				      		<xsd:complexType>
+					      	<xsd:sequence>
+			           			<xsd:element name="name">
+			           				<xsd:simpleType>
+										    <xsd:restriction base="xsd:string">
+                          <xsd:enumeration value="MUSIC"/>
+                          <xsd:enumeration value="MUSIC_ALBUMS"/>
+                          <xsd:enumeration value="MUSIC_ARTISTS"/>
+                          <xsd:enumeration value="MUSIC_GENRES"/>
+                          <xsd:enumeration value="MUSIC_PLAYLISTS"/>
+                          <xsd:enumeration value="MUSIC_RECENTLY_ADDED"/>
+                          <xsd:enumeration value="MUSIC_LAST_PLAYED"/>
+                          <xsd:enumeration value="MUSIC_AUDIOBOOKS"/>
+                          <xsd:enumeration value="MUSIC_STATIONS"/>
+                          <xsd:enumeration value="MUSIC_ALL"/>
+                          <xsd:enumeration value="MUSIC_FOLDER_STRUCTURE"/>
+                          <xsd:enumeration value="IMAGES"/>
+                          <xsd:enumeration value="IMAGES_YEARS"/>
+                          <xsd:enumeration value="IMAGES_YEARS_MONTH"/>
+                          <xsd:enumeration value="IMAGES_ALBUM"/>
+                          <xsd:enumeration value="IMAGES_SLIDESHOWS"/>
+                          <xsd:enumeration value="IMAGES_RECENTLY_ADDED"/>
+                          <xsd:enumeration value="IMAGES_LAST_WATCHED"/>
+                          <xsd:enumeration value="IMAGES_ALL"/>
+                          <xsd:enumeration value="IMAGES_FOLDER_STRUCTURE"/>
+                          <xsd:enumeration value="VIDEOS"/>
+                          <xsd:enumeration value="VIDEOS_GENRES"/>
+                          <xsd:enumeration value="VIDEOS_YEARS"/>
+                          <xsd:enumeration value="VIDEOS_YEARS_MONTH"/>
+                          <xsd:enumeration value="VIDEOS_ALBUM"/>
+                          <xsd:enumeration value="VIDEOS_RECENTLY_ADDED"/>
+                          <xsd:enumeration value="VIDEOS_LAST_PLAYED"/>
+                          <xsd:enumeration value="VIDEOS_RECORDINGS"/>
+                          <xsd:enumeration value="VIDEOS_ALL"/>
+                          <xsd:enumeration value="VIDEOS_FOLDER_STRUCTURE"/>
+                          <xsd:enumeration value="FOLDER_STRUCTURE"/>
+										    </xsd:restriction>
+									      </xsd:simpleType>
+								      </xsd:element>
+			          			<xsd:element name="objectID" type="xsd:string"/>
+                    </xsd:sequence>
+                		</xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+             	</xsd:complexType>
+          </xsd:element>
+		</xsd:choice>
+	</xsd:group>
+
+	<!--============================================================
+	 Vendor Capability Elements
+    ============================================================-->
+	<xsd:group name="allowedUnderFeature.vx.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				Currently the content of a Feature element may include zero or
+				more of the occurrences of the element 'objectIDs' and/or any
+				vendor-defined element.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!--============================================================
+
+	Free-Form Query (FFQ) Capabilities
+	'Capabilities' is the root element of any UPnP AV document that
+	contains a list of service-supported FreeFormQuery capabilities.
+	It contains 0 or 1 occurrences of the element 'namespaceList', which
+	contains a list of the element 'namespaceName', and 0 or 1 
+	occurrences of the element 'propertyList', which contains a list of
+	the element 'propertyName'.
+
+    ============================================================-->
+	<xsd:complexType name="Capabilities.type">
+		<xsd:annotation/>
+		<xsd:all>
+			<xsd:element name="namespaceList" type="avs:namespaceList.type" minOccurs="1"/>
+			<xsd:element name="propertyList" type="avs:propertyList.type" minOccurs="1"/>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="namespaceList.type">
+		<xsd:annotation>
+			<xsd:documentation>
+        The existence of a namespaceList element indicates support for searches
+        using FreeFormQuery on the properties belonging to those namespaces.
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="namespaceName" type="avs:namespaceName.type"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:simpleType name="namespaceName.type">
+		<xsd:restriction base="av:NSName"/>
+	</xsd:simpleType>
+	<xsd:complexType name="propertyList.type">
+		<xsd:annotation>
+			<xsd:documentation>
+        The existence of a propertyList element indicates support for searches
+        using FreeFormQuery on the properties in the list.
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="propertyName" type="avs:propertyName.type"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:simpleType name="propertyName.type">
+		<xsd:restriction base="av:pName"/>
+	</xsd:simpleType>
+</xsd:schema>

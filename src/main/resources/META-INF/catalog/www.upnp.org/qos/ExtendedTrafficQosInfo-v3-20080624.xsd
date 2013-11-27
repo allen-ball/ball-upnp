@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by Swade (Sharp Labs of America) -->
+<!-- schema start tags. Note that namespace td3 refers to an existing namespace name hence the http -format -->
+<!-- What is the role of the id field? -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-upnp-org:qos:ExtendedTrafficQosInfo" xmlns:td3="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" targetNamespace="urn:schemas-upnp-org:qos:ExtendedTrafficQosInfo" elementFormDefault="qualified">
+	<!-- below only when using other schemes -->
+	<xs:import namespace="http://www.upnp.org/schemas/TrafficDescriptorv1.xsd" schemaLocation="http://www.upnp.org/schemas/qos/TrafficDescriptor-v3.xsd"/>
+	<!-- some textual clarification -->
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+		  This file describes the schema for the ExtendedTrafficQosInfo
+		  This is for Version 3.0 of the UPnP QoS specification
+	          Copyright 2007-2008 Contributing Members of the UPnP Forum. All rights reserved.
+
+		  Schema Location: "http://www.upnp.org/schemas/qos/ExtendedTrafficQosInfo-v3.xsd"
+		</xs:documentation>
+	</xs:annotation>
+	<!-- next line is the root element and is of type ExtendedTrafficQosInfoType -->
+	<xs:element name="ExtendedTrafficQosInfo" type="ExtendedTrafficQosInfoType"/>
+	<!-- type definition of the ExtendedTrafficQosInfoType -->
+	<xs:complexType name="ExtendedTrafficQosInfoType">
+		<xs:sequence>
+			<xs:element name="UINOfCurrentStream" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:nonNegativeInteger">
+						<xs:minInclusive value="0"/>
+						<xs:maxInclusive value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BlockingStreamsPerSegment" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QosSegmentId" type="xs:string"/>
+						<xs:element name="DeviceResourceId" type="xs:string" minOccurs="0"/>
+						<xs:element name="BlockingStreamInfo" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="TrafficDescriptor" type="td3:TrafficDescriptorType" minOccurs="0"/>
+									<xs:element name="UserImportanceNumber" minOccurs="0">
+										<xs:simpleType>
+											<xs:restriction base="xs:nonNegativeInteger">
+												<xs:minInclusive value="0"/>
+												<xs:maxInclusive value="255"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="Layer2StreamId" type="Layer2StreamId64Type" minOccurs="0"/>
+									<xs:element name="v4OptionalInfo" type="v4OptionalParamsType" minOccurs="0"/>
+									<xs:choice minOccurs="0" maxOccurs="unbounded">
+										<xs:any namespace="##other" processContents="lax"/>
+										<xs:any namespace="##local" processContents="lax"/>
+									</xs:choice>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:choice minOccurs="0" maxOccurs="unbounded">
+							<xs:any namespace="##other" processContents="lax"/>
+							<xs:any namespace="##local" processContents="lax"/>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="v4Info" type="v4OptionalParamsType" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v4OptionalParamsType">
+		<xs:sequence>
+			<xs:any namespace="##targetNamespace" processContents="lax" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute/>
+	</xs:complexType>
+	<xs:simpleType name="Layer2StreamId64Type">
+		<xs:restriction base="xs:string">
+			<xs:length value="64" fixed="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

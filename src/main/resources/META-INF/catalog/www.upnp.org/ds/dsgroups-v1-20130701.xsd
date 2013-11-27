@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:ds:dsgroups" targetNamespace="urn:schemas-upnp-org:ds:dsgroups" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20130701">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        DataStoreGroups schema for UPnP DataStore service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="DataStoreGroups">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="datastoregroup" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:attribute name="groupName" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
+
+
+

@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<schema targetNamespace="urn:schemas-upnp-org:phone:cams" xmlns:cams="urn:schemas-upnp-org:phone:cams" xmlns="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" xmlns:peer="urn:schemas-upnp-org:phone:peer">
+<import namespace="urn:schemas-upnp-org:phone:peer" schemaLocation="http://www.upnp.org/schemas/phone/peer-v1.xsd"/>
+
+  <simpleType name="targetNamesType">
+  <restriction base="string">
+    <enumeration value="TelCPName" />
+    <enumeration value="TelCPID" />
+    <enumeration value="Username" />
+    <enumeration value="*" />
+  </restriction>
+  </simpleType>
+
+  <simpleType name="callStatusValueType">
+  <restriction base="string">
+    <enumeration value="Ringing" />
+    <enumeration value="Dialing" />
+    <enumeration value="Calling" />
+    <enumeration value="Connected" />
+    <enumeration value="Talking" />
+    <enumeration value="Disconnected" />
+    <enumeration value="SendingModifyRequest" />
+    <enumeration value="ReceivingModifyRequest" />
+    <enumeration value="Modified" />
+    <enumeration value="ModifiyFailed" />
+  </restriction>
+  </simpleType>
+
+  <simpleType name="callStatusReasonType">
+  <restriction base="string">
+    <enumeration value="Accepted by TS" />
+    <enumeration value="Initiated by TS" />
+    <enumeration value="Busy" />
+    <enumeration value="Not Acceptable Capability" />
+    <enumeration value="Not Found" />
+    <enumeration value="Rejected by TS" />
+    <enumeration value="Rejected" />
+    <enumeration value="Cancelled" />
+  </restriction>
+  </simpleType>
+
+  <simpleType name="priorityValueType">
+  <restriction base="string">
+    <enumeration value="Emergency" />
+    <enumeration value="Normal" />
+  </restriction>
+  </simpleType>
+
+  <simpleType name="mediaCapabilityFormatType">
+  <restriction base="string">
+    <enumeration value="SDP" />
+  </restriction>
+  </simpleType>
+
+  <complexType name="callBackInfoType">
+    <choice minOccurs="0" maxOccurs="unbounded">
+      <element name="callBackInfo" form="unqualified">
+        <complexType>
+          <sequence>
+            <element name="callBackID" form="unqualified" type="string" />
+            <element name="callee" form="unqualified" maxOccurs="unbounded">
+              <complexType>
+                <sequence>
+                  <element ref="peer:id" />
+                </sequence>
+              </complexType>
+            </element>
+          </sequence>
+        </complexType>
+      </element>
+    </choice>
+  </complexType>
+
+  <complexType name="TCListType">
+    <sequence>
+      <element name="TC" form="unqualified" minOccurs="0" maxOccurs="unbounded">
+        <complexType>
+          <sequence>
+            <element name="UDN" form="unqualified" type="string" minOccurs="0" />
+            <element name="mediaSessionID" form="unqualified" type="string" minOccurs="0" />
+          </sequence>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="callInfoType">
+    <sequence>
+      <element name="callID" form="unqualified" type="string" minOccurs="1" />
+      <element name="targetNames" form="unqualified" nillable="true" minOccurs="1">
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="type" form="unqualified" type="cams:targetNamesType" use="required" />
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element name="callStatus" form="unqualified" nillable="true" minOccurs="1">
+        <complexType>
+          <simpleContent>
+            <extension base="cams:callStatusValueType">
+              <attribute name="reason" form="unqualified" type="cams:callStatusReasonType" use="optional" />
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element name="priority" form="unqualified" type="cams:priorityValueType" minOccurs="0" maxOccurs="1" />
+      <element name="remoteParty" form="unqualified" minOccurs="0" maxOccurs="1">
+        <complexType>
+          <sequence>
+            <element ref="peer:id" minOccurs="0" maxOccurs="unbounded" />
+          </sequence>
+        </complexType>
+      </element>
+      <element name="TCList" form="unqualified" minOccurs="0" maxOccurs="1" type="cams:TCListType" />
+      <element name="enableMediaMixing" form="unqualified" type="integer" minOccurs="0" />
+      <element name="shareMedia" form="unqualified" type="string" minOccurs="0" />
+      <element name="mediaCapability" form="unqualified" nillable="true" minOccurs="0" maxOccurs="1">
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="format" form="unqualified" type="cams:mediaCapabilityFormatType" use="optional" />
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element name="nativeMediaCapability" form="unqualified" nillable="true" minOccurs="0" maxOccurs="1">
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="format" form="unqualified" type="string" use="optional" />
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+
+  <element name="callInfo" type="cams:callInfoType" />
+
+  <element name="callInfoList">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element name="callInfo" form="unqualified" type="cams:callInfoType" />
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="mediaCapabilityInfo">
+    <complexType>
+      <sequence>
+        <element name="mediaMixingCapability" form="unqualified" type="string" minOccurs="0" />
+        <element name="mediaSharingCapability" form="unqualified" type="string" minOccurs="0" />
+        <element name="enableMediaMixing" form="unqualified" type="integer" minOccurs="0" />
+        <element name="shareMedia" form="unqualified" type="string" minOccurs="0" />
+        <element name="mediaCapability" form="unqualified" nillable="true" minOccurs="0" maxOccurs="1">
+          <complexType>
+            <simpleContent>
+              <extension base="string">
+                <attribute name="format" form="unqualified" type="cams:mediaCapabilityFormatType" />
+              </extension>
+            </simpleContent>
+          </complexType>
+        </element>
+        <element name="nativeMediaCapability" form="unqualified" nillable="true" minOccurs="0" maxOccurs="1">
+          <complexType>
+            <simpleContent>
+              <extension base="string">
+                <attribute name="format" form="unqualified" type="cams:mediaCapabilityFormatType" />
+              </extension>
+            </simpleContent>
+          </complexType>
+        </element>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="callLogs">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element name="call" form="unqualified">
+          <complexType>
+            <sequence>
+              <element name="type" form="unqualified" type="string" />
+              <element name="caller" form="unqualified" maxOccurs="unbounded">
+                <complexType>
+                  <sequence>
+                    <element ref="peer:id" />
+                    <element ref="peer:name" minOccurs="0" />
+                  </sequence>
+                </complexType>
+              </element>
+              <element name="callee" form="unqualified" maxOccurs="unbounded">
+                <complexType>
+                  <sequence>
+                    <element ref="peer:id" />
+                    <element ref="peer:name" minOccurs="0" />
+                  </sequence>
+                </complexType>
+              </element>
+              <element name="startDateTime" form="unqualified" type="string" />
+              <element name="duration" form="unqualified" type="string" minOccurs="0" />
+            </sequence>
+            <attribute name="direction" form="unqualified" type="string" />
+            <attribute name="success" form="unqualified" type="string" />
+          </complexType>
+        </element>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="CallBackAvailability">
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element name="callBack" form="unqualified">
+          <complexType>
+            <sequence>
+              <element name="callBackID" form="unqualified" type="string" />
+            </sequence>
+          </complexType>
+        </element>
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="callBackInfoList" msdata:IsDataSet="true" msdata:Locale="en-US" msdata:Prefix="cams">
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element name="callBackInfo" form="unqualified" type="cams:callBackInfoType" />
+      </choice>
+    </complexType>
+  </element>
+
+  <element name="TCList" type="cams:TCListType" />
+  
+</schema>

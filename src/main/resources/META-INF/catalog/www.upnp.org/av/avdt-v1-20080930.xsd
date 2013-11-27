@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	targetNamespace="urn:schemas-upnp-org:av:avdt"
+	xmlns:avdt="urn:schemas-upnp-org:av:avdt"
+	xmlns:av="urn:schemas-upnp-org:av:av"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1-20080930">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Defines the UPnP A/V Datastructure Template (AVDT).
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+		schemaLocation="http://www.w3.org/2005/08/xml.xsd"/>
+	<xsd:import namespace="urn:schemas-upnp-org:av:av"
+		schemaLocation="http://www.upnp.org/schemas/av/av-v2.xsd"/>
+
+	<!--============================================================
+
+	'AVDT' is the root element of AVDataStructure.
+
+	============================================================-->
+	<xsd:element name="AVDT" type="avdt:rootType"/>
+	<xsd:complexType name="rootType">
+		<xsd:annotation>
+			<xsd:documentation> Root element. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="contextID" type="xsd:anyType"/>
+			<xsd:element name="dataStructType" type="avdt:dataStructType.type"/>
+			<xsd:element name="fieldTable" type="avdt:fieldTable.type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--============================================================
+
+	'contextID' element identifies context in which this
+	data structure is defined.
+
+
+	<xsd:complexType name="contextID.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				Identifies the context for which this data structure is defined. The
+				use of xsd:anyType allows mixed text and element content plus any attributes.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:group>
+			<xsd:anyType/>
+		</xsd:group>
+	</xsd:complexType>
+		============================================================-->	
+	<!--============================================================
+
+	'dataStructType' element identifies data structure.
+
+	============================================================-->
+	<xsd:complexType name="dataStructType.type">
+		<xsd:annotation>
+			<xsd:documentation> Identifies the data structure being described. Scoped by the
+				contextID element. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:QName">
+				<xsd:anyAttribute/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	
+	<!--============================================================
+
+	'fieldTable' element contains one or more ‘field’ elements.
+
+	============================================================-->
+	<xsd:complexType name="fieldTable.type">
+		<xsd:annotation>
+			<xsd:documentation> Contains all of the field elements for this data structure.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="field" type="avdt:field.type"/>
+		</xsd:choice>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+	<!--============================================================
+
+	'field' element contains:
+	'name' 'dataType' 'allowedValueDescriptor' elements.
+
+	============================================================-->
+	<xsd:complexType name="field.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				Identifies one of the fields of this data structure.
+				Includes: name, dataType and elements.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="av:pName"/>
+			<xsd:element name="dataType" type="avdt:dataType.type"/>
+			<xsd:element name="minCountTotal" type="xsd:unsignedInt"
+				minOccurs="0" default="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						'minCountTotal' represents the minimum number of times this
+						field MUST occur in each XML instance document.(MUST be >= 0)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxCountTotal" type="av:unsignedInt.or.UNBOUNDED"
+				minOccurs="0" default="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						'maxCountTotal' represents the maximum number of times this
+						field may occur in each XML instance document.(MUST be >= 0)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="minListSizeTotal" type="xsd:unsignedInt"
+				minOccurs="0" default="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						When this dataType contains a CSV list, 'minListSizeTotal' represents
+						the minimum number of values that MUST appear in the list.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxListSizeTotal" type="av:unsignedInt.or.UNBOUNDED"
+				minOccurs="0" default="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						When this dataType contains a CSV list, 'maxListSizeTotal' represents
+						the maximum number of values that MUST appear in the list.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="allowedValueDescriptor" type="avdt:allowedValueDescriptor.type"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+	<!--============================================================
+
+	'name.type' is used for the name of a 'field'.
+
+	============================================================-->
+	<xsd:complexType name="name.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				Element identifies field name. Spec defines this as either a "QName" or
+				"QName '@' NCName". This is difficult to define in XML Schema, so it's
+				typed as a string right now.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:anyAttribute/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--============================================================
+
+	'dataType.type' is used to declare the data type of a 'field'.
+
+	============================================================-->
+	<xsd:complexType name="dataType.type">
+		<xsd:annotation>
+			<xsd:documentation> element identifies data type of this field. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="av:pName">
+				<xsd:attribute name="csv" type="xsd:string"/>
+				<xsd:attribute name="maxSize" type="xsd:unsignedInt"/>
+				<xsd:anyAttribute/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--============================================================
+
+	'allowedValueDescriptor' element contains allowed usages.
+
+	============================================================-->
+	<xsd:complexType name="allowedValueDescriptor.type">
+		<xsd:annotation>
+			<xsd:documentation> element indicates allowed usages. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="dependentField" type="avdt:dependentField.type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="minCount" type="xsd:unsignedInt"
+				minOccurs="0" default="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						'minCount' represents the minimum number of times this
+						field MUST occur with one of the values specified in this
+						allowedValueDescriptor.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxCount" type="av:unsignedInt.or.UNBOUNDED"
+				minOccurs="0" default="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						'maxCount' represents the maximum number of times this
+						field may occur with one of the values specified in this
+						allowedValueDescriptor.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="minListSize" type="xsd:unsignedInt"
+				minOccurs="0" default="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						When this dataType contains a CSV list, 'minListSize' represents
+						the minimum number of values that MUST appear in the list.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxListSize" type="av:unsignedInt.or.UNBOUNDED"
+				minOccurs="0" default="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						When this dataType contains a CSV list, 'maxListSize' represents
+						the maximum number of values that MUST appear in the list.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<!-- 'defaultValue' element indicates a default value. -->
+			<xsd:element name="defaultValue" type="avdt:value.type" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:element name="allowAny" type="avdt:allowAnyValue.type"/>
+				<xsd:sequence>
+					<xsd:element name="allowedValueList" type="avdt:allowedValueList.type"
+						minOccurs="1" maxOccurs="1"/>
+					<xsd:group ref="avdt:allowedValueRange.group"/>
+				</xsd:sequence>
+				<xsd:group ref="avdt:allowedValueRange.group"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+
+	<xsd:group name="allowedValueRange.group">
+		<xsd:choice>
+			<xsd:element name="allowedValueRange" type="avdt:valueRange.type"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+	</xsd:group>
+	<!--============================================================
+
+	'dependentField' element indicates dependency with another field.
+
+	============================================================-->
+	<xsd:complexType name="dependentField.type">
+		<xsd:annotation>
+			<xsd:documentation> element indicates dependency with field. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="avdt:name.type"/>
+			<xsd:choice>
+				<xsd:element name="anyValue" type="avdt:allowAnyValue.type"/>
+				<xsd:sequence>
+					<xsd:element name="valueList" type="avdt:valueList.type"
+						minOccurs="1" maxOccurs="1"/>
+					<xsd:group ref="avdt:valueRange.group"/>
+				</xsd:sequence>
+				<xsd:group ref="avdt:valueRange.group"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="defaultDependency" type="xsd:boolean"/>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+	
+	<xsd:group name="valueRange.group">
+		<xsd:choice>
+			<xsd:element name="valueRange" type="avdt:valueRange.type"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+	</xsd:group>
+	<!--============================================================
+
+		'allowAnyValue.type' indicates that any value is allowed.
+
+	============================================================-->
+	<xsd:complexType name="allowAnyValue.type">
+		<xsd:annotation>
+			<xsd:documentation> element identifies that any value can be used. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+	<!--============================================================
+
+	'valueList' element indicates a value list.
+
+	============================================================-->
+	<xsd:complexType name="valueList.type">
+		<xsd:annotation>
+			<xsd:documentation> element indicates a value list. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="value" type="avdt:value.type"/>
+		</xsd:choice>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+
+	<!--============================================================
+		The 'value.type' is used for default values, allowed values
+		and actual values.
+	============================================================-->
+	<xsd:complexType name="value.type">
+		<xsd:annotation>
+			<xsd:documentation> element identifies a value. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:anyAttribute/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--============================================================
+
+	'valueRange.type' defines a value range for use in both
+		'dependentField's and 'allowedValueDescriptor's.
+		
+		It is defined by the following subelements:
+			'minimum' element indicates a minimum value.
+			'maximum' element indicates a maximum value.
+			'step' element indicates a step value.
+
+	============================================================-->
+	<xsd:complexType name="valueRange.type">
+		<xsd:annotation>
+			<xsd:documentation> element indicates a value range. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="minimum" type="avdt:numericValue.type"/>
+			<xsd:element name="maximum" type="avdt:numericValue.type"/>
+			<xsd:element name="step" type="avdt:numericValue.type"/>
+		</xsd:sequence>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+	<!--============================================================
+
+		'numericValue.type' for the 'valueRange' subelements 
+
+	============================================================-->
+	<xsd:complexType name="numericValue.type">
+		<xsd:annotation>
+			<xsd:documentation> XML decimal, float or double data type. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="avdt:baseNumeric.type">
+				<xsd:anyAttribute/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="baseNumeric.type">
+		<xsd:union memberTypes="xsd:decimal xsd:float xsd:double"/>
+	</xsd:simpleType>
+
+	<!--============================================================
+
+	An 'allowedValueList' contains a list of allowed values.
+
+	============================================================-->
+	<xsd:complexType name="allowedValueList.type">
+		<xsd:annotation>
+			<xsd:documentation> element indicates an allowed value list. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<!-- Individual allowed value -->
+			<xsd:element name="allowedValue" type="avdt:value.type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:anyAttribute/>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:rii="urn:schemas-upnp-org:av:rii" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:av="urn:schemas-upnp-org:av:av" xmlns:atrs="urn:schemas-upnp-org:av:AllowedTransformSettings" targetNamespace="urn:schemas-upnp-org:av:rii" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20101231">
+	<xsd:import namespace="urn:schemas-upnp-org:av:av" schemaLocation="http://www.upnp.org/schemas/av/av.xsd"/>
+	<xsd:import namespace="urn:schemas-upnp-org:av:AllowedTransformSettings" schemaLocation="http://www.upnp.org/schemas/av/AllowedTransformSettings.xsd"/>
+	<xsd:element name="rendererInfo">
+		<xsd:annotation>
+			<xsd:documentation>
+			Note that all schema supplied by the UPnP Forum AV WC committee are for informational use only and that the 
+			standardized DCPs describe the normative requirements for these schema. Some schema provided do not necessarily
+			embody requirements regarding number of element occurrances allowed or their ordering.
+		
+			RendererInfo XML Document Schema</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="itemInfo" type="rii:itemInfoType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="itemInfoType">
+		<xsd:sequence>
+			<xsd:element name="resPlaybackInfo" type="rii:resPlaybackInfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="itemID" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="resPlaybackInfoType">
+		<xsd:all>
+			<xsd:element name="drmInfo" type="rii:drmInfoType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="playbackInfo" type="rii:playbackInfoType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="transformInfo" type="rii:transformInfoType" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
+		<xsd:attribute name="resID" type="xsd:string" use="required"/>
+		<xsd:attribute name="resIndex" type="xsd:unsignedInt" use="required"/>
+		<xsd:attribute name="canPlay" type="xsd:boolean" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="drmInfoType">
+		<xsd:all>
+			<xsd:element name="drmSystem" type="rii:drmSystemType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="licenseIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="licenseRights" type="rii:licenseRightsType" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
+		<xsd:attribute name="drmProtected" type="xsd:boolean" use="required"/>
+		<xsd:attribute name="drmStatus" type="rii:drmStatusType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="drmSystemType">
+		<xsd:all>
+			<xsd:element name="friendlyName" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="ICANNName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="systemIdentifier" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="systemVersion" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="licenseRightsType">
+		<xsd:all>
+			<xsd:element name="licenseSubscriptionTimeRemaining" type="av:unsignedDuration.or.INFINITY" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="licenseValidTimeRemaining" type="av:unsignedDuration.or.INFINITY" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="licenseUsageTimeRemaining" type="av:unsignedDuration.or.INFINITY" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="licenseUsageCountRemaining" type="xsd:unsignedInt" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
+		<xsd:attribute name="type">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="play"/>
+					<xsd:enumeration value="copy"/>
+					<xsd:enumeration value="store"/>
+					<xsd:enumeration value="stream"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:simpleType name="drmStatusType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="OK"/>
+			<xsd:enumeration value="UNKNOWN"/>
+			<xsd:enumeration value="PROCESSING_CONTENT_KEY"/>
+			<xsd:enumeration value="CONTENT_KEY_FAILURE"/>
+			<xsd:enumeration value="ATTEMPTING_AUTHENTICATION"/>
+			<xsd:enumeration value="FAILED_AUTHENTICATION"/>
+			<xsd:enumeration value="NOT_AUTHENTICATED"/>
+			<xsd:enumeration value="DEVICE_REVOCATION"/>
+			<xsd:enumeration value="DRM_SYSTEM_NOT_SUPPORTED"/>
+			<xsd:enumeration value="LICENSE_DENIED"/>
+			<xsd:enumeration value="LICENSE_EXPIRED"/>
+			<xsd:enumeration value="LICENSE_INSUFFICIENT"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="playbackInfoType">
+		<xsd:all>
+			<xsd:element name="videoStreamInfo" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="outputResolution" use="required">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:pattern value="[0-9]+x[0-9]+[pi]((/)?[0-9]+)?(,.+)?"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="imageStreamInfo" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="outputResolution" use="required">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:pattern value="[0-9]+x[0-9]+"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="audioStreamInfo" minOccurs="0" maxOccurs="1">
+				<xsd:complexType>
+					<xsd:attribute name="outputChannels" use="required">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:pattern value="[0-9]+(\.[0-9])?"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:all>
+		<xsd:attribute name="playbackCompatibility" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="OK"/>
+					<xsd:enumeration value="DRM_ERROR"/>
+					<xsd:enumeration value="OTHER_PLAYBACK_ERROR"/>
+					<xsd:enumeration value="MEDIA_FORMAT_NOT_SUPPORTED"/>
+					<xsd:enumeration value="MEDIA_FORMAT_EXCEEDS_DEVICE_CAPABILITIES"/>
+					<xsd:enumeration value="MULTI_STREAM_PLAYBACK_NOT_SUPPORTED"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="transformInfoType">
+		<xsd:sequence minOccurs="0" maxOccurs="1">
+			<xsd:element ref="atrs:TransformList"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

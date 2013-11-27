@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by Swade (Sharp Labs of America) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-upnp-org:qos:QmCapabilities" targetNamespace="urn:schemas-upnp-org:qos:QmCapabilities" elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+      QmCapabilities
+      This is for Version 3.0 of the UPnP QoS specification
+      Copyright 2007-2008 Contributing Members of the UPnP Forum. All rights reserved.
+	  Schema Location: "http://www.upnp.org/schemas/qos/QmCapabilities-v3.xsd"
+    </xs:documentation>
+	</xs:annotation>
+	<xs:element name="QmCapabilities" type="QmCapabilitiesType"/>
+	<xs:complexType name="QmCapabilitiesType">
+		<xs:sequence>
+			<xs:element name="PreemptionCapabilities" type="PreemptionCapabilitiesType"/>
+			<xs:element name="v4ExtCapabilities" type="v4OptionalParamsType" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PreemptionCapabilitiesType">
+		<xs:sequence>
+			<xs:element name="ReportBlockingStreams" type="xs:boolean"/>
+			<xs:element name="Preemption" type="xs:boolean"/>
+			<xs:element name="v4ExtPreemptionInfo" type="v4OptionalParamsType" minOccurs="0"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="v4OptionalParamsType">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:any namespace="##other" processContents="lax"/>
+				<xs:any namespace="##local" processContents="lax"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

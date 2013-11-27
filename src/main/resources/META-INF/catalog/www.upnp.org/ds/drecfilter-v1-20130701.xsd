@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="urn:schemas-upnp-org:ds:drecfilter" targetNamespace="urn:schemas-upnp-org:ds:drecfilter" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="1-20130701">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+        DataRecordFilter schema for UPnP DataStore service, version 1.0.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:element name="DataRecordFilter">
+    <xsd:complexType>
+      <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="filterset" maxOccurs="unbounded" minOccurs="0">
+          <xsd:complexType>
+            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+              <xsd:element name="filter">
+              <xsd:complexType>
+              <xsd:attribute name="condition" use="required" type="xsd:string"/>
+              </xsd:complexType>
+              </xsd:element>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>
+
+
+
+

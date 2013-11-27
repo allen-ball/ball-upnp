@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ics="urn:schemas-upnp-org:phone:ics" targetNamespace="urn:schemas-upnp-org:phone:ics" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <element name="ics" type="ics:ics.type">
+    <complexType name="ics.type">
+      <choice>
+        <element name="deviceInputCapability" type="ics:deviceInputCapability.type" />
+        <element name="inputConnectionList" type="ics:InputConnectionList.type" />
+        <element name="requiredInputType" type="ics:requiredInputType.type" />
+        <element name="connectionInfo" type="ics:connectionInfo.type" />
+        <element name="inputCapability" type="ics:inputCapability.type" />
+        <element name="deviceInfo" type="ics:deviceInfo.type" />
+      </choice>
+    </complexType>
+    <complexType name="deviceInputCapability.type">
+      <sequence>
+        <element name="capablility" type="ics:capability.type" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+      <attribute name="role" type="ics:role.value" use="required" />
+    </complexType>
+    <complexType name="capability.type">
+      <sequence>
+        <element name="inputModeList" type="ics:inputModeList.type" />
+      </sequence>
+    </complexType>
+    <complexType name="inputModeList.type">
+      <sequence>
+        <element name="inputMode" type="ics:inputMode.type" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+    </complexType>
+    <complexType name="inputMode.type">
+      <sequence>
+        <element name="inputDeviceType" type="ics:inputDeviceType.value" />
+        <element name="inputDeviceSubClass" type="string" />
+        <element name="inputDataFormat" type="ics:inputDataFormat.type" />
+        <element name="transportProtocol" type="string" defualt="BT_HID_REQUEST" />
+        <element name="supportedSecureChannel" type="ics:supportedSecureChannel.type" />
+      </sequence>
+    </complexType>
+    <complexType name="inputDataFormat.type">
+        <element name="reportDescriptior" type="string" />
+        <attribute name="type" type="string" defualt="USB_RD" use="required" />
+    </complexType>
+    <complexType name="supportedSecureChannel.type">
+      <sequence>
+        <element name="TLS" type="boolean" />
+        <element name="DTLS" type="boolean" />
+      </sequence>
+    </complexType>
+    <complexType name="inputConnectionList.type">
+      <sequence>
+        <element name="multiInputMode" type="ics:multiInputMode.value" />
+        <element name="peerDeviceList" type="ics:peerDeviceList.type" />
+      </sequence>
+      <attribute name="role" type="ics:role.value" use="required" />
+    </complexType>
+    <complexType name="peerDeviceList.type">
+      <sequence>
+        <element name="peerDevice" type="ics:peerDevice.type" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+    </complexType>
+    <complexType name="peerDevice.type">
+      <sequence>
+        <element name="sessionList" type="ics:sessionList.type" />
+      </sequence>
+      <attribute name="uuid" type="string" use="required" />
+    </complexType>
+    <complexType name="sessionList.type">
+      <sequence>
+        <element name="session" type="ics:session.type" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+      <attribute name="localSessionID" type="int" use="required" />
+    </complexType>
+    <complexType name="session.type">
+      <sequence>
+        <element name="localDeviceRole" type="ics:role.value" />
+        <element name="inputType" type="ics:inputType.value" />
+        <element name="sessionStatus" type="sessionStatus.value" />
+        <element name="peerSessionID" type="int" />
+      </sequence>
+      <attribute name="localSessionID" type="int" use="required" />
+    </complexType>
+    <complexType name="deviceInputCapability.type">
+      <sequence>
+        <element name="capablility" type="ics:capability.type" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+      <attribute name="role" type="ics:role.value" use="required" />
+    </complexType>
+    <complexType name="requiredInputType.type">
+      <sequence>
+        <element name="inputMode" type="ics:inputMode.type" />
+      </sequence>
+      <attribute name="role" type="ics:role.value" use="required" />
+    </complexType>
+    <complexType name="connectionInfo.type">
+      <sequence>
+        <element name="sessionParameter" type="ics:sessionParameter.type" />
+      </sequence>
+    </complexType>
+    <complexType name="sessionParameter.type">
+      <sequence>
+        <element name="deviceRole" type="ics:role.value" />
+        <element name="RDtransportPortNum" type="int" />
+        <element name="controlPortNum" type="int" />
+        <element name="interruptPortNum" type="int" />
+        <element name="secureControlPortNum" type="int" />
+        <element name="secureInterruptPortNum" type="int" />
+      </sequence>
+    </complexType>
+    <complexType name="inputCapability.type">
+      <sequence>
+        <element name="capablility" type="ics:capability.type" />
+      </sequence>
+    </complexType>
+    <complexType name="deviceInfo.type">
+      <sequence>
+        <element name="deviceFriendlyName" type="string" />
+        <element name="deviceUUID" type="string" />
+        <element name="peerSessionID" type="int" />
+      </sequence>
+    </complexType>
+    <simpleType name="role.value">
+      <restriction base="token">
+        <enumeration value="sender" />
+        <enumeration value="receiver" />
+      </restriction>
+    </simpleType>
+    <simpleType name="inputDeviceType.value">
+      <restriction base="token">
+        <enumeration value="keybord" />
+        <enumeration value="mouse" />
+      </restriction>
+    </simpleType>
+    <simpleType name="multiInputMode.value">
+      <restriction base="token">
+        <enumeration value="1" />
+        <enumeration value="2" />
+        <enumeration value="3" />
+      </restriction>
+    </simpleType>
+    <simpleType name="inputType.value">
+      <restriction base="token">
+        <enumeration value="TEXT" />
+        <enumeration value="COORDINATE" />
+      </restriction>
+    </simpleType>
+    <simpleType name="sessionStatus.value">
+      <restriction base="token">
+        <enumeration value="active" />
+        <enumeration value="idle" />
+      </restriction>
+    </simpleType>
+  </element>
+</schema>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:bmsnsl="urn:schemas-upnp-org:dm:bms:nsl" targetNamespace="urn:schemas-upnp-org:dm:bms:nsl" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="1-20100114">
+  <xs:simpleType name="IPAddress">
+    <xs:annotation>
+      <xs:documentation>IPv4/IPv6 address (currently just a placeholder).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:element name="NSLookupResult">
+    <xs:annotation>
+      <xs:documentation>Result of a DNS lookup test.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Result" minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Results from the most recent invocation of the test, one instance per repetition.</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Status">
+                <xs:annotation>
+                  <xs:documentation>Result Parameter to represent whether the NS Lookup was successful or not.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="Success"/>
+                    <xs:enumeration value="Error_DNSServerNotAvailable"/>
+                    <xs:enumeration value="Error_HostNameNotResolved"/>
+                    <xs:enumeration value="Error_Timeout"/>
+                    <xs:enumeration value="Error_Other"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="AnswerType">
+                <xs:annotation>
+                  <xs:documentation>Result parameter to represent whether the answer is Authoritative or not.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:token">
+                    <xs:enumeration value="None"/>
+                    <xs:enumeration value="Authoritative"/>
+                    <xs:enumeration value="NonAuthoritative"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="HostNameReturned">
+                <xs:annotation>
+                  <xs:documentation>Result parameter to represent the fully qualified name for the Host Name in the calling parameter (e.g. HostName.DomainName); if no response was provided, then this parameter is an empty string.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="IPAddresses">
+                <xs:annotation>
+                  <xs:documentation>Result parameter to represent the list of one or more comma-separated IPv4/IPv6 addresses returned by the NS Lookup; if no response was provided, then this parameter is an empty string.</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="256"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DNSServerIP" type="bmsnsl:IPAddress">
+                <xs:annotation>
+                  <xs:documentation>Result parameter to represent the actual DNS Server IPv4/IPv6 address that the NS Lookup used.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="ResponseTime" type="xs:unsignedInt">
+                <xs:annotation>
+                  <xs:documentation>Response time (for the first response packet) in milliseconds, or 0 if no response was received.</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

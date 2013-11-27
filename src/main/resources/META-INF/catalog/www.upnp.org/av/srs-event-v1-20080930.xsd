@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+	targetNamespace="urn:schemas-upnp-org:av:srs-event"
+	xmlns:srs-event="urn:schemas-upnp-org:av:srs-event"
+	xmlns:av="urn:schemas-upnp-org:av:av"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	version="1-20080930">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			For UPnP A/V ScheduledRecording Service events
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+		schemaLocation="http://www.w3.org/2005/08/xml.xsd"/>
+	<xsd:import namespace="urn:schemas-upnp-org:av:av"
+		schemaLocation="http://www.upnp.org/schemas/av/av-v1.xsd"/>
+
+	<!--===========================================================
+		'Event' is the root element of SRS event documents.
+	============================================================-->
+	<xsd:element name="StateEvent" type="srs-event:rootType"/>
+	
+	<xsd:complexType name="rootType">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="srs-event:events.wc.group"/>
+			<xsd:group ref="srs-event:events.vx.group"/>
+		</xsd:choice>
+	</xsd:complexType>
+	
+	<xsd:group name="events.wc.group">
+		<xsd:annotation>
+			<xsd:documentation>
+				Elements that are allowed under the root element 'Event'.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="RecordScheduleCreated" type="srs-event:event.wc.type"/>
+			<xsd:element name="RecordScheduleModified" type="srs-event:event.wc.type"/>
+			<xsd:element name="RecordScheduleDeleted" type="srs-event:event.wc.type"/>
+			<xsd:element name="RecordTaskCreated" type="srs-event:event.wc.type"/>
+			<xsd:element name="RecordTaskModified" type="srs-event:event.wc.type"/>
+			<xsd:element name="RecordTaskDeleted" type="srs-event:event.wc.type"/>
+		</xsd:choice>
+	</xsd:group>
+	
+	<xsd:complexType name="event.wc.type">
+		<xsd:annotation>
+			<xsd:documentation>
+				WC-defined structure for an 'Event' subelement.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="av:string.len.0">
+				<xsd:attribute name="updateID" type="av:stateUpdateID.type" use="required"/>
+				<xsd:attribute name="objectID" type="av:srs_COLON_at_id.vd.type" use="required"/>
+				<xsd:attributeGroup ref="srs-event:event.extensions.attributes"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	
+	<!--
+		========================================================================================
+		
+		Extension Component Datatypes
+		
+		========================================================================================
+	-->
+	<xsd:attributeGroup name="event.extensions.attributes">
+		<xsd:attributeGroup ref="av:extensions.attributes.any"/>
+	</xsd:attributeGroup>
+	
+	<xsd:group name="events.vx.group">
+		<xsd:choice>
+			<xsd:any namespace="##other"/>
+		</xsd:choice>
+	</xsd:group>
+	
+</xsd:schema>
+
