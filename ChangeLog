@@ -1,0 +1,15 @@
+2013-11-27  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* src/main/java/iprotium/upnp/ssdp/SSDPNotifyRequest.java:
+	Initial writing.
+
+2013-11-26  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* Imported XSDs from http://upnp.org/resources/upnpresources.zip
+	to META-INF/catalog/www.upnp.org.
+
+2013-11-25  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* Moved iprotium.upnp.ssdp from iprotium.media.ssdp (in
+	iprotium-media JAR).
+
