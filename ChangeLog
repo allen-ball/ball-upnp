@@ -1,5 +1,8 @@
 2013-11-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryCache.java:
+	Process send events to capture "local" changes.
+
 	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryThread.java:
 	Changed Listener.sendEvent(SSDPDiscoveryRequest) interface method
 	to sendEvent(SSDPMessage).

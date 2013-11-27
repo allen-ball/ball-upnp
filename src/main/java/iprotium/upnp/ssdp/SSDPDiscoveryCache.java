@@ -24,9 +24,11 @@ import org.apache.http.client.utils.DateUtils;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryThread.Listener {
-    private static final long serialVersionUID = -7242694350134746352L;
+    private static final long serialVersionUID = 3201991262995832734L;
 
     private static final String MAX_AGE = "max-age";
+
+    private static final String BYEBYE = "ssdp:byebye";
 
     /**
      * Sole constructor.
@@ -38,7 +40,7 @@ public class SSDPDiscoveryCache
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryRequest request) { }
+    public void sendEvent(SSDPMessage message) { receiveEvent(message); }
 
     @Override
     public void receiveEvent(SSDPMessage message) {
@@ -71,14 +73,19 @@ public class SSDPDiscoveryCache
         }
 
         if (expiration > now()) {
-            if (message instanceof SSDPRequest) {
-                SSDPRequest request = (SSDPRequest) message;
-            }
+            put(message.getUSN(), new Value(message, expiration));
+        }
 
-            if (message instanceof SSDPResponse) {
-                SSDPResponse response = (SSDPResponse) message;
+        if (message instanceof SSDPRequest) {
+            SSDPRequest request = (SSDPRequest) message;
+            String method = request.getRequestLine().getMethod();
 
-                put(response.getUSN(), new Value(response, expiration));
+            if (SSDPNotifyRequest.METHOD.equals(method)) {
+                Header header = message.getFirstHeader(SSDPMessage.NTS);
+
+                if (header != null && BYEBYE.equals(header.getValue())) {
+                    remove(request.getUSN());
+                }
             }
         }
     }
