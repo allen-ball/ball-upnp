@@ -104,6 +104,12 @@
   <uriSuffix uriSuffix="/av/upnp-v4.xsd"
              uri="/av/upnp-v4-20130331.xsd"/>
 
+  <uriSuffix uriSuffix="/cs/avcs-v1.xsd"
+             uri="/cs/avcs-v1-200800306.xsd"/>
+
+  <uriSuffix uriSuffix="/cs/cs-v1.xsd"
+             uri="/cs/cs-v1-200800303.xsd"/>
+
   <uriSuffix uriSuffix="/gw/WANIPConnection.xsd"
              uri="/gw/WANIPConnection-v1-20091103.xsd"/>
 
