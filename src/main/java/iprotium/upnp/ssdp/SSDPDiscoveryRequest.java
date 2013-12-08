@@ -10,7 +10,7 @@ import org.apache.http.HttpHeaders;
 /**
  * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
 public class SSDPDiscoveryRequest extends SSDPRequest {

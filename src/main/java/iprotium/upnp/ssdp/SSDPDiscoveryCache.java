@@ -18,7 +18,7 @@ import org.apache.http.client.utils.DateUtils;
 /**
  * SSDP discovery cache implementation.
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
 public class SSDPDiscoveryCache

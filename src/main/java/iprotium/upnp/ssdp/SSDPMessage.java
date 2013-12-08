@@ -15,7 +15,7 @@ import org.apache.http.HttpMessage;
 /**
  * SSDP {@link HttpMessage} interface definition.
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
 public interface SSDPMessage extends HttpMessage {

@@ -1,10 +1,8 @@
 /**
  * Classes specific to
- * <a href="http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt">
- * Simple Service Discovery Protocol 1.0 (SSDP)
- * </a>.
+ * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  */
 @ManifestSection
 package iprotium.upnp.ssdp;

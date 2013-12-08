@@ -15,7 +15,7 @@ import org.apache.http.message.BasicLineParser;
 /**
  * SSDP {@link org.apache.http.HttpResponse} implementation.
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
