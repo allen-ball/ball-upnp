@@ -1,5 +1,7 @@
 2013-12-26  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* pom.xml: Require org.apache.tomcat.embed:tomcat-embed-core.
+
 	* src/main/java/iprotium/upnp/RedirectServlet.java:
 	Initial writing.
 
