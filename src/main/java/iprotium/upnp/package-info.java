@@ -1,8 +1,8 @@
 /**
  * Classes specific to
- * <a href="http://www.upnp.org/">Universal Plug and Play (UPnP)</a>.
+ * {@link.uri http://www.upnp.org/ Universal Plug and Play (UPnP)}.
  *
- * @author <a href="mailto:ball@iprotium.com">Allen D. Ball</a>
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  */
 @ManifestSection
 package iprotium.upnp;
