@@ -93,6 +93,14 @@
     </artifact:install>
   </target>
 
+  <target name="media-server"
+          description="--> Invokes &lt;media-server/&gt; task."
+          depends="classes">
+    <taskdef classpathref="build.classpath"
+             resource="iprotium/upnp/ant/defaults.properties"/>
+    <media-server port="${port}" verbose="true"/>
+  </target>
+
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="classes">

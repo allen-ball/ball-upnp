@@ -1,5 +1,8 @@
 2013-12-26  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* Interim check-in: Created UPnP Service and Device abstractions
+	and Tomcat scaffolding.
+
 	* pom.xml: Require org.apache.tomcat.embed:tomcat-embed-core.
 
 	* src/main/java/iprotium/upnp/RedirectServlet.java:
