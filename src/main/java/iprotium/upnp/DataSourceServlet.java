@@ -6,6 +6,7 @@
 package iprotium.upnp;
 
 import iprotium.io.IOUtil;
+import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.activation.DataSource;
@@ -18,6 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * {@link HttpServlet} implementation to serve a {@link DataSource}.
  *
+ * {@bean-info}
+ *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
@@ -29,8 +32,9 @@ public class DataSourceServlet extends HttpServlet {
     /**
      * Sole constructor.
      *
-     * @param   ds              The {@link DataSouce}.
+     * @param   ds              The {@link DataSource}.
      */
+    @ConstructorProperties({ "dataSource" })
     public DataSourceServlet(DataSource ds) {
         super();
 
