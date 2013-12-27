@@ -6,9 +6,11 @@
 package iprotium.upnp.ssdp;
 
 import java.net.DatagramPacket;
+import java.net.SocketException;
 import java.net.URI;
 import java.util.regex.Pattern;
 import org.apache.http.Header;
+import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicLineParser;
 
@@ -44,14 +46,29 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
         }
     }
 
-    @Override
-    public URI getLocation() { return HELPER.getLocation(this); }
+    /**
+     * Protected constructor for subclasses.
+     *
+     * @param   code            The response status code.
+     * @param   reason          The response status reason.
+     */
+    protected SSDPResponse(int code, String reason) {
+        super(HttpVersion.HTTP_1_1, code, reason);
+    }
 
     @Override
-    public URI getST() { return HELPER.getST(this); }
+    public URI getLocation() { return IMPL.getLocation(this); }
 
     @Override
-    public URI getUSN() { return HELPER.getUSN(this); }
+    public URI getST() { return IMPL.getST(this); }
+
+    @Override
+    public URI getUSN() { return IMPL.getUSN(this); }
+
+    @Override
+    public DatagramPacket toDatagramPacket() throws SocketException {
+        return IMPL.toDatagramPacket(this);
+    }
 
     @Override
     public String toString() {

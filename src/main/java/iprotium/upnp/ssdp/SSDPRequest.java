@@ -57,20 +57,6 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     /**
-     * Method to encode {@code this} {@link SSDPRequest} to a
-     * {@link DatagramPacket}.
-     *
-     * @return  The {@link DatagramPacket}.
-     *
-     * @see #ADDRESS
-     */
-    public DatagramPacket toDatagramPacket() throws SocketException {
-        byte[] bytes = toString().getBytes(CHARSET);
-
-        return new DatagramPacket(bytes, 0, bytes.length, ADDRESS);
-    }
-
-    /**
      * Convenience method to format a {@link InetSocketAddress} to its
      * {@link String} representation.
      *
@@ -83,13 +69,18 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     @Override
-    public URI getLocation() { return HELPER.getLocation(this); }
+    public URI getLocation() { return IMPL.getLocation(this); }
 
     @Override
-    public URI getST() { return HELPER.getST(this); }
+    public URI getST() { return IMPL.getST(this); }
 
     @Override
-    public URI getUSN() { return HELPER.getUSN(this); }
+    public URI getUSN() { return IMPL.getUSN(this); }
+
+    @Override
+    public DatagramPacket toDatagramPacket() throws SocketException {
+        return IMPL.toDatagramPacket(this);
+    }
 
     @Override
     public String toString() {

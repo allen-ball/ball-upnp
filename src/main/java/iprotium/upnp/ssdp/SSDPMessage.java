@@ -5,7 +5,9 @@
  */
 package iprotium.upnp.ssdp;
 
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import org.apache.http.Header;
@@ -35,6 +37,8 @@ public interface SSDPMessage extends HttpMessage {
      * SSDP message header name
      */
     public static final String
+        AL = "AL",
+        EXT = "EXT",
         MAN = "MAN",
         MX = "MX",
         NT = "NT",
@@ -48,11 +52,11 @@ public interface SSDPMessage extends HttpMessage {
     public static final String CRLF = "\r\n";
 
     /**
-     * {@link Helper} class instance to help implement
-     * {@link #getLocation()}, {@link #getST()}, and {@link #getUSN()}
+     * {@link Impl} instance to help implement {@link #getLocation()},
+     * {@link #getST()}, {@link #getUSN()}, and {@link #toDatagramPacket()}
      * methods.
      */
-    public static final Helper HELPER = new Helper();
+    public static final Impl IMPL = new Impl();
 
     /**
      * Method to get the service location.
@@ -76,11 +80,21 @@ public interface SSDPMessage extends HttpMessage {
     public URI getUSN();
 
     /**
-     * {@link Helper} class to help implement {@link #getLocation()},
-     * {@link #getST()}, and {@link #getUSN()} methods.
+     * Method to encode {@code this} {@link SSDPMessage} to a
+     * {@link DatagramPacket}.
+     *
+     * @return  The {@link DatagramPacket}.
+     *
+     * @see #ADDRESS
      */
-    public class Helper {
-        private Helper() { }
+    public DatagramPacket toDatagramPacket() throws SocketException;
+
+    /**
+     * Class to help implement {@link #getLocation()}, {@link #getST()},
+     * {@link #getUSN()}, and {@link #toDatagramPacket()} methods.
+     */
+    public class Impl {
+        private Impl() { }
 
         /**
          * Method to help implement {@link SSDPMessage#getLocation()}.
@@ -122,6 +136,19 @@ public interface SSDPMessage extends HttpMessage {
             String value = (header != null) ? header.getValue() : null;
 
             return (value != null) ? URI.create(value) : null;
+        }
+
+        /**
+         * Method to encode {@code this} {@link SSDPRequest} to a
+         * {@link DatagramPacket}.
+         *
+         * @return      The {@link DatagramPacket}.
+         */
+        public DatagramPacket toDatagramPacket(SSDPMessage message)
+                                                throws SocketException {
+            byte[] bytes = message.toString().getBytes(CHARSET);
+
+            return new DatagramPacket(bytes, 0, bytes.length, ADDRESS);
         }
 
         @Override

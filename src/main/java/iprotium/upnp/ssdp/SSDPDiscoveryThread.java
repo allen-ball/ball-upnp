@@ -11,7 +11,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.http.ParseException;
 
 /**
@@ -21,14 +22,18 @@ import org.apache.http.ParseException;
  * @version $Revision$
  */
 public class SSDPDiscoveryThread extends Thread {
-    private final ArrayList<Listener> list = new ArrayList<Listener>();
     private final int interval;
     private final DatagramSocket socket;
+    private final CopyOnWriteArrayList<Listener> list =
+        new CopyOnWriteArrayList<Listener>();
+    private final ConcurrentLinkedQueue<SSDPMessage> queue =
+        new ConcurrentLinkedQueue<SSDPMessage>();
+    private final SSDPDiscoveryRequest request = new SSDPDiscoveryRequest();
 
     /**
      * Sole constructor.
      *
-     * @param   interval        The maximum interval (in seconds) between
+     * @param   interval        The minimum interval (in seconds) between
      *                          broadcast messages.
      */
     public SSDPDiscoveryThread(int interval) throws SocketException {
@@ -46,7 +51,7 @@ public class SSDPDiscoveryThread extends Thread {
         socket = new DatagramSocket();
         socket.setBroadcast(true);
         socket.setReuseAddress(true);
-        socket.setSoTimeout(interval * 1000);
+        socket.setSoTimeout((interval * 1000) / 2);
     }
 
     /**
@@ -54,21 +59,45 @@ public class SSDPDiscoveryThread extends Thread {
      *
      * @param  listener         The {@link Listener}.
      */
-    public void addListener(Listener listener) {
-        synchronized (this) {
-            list.add(listener);
-        }
-    }
+    public void addListener(Listener listener) { list.add(listener); }
 
     /**
      * Method to remove a {@link Listener}.
      *
      * @param  listener         The {@link Listener}.
      */
-    public void removeListener(Listener listener) {
-        synchronized (this) {
-            list.remove(listener);
+    public void removeListener(Listener listener) { list.remove(listener); }
+
+    /**
+     * Method to queue a {@link SSDPMessage} for transmission.
+     *
+     * @param  message          The {@link SSDPMessage}.
+     */
+    public void queue(SSDPMessage message) {
+        if (message != null && (! queue.contains(message))) {
+            queue.add(message);
         }
+    }
+
+    @Override
+    public void start() {
+        new Thread() {
+            { setDaemon(true); }
+
+            @Override
+            public void run() {
+                for (;;) {
+                    queue(request);
+
+                    try {
+                        sleep(interval * 1000);
+                    } catch (InterruptedException exception) {
+                    }
+                }
+            }
+        }.start();
+
+        super.start();
     }
 
     @Override
@@ -78,44 +107,28 @@ public class SSDPDiscoveryThread extends Thread {
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
             for (;;) {
-                SSDPDiscoveryRequest request = new SSDPDiscoveryRequest();
+                SSDPMessage message = null;
 
-                for (Listener listener : list) {
-                    listener.sendEvent(request);
+                while ((message = queue.poll()) != null) {
+                    for (Listener listener : list) {
+                        listener.sendEvent(this, message);
+                    }
+
+                    socket.send(message.toDatagramPacket());
                 }
 
-                socket.send(request.toDatagramPacket());
+                try {
+                    packet.setData(bytes);
+                    socket.receive(packet);
 
-                for (;;) {
-                    try {
-                        packet.setData(bytes);
+                    message = parse(packet);
 
-                        socket.receive(packet);
-
-                        SSDPMessage message = null;
-
-                        if (message == null) {
-                            try {
-                                message = new SSDPResponse(packet);
-                            } catch (ParseException exception) {
-                            }
+                    if (message != null) {
+                        for (Listener listener : list) {
+                            listener.receiveEvent(this, message);
                         }
-
-                        if (message == null) {
-                            try {
-                                message = new SSDPRequest(packet);
-                            } catch (ParseException exception) {
-                            }
-                        }
-
-                        if (message != null) {
-                            for (Listener listener : list) {
-                                listener.receiveEvent(message);
-                            }
-                        }
-                    } catch (SocketTimeoutException exception) {
-                        break;
                     }
+                } catch (SocketTimeoutException exception) {
                 }
             }
         } catch (IOException exception) {
@@ -124,23 +137,46 @@ public class SSDPDiscoveryThread extends Thread {
         }
     }
 
+    private SSDPMessage parse(DatagramPacket packet) {
+        SSDPMessage message = null;
+
+        if (message == null) {
+            try {
+                message = new SSDPResponse(packet);
+            } catch (ParseException exception) {
+            }
+        }
+
+        if (message == null) {
+            try {
+                message = new SSDPRequest(packet);
+            } catch (ParseException exception) {
+            }
+        }
+
+        return message;
+    }
+
     /**
      * {@link SSDPDiscoveryThread} listener interface definition.
      */
     public interface Listener {
 
         /**
-         * Callback made just before sending a {@link SSDPDiscoveryRequest}.
+         * Callback made just before sending a {@link SSDPMessage}.
          *
+         * @param       thread          The {@link SSDPDiscoveryThread}.
          * @param       message         The {@link SSDPMessage}.
          */
-        public void sendEvent(SSDPMessage message);
+        public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message);
 
         /**
          * Callback made after receiving a {@link SSDPMessage}.
          *
+         * @param       thread          The {@link SSDPDiscoveryThread}.
          * @param       message         The {@link SSDPMessage}.
          */
-        public void receiveEvent(SSDPMessage message);
+        public void receiveEvent(SSDPDiscoveryThread thread,
+                                 SSDPMessage message);
     }
 }

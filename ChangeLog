@@ -1,5 +1,11 @@
 2013-12-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
+	* iprotium.upnp.ssdp:
+	Added SSDPDiscoveryThread.queue(SSDPMessage) method.
+	SSDPMessage interface specifies toDatagramPacket() method.
+	Added SSDPDiscoveryThread parameter to
+	SSDPDiscoveryThread.Listener methods.
+
 	* src/main/java/iprotium/upnp/RootDevice.java: Initial writing.
 
 	* src/main/java/iprotium/upnp/DataSourceServlet.java:

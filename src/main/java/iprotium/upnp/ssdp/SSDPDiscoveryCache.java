@@ -24,7 +24,7 @@ import org.apache.http.client.utils.DateUtils;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryThread.Listener {
-    private static final long serialVersionUID = 3201991262995832734L;
+    private static final long serialVersionUID = 437339045307811099L;
 
     private static final String MAX_AGE = "max-age";
 
@@ -36,14 +36,38 @@ public class SSDPDiscoveryCache
     public SSDPDiscoveryCache() {
         super();
 
-        new ExpiryThread().start();
+        new Thread() {
+            { setDaemon(true); }
+
+            @Override
+            public void run() {
+                for (;;) {
+                    try {
+                        sleep(60 * 1000);
+                    } catch (InterruptedException exception) {
+                    }
+
+                    Iterator<Value> iterator = values().iterator();
+
+                    while (iterator.hasNext()) {
+                        Value value = iterator.next();
+
+                        if (now() > value.getExpiration()) {
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+        }.start();
     }
 
     @Override
-    public void sendEvent(SSDPMessage message) { receiveEvent(message); }
+    public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+        receiveEvent(thread, message);
+    }
 
     @Override
-    public void receiveEvent(SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
         long expiration = 0;
 
         try {
@@ -123,35 +147,6 @@ public class SSDPDiscoveryCache
 
         @Override
         public String toString() { return message.toString(); }
-    }
-
-    private class ExpiryThread extends Thread {
-        public ExpiryThread() {
-            super();
-
-            setDaemon(true);
-            setName(getClass().getName());
-        }
-
-        @Override
-        public void run() {
-            for (;;) {
-                try {
-                    sleep(60 * 1000);
-                } catch (InterruptedException exception) {
-                }
-
-                Iterator<Value> iterator = values().iterator();
-
-                while (iterator.hasNext()) {
-                    Value value = iterator.next();
-
-                    if (now() > value.getExpiration()) {
-                        iterator.remove();
-                    }
-                }
-            }
-        }
     }
 
     private class CacheControlDirectiveMap extends TreeMap<String,String> {
