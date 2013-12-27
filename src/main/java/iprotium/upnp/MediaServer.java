@@ -27,6 +27,7 @@ public class MediaServer extends Device {
     public static final String TYPE =
         "urn:schemas-upnp-org:device:MediaServer:1";
 
+    private final RootDevice root;
     private final ContentDirectory directory;
     private final ConnectionManager manager;
     private final List<Service> list;
@@ -37,10 +38,11 @@ public class MediaServer extends Device {
     public MediaServer() {
         super(URI.create(TYPE));
 
+        root = new RootDevice(this);
         directory = new ContentDirectory(this);
         manager = new ConnectionManager(this);
 
-        list = Arrays.asList(directory, manager);
+        list = Arrays.asList(root, directory, manager);
     }
 
     @Override
