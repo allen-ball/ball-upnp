@@ -28,7 +28,8 @@ public class SSDPDiscoveryThread extends Thread {
     /**
      * Sole constructor.
      *
-     * @param   interval
+     * @param   interval        The maximum interval (in seconds) between
+     *                          broadcast messages.
      */
     public SSDPDiscoveryThread(int interval) throws SocketException {
         super();
