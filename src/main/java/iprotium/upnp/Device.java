@@ -6,27 +6,17 @@
 package iprotium.upnp;
 
 import iprotium.io.Directory;
-import iprotium.io.IOUtil;
 import iprotium.upnp.ssdp.SSDPDiscoveryCache;
 import iprotium.upnp.ssdp.SSDPDiscoveryThread;
-import iprotium.upnp.ssdp.SSDPMessage;
 import iprotium.util.NetworkInterfaceUtil;
 import iprotium.util.UUIDFactory;
 import iprotium.xml.bind.JAXBDataSource;
 import java.beans.ConstructorProperties;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import javax.activation.DataSource;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -65,8 +55,7 @@ public abstract class Device extends Tomcat {
 
     private final URI udn;
     private final URI uri;
-    private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
-    private final SSDPDiscoveryThread thread;
+    private final SSDPThread thread;
     private final URI deviceType;
     private Context context = null;
 
@@ -79,9 +68,7 @@ public abstract class Device extends Tomcat {
             uri =
                 new URI(HTTP, null, LOCALHOST.getHostAddress(), port,
                         SLASH, null, null);
-            thread = new SSDPDiscoveryThread(60);
-            thread.addListener(new ListenerImpl());
-            thread.addListener(cache);
+            thread = new SSDPThread(this);
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -90,7 +77,7 @@ public abstract class Device extends Tomcat {
     /**
      * Sole constructor.
      *
-     * @param   deviceType              The {@link Device} type (URN).
+     * @param   deviceType      The {@link Device} type (URN).
      */
     @ConstructorProperties({ "deviceType" })
     protected Device(URI deviceType) {
@@ -151,7 +138,9 @@ public abstract class Device extends Tomcat {
      *
      * @return  The {@link SSDPDiscoveryCache}.
      */
-    public SSDPDiscoveryCache getSSDPDiscoveryCache() { return cache; }
+    public SSDPDiscoveryCache getSSDPDiscoveryCache() {
+        return thread.cache();
+    }
 
     /**
      * Method to get the {@link SSDPDiscoveryThread} associated with this
@@ -229,7 +218,7 @@ public abstract class Device extends Tomcat {
     @Override
     public void start() throws LifecycleException {
         try {
-            addServlet(getLocation(), new JAXBDocumentServlet());
+            addServlet(getLocation(), new LocationServlet());
 
             for (Service service : getServiceList()) {
                 addServlet(service.getSCPDURL(),
@@ -266,49 +255,15 @@ public abstract class Device extends Tomcat {
     @Override
     public String toString() { return getDeviceType().toString(); }
 
-    private class ListenerImpl implements SSDPDiscoveryThread.Listener {
-        public ListenerImpl() { }
+    private class LocationServlet extends DataSourceServlet {
+        private static final long serialVersionUID = -3666209110730272906L;
+
+        public LocationServlet() { super(null); }
 
         @Override
-        public void sendEvent(SSDPMessage message) {
+        public JAXBDataSource getDataSource() {
+            return new JAXBDataSource(getDocument());
         }
-
-        @Override
-        public void receiveEvent(SSDPMessage message) {
-        }
-
-        @Override
-        public String toString() { return getClass().getCanonicalName(); }
-    }
-
-    private class JAXBDocumentServlet extends HttpServlet {
-        private static final long serialVersionUID = 6867002874183364142L;
-
-        public JAXBDocumentServlet() { super(); }
-
-        @Override
-        protected void doGet(HttpServletRequest request,
-                             HttpServletResponse response) throws IOException,
-                                                                  ServletException {
-            InputStream in = null;
-            ServletOutputStream out = null;
-
-            try {
-                DataSource ds = new JAXBDataSource(getDocument());
-
-                response.setContentType(ds.getContentType());
-
-                in = ds.getInputStream();
-                out = response.getOutputStream();
-                IOUtil.copy(in, out);
-            } finally {
-                IOUtil.close(in);
-                IOUtil.close(out);
-            }
-        }
-
-        @Override
-        public String toString() { return getClass().getSimpleName(); }
     }
 
     /**

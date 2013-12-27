@@ -1,10 +1,13 @@
 2013-12-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
-	* src/main/java/iprotium/upnp/MediaServer.java:
-	Provide RootDevice Service.
+	* src/main/java/iprotium/upnp/Device.java:
+	Integrate SSDPThread to announce Device Services.
 
 	* src/main/java/iprotium/upnp/Service.java:
 	Added getUSN() method.
+
+	* src/main/java/iprotium/upnp/MediaServer.java:
+	Provide RootDevice Service.
 
 	* src/main/java/iprotium/upnp/RootDevice.java: Initial writing.
 
