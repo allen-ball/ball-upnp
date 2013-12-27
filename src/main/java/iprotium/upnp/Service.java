@@ -19,14 +19,16 @@ import javax.xml.bind.annotation.XmlType;
  */
 public abstract class Service {
     private static final String SCPD_XML = "scpd.xml";
-    private static final String CTRL = "ctrl";
-    private static final String EVT = "evt";
+    private static final String CONTROL = "control";
+    private static final String EVENT = "event";
 
+    private static final String COLON = ":";
     private static final String SLASH = "/";
 
     private final Device device;
     private final URI serviceType;
     private final URI serviceId;
+    private final URI usn;
     private URI uri = null;
 
     /**
@@ -56,6 +58,10 @@ public abstract class Service {
         } else {
             throw new NullPointerException("serviceId");
         }
+
+        usn =
+            URI.create(getDevice().getUDN().toString()
+                       + COLON + COLON + getServiceId().toString());
     }
 
     /**
@@ -80,6 +86,14 @@ public abstract class Service {
      * @return  The service ID {@link URI}.
      */
     public URI getServiceId() { return serviceId; }
+
+    /**
+     * Method to get the USN {@link URI}.  The {@link URI} is calculated by
+     * combining the {@link Device#getUDN()} and {@link #getServiceId()}.
+     *
+     * @return  The USN {@link URI}.
+     */
+    public URI getUSN() { return usn; }
 
     /**
      * Method to get the {@link URI} to this {@link Service}'s Service
@@ -116,7 +130,7 @@ public abstract class Service {
      *
      * @return  The service control {@link URI}.
      */
-    protected URI getControlURL() { return uri().resolve(CTRL); }
+    protected URI getControlURL() { return uri().resolve(CONTROL); }
 
     /**
      * Method to get the {@link HttpServlet} that implements control.  If
@@ -132,7 +146,7 @@ public abstract class Service {
      *
      * @return  The evt sub-{@link URI}.
      */
-    protected URI getEventSubURL() { return uri().resolve(EVT); }
+    protected URI getEventSubURL() { return uri().resolve(EVENT); }
 
     /**
      * Method to get the {@link HttpServlet} that implements evt.  If

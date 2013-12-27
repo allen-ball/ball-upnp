@@ -3,6 +3,9 @@
 	* src/main/java/iprotium/upnp/MediaServer.java:
 	Provide RootDevice Service.
 
+	* src/main/java/iprotium/upnp/Service.java:
+	Added getUSN() method.
+
 	* src/main/java/iprotium/upnp/RootDevice.java: Initial writing.
 
 	* src/main/java/iprotium/upnp/SSDPThread.java: Initial writing.
