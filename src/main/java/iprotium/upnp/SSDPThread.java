@@ -1,0 +1,125 @@
+/*
+ * $Id$
+ *
+ * Copyright 2013 Allen D. Ball.  All rights reserved.
+ */
+package iprotium.upnp;
+
+import iprotium.upnp.ssdp.SSDPDiscoveryCache;
+import iprotium.upnp.ssdp.SSDPDiscoveryRequest;
+import iprotium.upnp.ssdp.SSDPDiscoveryThread;
+import iprotium.upnp.ssdp.SSDPMessage;
+import iprotium.upnp.ssdp.SSDPNotifyRequest;
+import iprotium.upnp.ssdp.SSDPRequest;
+import iprotium.upnp.ssdp.SSDPResponse;
+import java.net.SocketException;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.http.HttpHeaders;
+
+/**
+ * {@link SSDPDiscoveryThread} implementation that also announces
+ * {@link Service}s provided by the specified {@link Device}s.
+ *
+ * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @version $Revision$
+ */
+public class SSDPThread extends SSDPDiscoveryThread
+                                implements SSDPDiscoveryThread.Listener {
+    private static final String ALIVE = "ssdp:alive";
+
+    private final List<Device> list;
+    private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
+
+    /**
+     * Sole constructor.
+     *
+     * @param   devices         The {@link Device}s.
+     */
+    public SSDPThread(Device... devices) throws SocketException {
+        super(60);
+
+        if (devices != null) {
+            list = Arrays.asList(devices);
+
+            if (list.isEmpty()) {
+                throw new IllegalArgumentException("devices");
+            }
+        } else {
+            throw new NullPointerException("devices");
+        }
+
+        addListener(cache);
+        addListener(this);
+    }
+
+    /**
+     * Method to get the {@link SSDPDiscoveryCache} managed by this
+     * {@link SSDPDiscoveryThread}.
+     *
+     * @return  The {@link SSDPDiscoveryThread}.
+     */
+    public SSDPDiscoveryCache cache() { return cache; }
+
+    @Override
+    public void start() {
+        for (Device device : list) {
+            for (Service service : device.getServiceList()) {
+                /*
+                 * queue(new SSDPNotifyRequestImpl(service));
+                 */
+            }
+        }
+
+        super.start();
+    }
+
+    @Override
+    public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+        receiveEvent(thread, message);
+    }
+
+    @Override
+    public void receiveEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+        if (message instanceof SSDPRequest) {
+            SSDPRequest request = (SSDPRequest) message;
+            String method = request.getRequestLine().getMethod();
+            /*
+             * Should check MAN and ST values, too.
+             */
+            if (SSDPDiscoveryRequest.METHOD.equalsIgnoreCase(method)) {
+                for (Device device : list) {
+                    for (Service service : device.getServiceList()) {
+                        queue(new SSDPDiscoveryResponse(service));
+                    }
+                }
+            }
+        }
+    }
+
+    private class SSDPNotifyRequestImpl extends SSDPNotifyRequest {
+        public SSDPNotifyRequestImpl(Service service) {
+            super();
+
+            addHeader(NT, service.getServiceId().toASCIIString());
+            addHeader(NTS, ALIVE);
+            addHeader(USN, service.getUSN().toASCIIString());
+            addHeader(AL, service.getSCPDURL().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
+        }
+    }
+
+    private class SSDPDiscoveryResponse extends SSDPResponse {
+        public SSDPDiscoveryResponse(Service service) {
+            super(200, "OK");
+
+            addHeader(HttpHeaders.SERVER, "UPnP/1.0");
+            addHeader(ST, service.getServiceId().toASCIIString());
+            addHeader(HttpHeaders.LOCATION,
+                      service.getSCPDURL().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
+            addHeader(USN, service.getUSN().toASCIIString());
+            addHeader(EXT, null);
+        }
+    }
+}
