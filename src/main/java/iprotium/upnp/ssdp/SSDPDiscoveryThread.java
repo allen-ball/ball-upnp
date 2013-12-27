@@ -60,7 +60,7 @@ public class SSDPDiscoveryThread extends Thread {
     }
 
     /**
-     * Method to add a {@link Listener}.
+     * Method to remove a {@link Listener}.
      *
      * @param  listener         The {@link Listener}.
      */
