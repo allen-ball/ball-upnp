@@ -70,10 +70,6 @@
       </classpath>
       <src path="${src.dir}/main/java"/>
     </javac>
-    <taskdef classpathref="build.classpath"
-             resource="iprotium/util/ant/defaults.properties"/>
-    <jaxb-indexes-for classpathref="build.classpath"
-                      basedir="${target.classes.dir}"/>
   </target>
 
   <target name="jar"
