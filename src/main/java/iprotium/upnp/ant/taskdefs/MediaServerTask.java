@@ -49,6 +49,7 @@ public class MediaServerTask extends AbstractClasspathTask
 
             MediaServer server = new MediaServer();
 
+            server.setPort(getPort());
             server.context().setParentClassLoader(getClassLoader());
 
             if (isVerbose()) {
