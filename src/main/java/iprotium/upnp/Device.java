@@ -5,12 +5,12 @@
  */
 package iprotium.upnp;
 
+import iprotium.activation.JAXBDataSource;
 import iprotium.io.Directory;
 import iprotium.upnp.ssdp.SSDPDiscoveryCache;
 import iprotium.upnp.ssdp.SSDPDiscoveryThread;
 import iprotium.util.NetworkInterfaceUtil;
 import iprotium.util.UUIDFactory;
-import iprotium.xml.bind.JAXBDataSource;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
 import java.net.URI;
