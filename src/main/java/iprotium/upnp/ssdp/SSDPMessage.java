@@ -105,6 +105,11 @@ public interface SSDPMessage extends HttpMessage {
          */
         public URI getLocation(SSDPMessage message) {
             Header header = message.getFirstHeader(HttpHeaders.LOCATION);
+
+            if (header == null) {
+                header = message.getFirstHeader(AL);
+            }
+
             String value = (header != null) ? header.getValue() : null;
 
             return (value != null) ? URI.create(value) : null;

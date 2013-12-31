@@ -1,3 +1,9 @@
+2013-12-30  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* src/main/java/iprotium/upnp/ssdp/SSDPMessage.java:
+	Changed Impl.getLocation(SSDPMessage) to use AL if
+	HttpHeaders.LOCATION is not set.
+
 2013-12-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* src/main/java/iprotium/upnp/Device.java:
