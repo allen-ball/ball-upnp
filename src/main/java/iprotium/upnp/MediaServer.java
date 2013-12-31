@@ -30,7 +30,7 @@ public class MediaServer extends Device {
     private final RootDevice root;
     private final ContentDirectory directory;
     private final ConnectionManager manager;
-    private final List<Service> list;
+    private final List<? extends Service> list;
 
     /**
      * Sole constructor.
@@ -46,5 +46,5 @@ public class MediaServer extends Device {
     }
 
     @Override
-    public List<Service> getServiceList() { return list; }
+    public List<? extends Service> getServiceList() { return list; }
 }

@@ -15,7 +15,9 @@ import java.beans.ConstructorProperties;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServlet;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -53,26 +55,12 @@ public abstract class Device extends Tomcat {
         }
     }
 
+    private final URI deviceType;
+    private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
     private final URI uri;
     private final SSDPThread thread;
-    private final URI deviceType;
     private Context context = null;
-
-    {
-        try {
-            udn =
-                new URI(UUID,
-                        UUIDFactory.getDefault().generateTime().toString(),
-                        null);
-            uri =
-                new URI(HTTP, null, LOCALHOST.getHostAddress(), port,
-                        SLASH, null, null);
-            thread = new SSDPThread(this);
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
 
     /**
      * Sole constructor.
@@ -89,6 +77,18 @@ public abstract class Device extends Tomcat {
             this.deviceType = deviceType;
         } else {
             throw new NullPointerException("deviceType");
+        }
+    }
+
+    {
+        try {
+            udn = new URI(UUID, uuid.toString().toUpperCase(), null);
+            uri =
+                new URI(HTTP, null, LOCALHOST.getHostAddress(), port,
+                        SLASH, null, null);
+            thread = new SSDPThread(this);
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
         }
     }
 
@@ -114,32 +114,47 @@ public abstract class Device extends Tomcat {
      *
      * @return  The {@link List} of {@link Service}s.
      */
-    protected abstract List<Service> getServiceList();
+    protected abstract List<? extends Service> getServiceList();
 
     /**
      * Method to get the location {@link URI} for this {@link Device}.
      *
      * @return  The location {@link URI}.
      */
-    public URI getLocation() {
-        return uri().resolve(getClass().getSimpleName() + DOT_XML);
+    public URI getLocation() { return uri.resolve(getPath() + DOT_XML); }
+
+    private String getPath() {
+        return SLASH + getClass().getSimpleName();
     }
 
-    /**
-     * Method to get the base {@link URI} of this {@link Device}.
-     *
-     * @return  The base {@link URI} of this {@link Device}.
-     */
-    protected URI uri() { return uri; }
+    private String getPath(Service service) {
+        String name = service.getClass().getSimpleName();
+        ArrayList<Service> list = new ArrayList<Service>(getServiceList());
+        Iterator<Service> iterator = list.iterator();
 
-    /**
-     * Method to get the {@link SSDPDiscoveryCache} associated with this
-     * {@link Device}.
-     *
-     * @return  The {@link SSDPDiscoveryCache}.
-     */
-    public SSDPDiscoveryCache getSSDPDiscoveryCache() {
-        return thread.cache();
+        while (iterator.hasNext()) {
+            if (! name.equals(iterator.next().getClass().getSimpleName())) {
+                iterator.remove();
+            }
+        }
+
+        if (list.size() > 1) {
+            name += list.indexOf(service);
+        }
+
+        return getPath() + SLASH + name;
+    }
+
+    private String getSCPDPath(Service service) {
+        return getPath(service) + DOT_XML;
+    }
+
+    private String getControlPath(Service service) {
+        return getPath(service) + SLASH + "control";
+    }
+
+    private String getEventPath(Service service) {
+        return getPath(service) + SLASH + "event";
     }
 
     /**
@@ -165,14 +180,6 @@ public abstract class Device extends Tomcat {
 
         return context;
     }
-
-    /**
-     * Method to get a {@link Document} that may be serialized with a
-     * {@link javax.xml.bind.Marshaller} to XML.
-     *
-     * @return  The {@link Document} representing this {@link Device}.
-     */
-    protected Document getDocument() { return new Document(this); }
 
     @Override
     protected void initBaseDir() {
@@ -218,15 +225,15 @@ public abstract class Device extends Tomcat {
     @Override
     public void start() throws LifecycleException {
         try {
-            addServlet(getLocation(), new LocationServlet());
+            addServlet(getLocation().getPath(), new LocationServlet());
 
             for (Service service : getServiceList()) {
-                addServlet(service.getSCPDURL(),
-                           service.getSCPDServlet());
-                addServlet(service.getControlURL(),
-                           service.getControlServlet());
-                addServlet(service.getEventSubURL(),
-                           service.getEventSubServlet());
+                addServlet(getSCPDPath(service),
+                           new SCPDServlet(service));
+                addServlet(getControlPath(service),
+                           new ControlServlet(service));
+                addServlet(getEventPath(service),
+                           new EventServlet(service));
             }
 
             addServlet(NIL, new RedirectServlet(getLocation().getPath()));
@@ -238,12 +245,6 @@ public abstract class Device extends Tomcat {
             throw exception;
         } catch (Exception exception) {
             throw new LifecycleException(exception);
-        }
-    }
-
-    private void addServlet(URI uri, HttpServlet servlet) {
-        if (servlet != null) {
-            addServlet(uri.getPath(), servlet);
         }
     }
 
@@ -262,7 +263,7 @@ public abstract class Device extends Tomcat {
 
         @Override
         public JAXBDataSource getDataSource() {
-            return new JAXBDataSource(getDocument());
+            return new JAXBDataSource(new RootElement(Device.this));
         }
     }
 
@@ -271,7 +272,7 @@ public abstract class Device extends Tomcat {
      */
     @XmlRootElement(name = "root")
     @XmlType(propOrder = { "specVersion", "device" })
-    protected static class Document {
+    protected static class RootElement {
         private static final String XMLNS = "urn:schemas-upnp-org:device-1-0";
         private static final SpecVersionElement VERSION =
             new SpecVersionElement(1, 0);
@@ -284,7 +285,7 @@ public abstract class Device extends Tomcat {
          *
          * @param       device          The {@link Device}.
          */
-        public Document(Device device) {
+        public RootElement(Device device) {
             if (device != null) {
                 this.device = device;
             } else {
@@ -294,7 +295,7 @@ public abstract class Device extends Tomcat {
             element = (device != null) ? new DeviceElement(device) : null;
         }
 
-        private Document() { this(null); }
+        private RootElement() { this(null); }
 
         @XmlAttribute
         public String getXMLNS() { return XMLNS; }
@@ -367,12 +368,12 @@ public abstract class Device extends Tomcat {
             private ServiceListElement() { this(null); }
 
             @XmlElement
-            public List<Service.Element> getService() {
-                ArrayList<Service.Element> list =
-                    new ArrayList<Service.Element>();
+            public List<ServiceElement> getService() {
+                ArrayList<ServiceElement> list =
+                    new ArrayList<ServiceElement>();
 
                 for (Service service : device.getServiceList()) {
-                    list.add(service.getElement());
+                    list.add(new ServiceElement(service));
                 }
 
                 return list;
@@ -380,6 +381,60 @@ public abstract class Device extends Tomcat {
 
             @Override
             public String toString() { return super.toString(); }
+
+            /**
+             * {@code <service/>}
+             */
+            @XmlType(propOrder = {
+                        "serviceType", "serviceId",
+                        "SCPDURL", "controlURL", "eventSubURL"
+                     })
+            protected static class ServiceElement {
+                private final Service service;
+
+                /**
+                 * Sole public constructor.
+                 *
+                 * @param   service         The {@link Service}.
+                 */
+                public ServiceElement(Service service) {
+                    if (service != null) {
+                        this.service = service;
+                    } else {
+                        throw new NullPointerException("service");
+                    }
+                }
+
+                private ServiceElement() { this(null); }
+
+                @XmlElement
+                public URI getServiceType() {
+                    return service.getServiceType();
+                }
+
+                @XmlElement
+                public URI getServiceId() { return service.getServiceId(); }
+
+                @XmlElement
+                public String getSCPDURL() {
+                    return service.getDevice().getSCPDPath(service);
+                }
+
+                @XmlElement
+                public String getControlURL() {
+                    return service.getDevice().getControlPath(service);
+                }
+
+                @XmlElement
+                public String getEventSubURL() {
+                    return service.getDevice().getEventPath(service);
+                }
+
+                @Override
+                public String toString() {
+                    return getServiceType().toString();
+                }
+            }
         }
     }
 }

@@ -34,7 +34,4 @@ public class RootDevice extends Service {
     public RootDevice(Device device) {
         super(device, URI.create(TYPE), URI.create(TYPE));
     }
-
-    @Override
-    public URI getSCPDURL() { return getDevice().getLocation(); }
 }
