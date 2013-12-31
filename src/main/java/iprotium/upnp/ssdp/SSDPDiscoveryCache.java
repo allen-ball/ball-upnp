@@ -15,6 +15,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
+import static iprotium.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
+
 /**
  * SSDP discovery cache implementation.
  *
@@ -27,8 +29,6 @@ public class SSDPDiscoveryCache
     private static final long serialVersionUID = 437339045307811099L;
 
     private static final String MAX_AGE = "max-age";
-
-    private static final String BYEBYE = "ssdp:byebye";
 
     /**
      * Sole constructor.
@@ -107,7 +107,7 @@ public class SSDPDiscoveryCache
             if (SSDPNotifyRequest.METHOD.equals(method)) {
                 Header header = message.getFirstHeader(SSDPMessage.NTS);
 
-                if (header != null && BYEBYE.equals(header.getValue())) {
+                if (header != null && SSDP_BYEBYE.equals(header.getValue())) {
                     remove(request.getUSN());
                 }
             }
