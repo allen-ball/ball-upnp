@@ -15,6 +15,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
+import static iprotium.upnp.ssdp.SSDPMessage.MAX_AGE;
 import static iprotium.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
 
 /**
@@ -27,8 +28,6 @@ public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryThread.Listener {
     private static final long serialVersionUID = 437339045307811099L;
-
-    private static final String MAX_AGE = "max-age";
 
     /**
      * Sole constructor.

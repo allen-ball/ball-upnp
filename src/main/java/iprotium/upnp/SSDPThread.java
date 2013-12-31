@@ -136,8 +136,9 @@ public class SSDPThread extends SSDPDiscoveryThread
             addHeader(NTS, SSDP_ALIVE);
             addHeader(USN, service.getUSN().toASCIIString());
             addHeader(HttpHeaders.LOCATION,
-                      service.getSCPDURL().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
+                      service.getDevice().getLocation().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL,
+                      MAX_AGE + "=" + String.valueOf(1800));
         }
     }
 
@@ -158,8 +159,9 @@ public class SSDPThread extends SSDPDiscoveryThread
             addHeader(HttpHeaders.SERVER, "UPnP/1.0");
             addHeader(ST, service.getServiceId().toASCIIString());
             addHeader(HttpHeaders.LOCATION,
-                      service.getSCPDURL().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
+                      service.getDevice().getLocation().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL,
+                      MAX_AGE + "=" + String.valueOf(1800));
             addHeader(USN, service.getUSN().toASCIIString());
             addHeader(EXT, null);
         }
