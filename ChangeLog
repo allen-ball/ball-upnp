@@ -1,3 +1,10 @@
+2013-12-31  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* src/main/java/iprotium/upnp/ControlServlet.java,
+	src/main/java/iprotium/upnp/EventServlet.java,
+	src/main/java/iprotium/upnp/SCPDServlet.java:
+	Initial writing (provides scaffolding only).
+
 2013-12-30  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* src/main/java/iprotium/upnp/SSDPThread.java:
