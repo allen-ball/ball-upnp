@@ -22,7 +22,7 @@ import org.apache.http.ParseException;
  * @version $Revision$
  */
 public class SSDPDiscoveryThread extends Thread {
-    private final int interval;
+    protected final int interval;
     private final DatagramSocket socket;
     private final CopyOnWriteArrayList<Listener> list =
         new CopyOnWriteArrayList<Listener>();
@@ -79,6 +79,13 @@ public class SSDPDiscoveryThread extends Thread {
         }
     }
 
+    /**
+     * Callback periodically made to {@link queue(SSDPMessage)} a
+     * {@link SSDPDiscoveryRequest} available to be intercepted (overridden)
+     * by subclass implementations.
+     */
+    protected void ping() { queue(request); }
+
     @Override
     public void start() {
         new Thread() {
@@ -87,7 +94,7 @@ public class SSDPDiscoveryThread extends Thread {
             @Override
             public void run() {
                 for (;;) {
-                    queue(request);
+                    ping();
 
                     try {
                         sleep(interval * 1000);
