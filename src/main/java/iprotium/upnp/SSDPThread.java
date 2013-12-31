@@ -13,8 +13,10 @@ import iprotium.upnp.ssdp.SSDPNotifyRequest;
 import iprotium.upnp.ssdp.SSDPRequest;
 import iprotium.upnp.ssdp.SSDPResponse;
 import java.net.SocketException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.apache.http.HttpHeaders;
 
 /**
@@ -62,12 +64,30 @@ public class SSDPThread extends SSDPDiscoveryThread
     public SSDPDiscoveryCache cache() { return cache; }
 
     @Override
+    protected void ping() {
+        long expiration = 0;
+        Map.Entry<URI,SSDPDiscoveryCache.Value> entry = cache.firstEntry();
+
+        if (entry != null) {
+            expiration = entry.getValue().getExpiration();
+
+            for (SSDPDiscoveryCache.Value value : cache.values()) {
+                expiration = Math.min(expiration, value.getExpiration());
+            }
+        }
+
+        if (expiration < (now() + (2 * interval * 1000))) {
+            super.ping();
+        }
+    }
+
+    private long now() { return System.currentTimeMillis(); }
+
+    @Override
     public void start() {
         for (Device device : list) {
             for (Service service : device.getServiceList()) {
-                /*
-                 * queue(new SSDPNotifyRequestImpl(service));
-                 */
+                queue(new SSDPNotifyRequestImpl(service));
             }
         }
 
@@ -104,7 +124,8 @@ public class SSDPThread extends SSDPDiscoveryThread
             addHeader(NT, service.getServiceId().toASCIIString());
             addHeader(NTS, ALIVE);
             addHeader(USN, service.getUSN().toASCIIString());
-            addHeader(AL, service.getSCPDURL().toASCIIString());
+            addHeader(HttpHeaders.LOCATION,
+                      service.getSCPDURL().toASCIIString());
             addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
         }
     }
