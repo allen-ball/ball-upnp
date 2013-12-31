@@ -47,6 +47,13 @@ public interface SSDPMessage extends HttpMessage {
         USN = "USN";
 
     /**
+     * SSDP {@link #NTS} value
+     */
+    public static final String
+        SSDP_ALIVE = "ssdp:alive",
+        SSDP_BYEBYE = "ssdp:byebye";
+
+    /**
      * {@link SSDPMessage} end-of-line sequence.
      */
     public static final String CRLF = "\r\n";
