@@ -93,7 +93,7 @@ public abstract class Device extends Tomcat {
     }
 
     /**
-     * Method to get the URN {{@link URI}) describing this {@link Device}'s
+     * Method to get the URN ({@link URI}) describing this {@link Device}'s
      * device type.
      *
      * @return  The device type.
