@@ -54,6 +54,12 @@ public interface SSDPMessage extends HttpMessage {
         SSDP_BYEBYE = "ssdp:byebye";
 
     /**
+     * HTTP cache control key
+     */
+    public static final String
+        MAX_AGE = "max-age";
+
+    /**
      * {@link SSDPMessage} end-of-line sequence.
      */
     public static final String CRLF = "\r\n";
