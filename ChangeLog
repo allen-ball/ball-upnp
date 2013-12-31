@@ -3,6 +3,7 @@
 	* src/main/java/iprotium/upnp/SSDPThread.java:
 	Override ping() to only broadcast a SSDPDiscoveryRequest if the
 	SSDPDiscoveryCache is empty or an entry is about to expire.
+	Added byebye() method.
 
 	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryThread.java:
 	Added ping() method and made interval member protected.

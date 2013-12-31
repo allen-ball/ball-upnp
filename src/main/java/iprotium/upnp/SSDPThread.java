@@ -28,8 +28,6 @@ import org.apache.http.HttpHeaders;
  */
 public class SSDPThread extends SSDPDiscoveryThread
                                 implements SSDPDiscoveryThread.Listener {
-    private static final String ALIVE = "ssdp:alive";
-
     private final List<Device> list;
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
@@ -83,11 +81,24 @@ public class SSDPThread extends SSDPDiscoveryThread
 
     private long now() { return System.currentTimeMillis(); }
 
+    /**
+     * Method to send {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
+     * {@link SSDPNotifyRequest}s for each {@link Service} in each
+     * {@link Device} known to this {@code this} {@link SSDPThread}.
+     */
+    protected void byebye() {
+        for (Device device : list) {
+            for (Service service : device.getServiceList()) {
+                queue(new SSDPNotifyByeByeRequest(service));
+            }
+        }
+    }
+
     @Override
     public void start() {
         for (Device device : list) {
             for (Service service : device.getServiceList()) {
-                queue(new SSDPNotifyRequestImpl(service));
+                queue(new SSDPNotifyAliveRequest(service));
             }
         }
 
@@ -117,16 +128,26 @@ public class SSDPThread extends SSDPDiscoveryThread
         }
     }
 
-    private class SSDPNotifyRequestImpl extends SSDPNotifyRequest {
-        public SSDPNotifyRequestImpl(Service service) {
+    private class SSDPNotifyAliveRequest extends SSDPNotifyRequest {
+        public SSDPNotifyAliveRequest(Service service) {
             super();
 
             addHeader(NT, service.getServiceId().toASCIIString());
-            addHeader(NTS, ALIVE);
+            addHeader(NTS, SSDP_ALIVE);
             addHeader(USN, service.getUSN().toASCIIString());
             addHeader(HttpHeaders.LOCATION,
                       service.getSCPDURL().toASCIIString());
             addHeader(HttpHeaders.CACHE_CONTROL, "max-age=1800");
+        }
+    }
+
+    private class SSDPNotifyByeByeRequest extends SSDPNotifyRequest {
+        public SSDPNotifyByeByeRequest(Service service) {
+            super();
+
+            addHeader(NT, service.getServiceId().toASCIIString());
+            addHeader(NTS, SSDP_BYEBYE);
+            addHeader(USN, service.getUSN().toASCIIString());
         }
     }
 
