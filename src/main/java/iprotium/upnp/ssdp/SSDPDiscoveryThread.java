@@ -80,7 +80,7 @@ public class SSDPDiscoveryThread extends Thread {
     }
 
     /**
-     * Callback periodically made to {@link queue(SSDPMessage)} a
+     * Callback periodically made to {@link #queue(SSDPMessage)} a
      * {@link SSDPDiscoveryRequest} available to be intercepted (overridden)
      * by subclass implementations.
      */
