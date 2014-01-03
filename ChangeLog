@@ -2,6 +2,9 @@
 
 	* Added <tomcat/> build target and Ant Task.
 
+	* src/main/java/iprotium/upnp/SSDPThread.java:
+	Added alive() method.
+
 2013-12-31  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* Moved all path calculations from Service to (internal to)

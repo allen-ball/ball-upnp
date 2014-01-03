@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp;
 
@@ -82,6 +82,19 @@ public class SSDPThread extends SSDPDiscoveryThread
     private long now() { return System.currentTimeMillis(); }
 
     /**
+     * Method to send {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
+     * {@link SSDPNotifyRequest}s for each {@link Service} in each
+     * {@link Device} known to this {@code this} {@link SSDPThread}.
+     */
+    protected void alive() {
+        for (Device device : list) {
+            for (Service service : device.getServiceList()) {
+                queue(new SSDPNotifyAliveRequest(service));
+            }
+        }
+    }
+
+    /**
      * Method to send {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
      * {@link SSDPNotifyRequest}s for each {@link Service} in each
      * {@link Device} known to this {@code this} {@link SSDPThread}.
@@ -92,17 +105,6 @@ public class SSDPThread extends SSDPDiscoveryThread
                 queue(new SSDPNotifyByeByeRequest(service));
             }
         }
-    }
-
-    @Override
-    public void start() {
-        for (Device device : list) {
-            for (Service service : device.getServiceList()) {
-                queue(new SSDPNotifyAliveRequest(service));
-            }
-        }
-
-        super.start();
     }
 
     @Override
