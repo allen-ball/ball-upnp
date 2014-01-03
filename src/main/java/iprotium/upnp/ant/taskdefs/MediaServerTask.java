@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp.ant.taskdefs;
 
@@ -50,15 +50,21 @@ public class MediaServerTask extends AbstractClasspathTask
             MediaServer server = new MediaServer();
 
             server.setPort(getPort());
-            server.context().setParentClassLoader(getClassLoader());
+            server.getServer().setParentClassLoader(getClassLoader());
 
             if (isVerbose()) {
-                server.getSSDPDiscoveryThread().addListener(this);
+                server.getSSDPThread().addListener(this);
             }
 
             server.start();
 
             log(String.valueOf(server.getLocation()));
+
+            if (server.getServer().getPort() > 0) {
+                log(String.valueOf(server.getServer().getAddress())
+                    + ":" + String.valueOf(server.getServer().getPort())
+                    + " " + String.valueOf(server.getServer().getShutdown()));
+            }
 
             server.getServer().await();
         } catch (BuildException exception) {
