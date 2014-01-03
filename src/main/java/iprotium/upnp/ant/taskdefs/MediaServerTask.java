@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 @AntTask("media-server")
 public class MediaServerTask extends AbstractClasspathTask
                              implements SSDPDiscoveryThread.Listener {
+    private boolean silent = false;
     private Integer port = null;
     private boolean verbose = false;
 
@@ -29,6 +30,9 @@ public class MediaServerTask extends AbstractClasspathTask
      * Sole constructor.
      */
     public MediaServerTask() { super(); }
+
+    protected boolean isSilent() { return silent; }
+    public void setSilent(boolean silent) { this.silent = silent; }
 
     protected Integer getPort() { return port; }
     public void setPort(Integer port) { this.port = port; }
@@ -49,6 +53,7 @@ public class MediaServerTask extends AbstractClasspathTask
 
             MediaServer server = new MediaServer();
 
+            server.setSilent(isSilent());
             server.setPort(getPort());
             server.getServer().setParentClassLoader(getClassLoader());
 

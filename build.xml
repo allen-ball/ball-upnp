@@ -93,7 +93,7 @@
           depends="classes">
     <taskdef classpathref="build.classpath"
              resource="iprotium/upnp/ant/defaults.properties"/>
-    <media-server port="${port}" verbose="${verbose}"/>
+    <media-server silent="${silent}" port="${port}" verbose="${verbose}"/>
   </target>
 
   <target name="ssdp-discover"
@@ -109,7 +109,7 @@
           depends="classes">
     <taskdef classpathref="build.classpath"
              resource="iprotium/upnp/ant/defaults.properties"/>
-    <tomcat type="${type}" port="${port}"/>
+    <tomcat type="${type}" silent="${silent}" port="${port}"/>
   </target>
 
 </project>

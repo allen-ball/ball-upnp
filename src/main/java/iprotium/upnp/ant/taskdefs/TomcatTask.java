@@ -23,6 +23,7 @@ import org.apache.tools.ant.BuildException;
 @AntTask("tomcat")
 public class TomcatTask extends AbstractClasspathTask {
     private String type = Tomcat.class.getName();
+    private boolean silent = false;
     private File basedir = null;
     private Integer port = null;
 
@@ -33,6 +34,9 @@ public class TomcatTask extends AbstractClasspathTask {
 
     protected String getType() { return type; }
     public void setType(String type) { this.type = type; }
+
+    protected boolean isSilent() { return silent; }
+    public void setSilent(boolean silent) { this.silent = silent; }
 
     protected File getBasedir() { return basedir; }
     public void setBasedir(File basedir) { this.basedir = basedir; }
@@ -54,6 +58,8 @@ public class TomcatTask extends AbstractClasspathTask {
             Class<? extends Tomcat> type =
                 Class.forName(getType()).asSubclass(Tomcat.class);
             Tomcat tomcat = new Factory<Tomcat>(type).getInstance();
+
+            tomcat.setSilent(isSilent());
 
             if (getBasedir() != null) {
                 tomcat.setBaseDir(getBasedir().getAbsolutePath());
