@@ -59,12 +59,13 @@ public class SSDPThread extends SSDPDiscoveryThread
      *
      * @return  The {@link SSDPDiscoveryThread}.
      */
-    public SSDPDiscoveryCache cache() { return cache; }
+    public SSDPDiscoveryCache getSSDPDiscoveryCache() { return cache; }
 
     @Override
     protected void ping() {
-        long expiration = 0;
+        SSDPDiscoveryCache cache = getSSDPDiscoveryCache();
         Map.Entry<URI,SSDPDiscoveryCache.Value> entry = cache.firstEntry();
+        long expiration = 0;
 
         if (entry != null) {
             expiration = entry.getValue().getExpiration();
