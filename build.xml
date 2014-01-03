@@ -104,4 +104,12 @@
     <ssdp-discover/>
   </target>
 
+  <target name="tomcat"
+          description="--> Invokes &lt;tomcat/&gt; task."
+          depends="classes">
+    <taskdef classpathref="build.classpath"
+             resource="iprotium/upnp/ant/defaults.properties"/>
+    <tomcat type="${type}" port="${port}"/>
+  </target>
+
 </project>
