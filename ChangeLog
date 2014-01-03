@@ -2,6 +2,10 @@
 
 	* Added <tomcat/> build target and Ant Task.
 
+	* src/main/java/iprotium/upnp/Device.java:
+	Call SSDPThread.byebye() on Tomcat stop.
+	Configure and install Servlets in a StandardContext subclass.
+
 	* src/main/java/iprotium/upnp/SSDPThread.java:
 	Added alive() method.
 

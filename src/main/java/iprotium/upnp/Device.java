@@ -1,14 +1,12 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp;
 
 import iprotium.activation.JAXBDataSource;
 import iprotium.io.Directory;
-import iprotium.upnp.ssdp.SSDPDiscoveryCache;
-import iprotium.upnp.ssdp.SSDPDiscoveryThread;
 import iprotium.util.NetworkInterfaceUtil;
 import iprotium.util.UUIDFactory;
 import java.beans.ConstructorProperties;
@@ -18,17 +16,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.Servlet;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Server;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 
 import static iprotium.io.Directory.TMPDIR;
-import static iprotium.util.StringUtil.NIL;
+//import static iprotium.util.StringUtil.NIL;
 
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
@@ -45,22 +45,12 @@ public abstract class Device extends Tomcat {
 
     private static final String DOT_XML = ".xml";
 
-    private static final InetAddress LOCALHOST;
-
-    static {
-        try {
-            LOCALHOST = InetAddress.getLocalHost();
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
-
     private final URI deviceType;
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
     private final URI uri;
-    private final SSDPThread thread;
-    private Context context = null;
+    private final SSDPThread ssdp;
+    private ContextImpl context = null;
 
     /**
      * Sole constructor.
@@ -71,22 +61,19 @@ public abstract class Device extends Tomcat {
     protected Device(URI deviceType) {
         super();
 
-        enableNaming();
-
         if (deviceType != null) {
             this.deviceType = deviceType;
         } else {
             throw new NullPointerException("deviceType");
         }
-    }
 
-    {
         try {
             udn = new URI(UUID, uuid.toString().toUpperCase(), null);
             uri =
-                new URI(HTTP, null, LOCALHOST.getHostAddress(), port,
+                new URI(HTTP, null,
+                        InetAddress.getLocalHost().getHostAddress(), port,
                         SLASH, null, null);
-            thread = new SSDPThread(this);
+            ssdp = new SSDPThread(this);
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -158,28 +145,12 @@ public abstract class Device extends Tomcat {
     }
 
     /**
-     * Method to get the {@link SSDPDiscoveryThread} associated with this
+     * Method to get the {@link SSDPThread} associated with this
      * {@link Device}.
      *
-     * @return  The {@link SSDPDiscoveryThread}.
+     * @return  The {@link SSDPThread}.
      */
-    public SSDPDiscoveryThread getSSDPDiscoveryThread() { return thread; }
-
-    /**
-     * Method to get the {@link Context} for this {@link Tomcat} instance.
-     *
-     * @return  The {@link Context}.
-     */
-    public Context context() {
-        synchronized (this) {
-            if (context == null) {
-                initBaseDir();
-                context = addContext(NIL, basedir);
-            }
-        }
-
-        return context;
-    }
+    public SSDPThread getSSDPThread() { return ssdp; }
 
     @Override
     protected void initBaseDir() {
@@ -198,59 +169,70 @@ public abstract class Device extends Tomcat {
     }
 
     @Override
-    public void init() throws LifecycleException {
-        try {
-            host.addAlias(LOCALHOST.getHostAddress());
-            host.addAlias(LOCALHOST.getHostName());
+    public void start() throws LifecycleException {
+        if (context == null) {
+            context = new ContextImpl();
 
-            for (InetAddress address :
-                     NetworkInterfaceUtil.getInterfaceInetAddressList()) {
-                if (address.isSiteLocalAddress()) {
-                    host.addAlias(address.getHostAddress());
-                }
+            getHost().addChild(context);
+        }
 
-                if (address.isLoopbackAddress()) {
-                    host.addAlias(address.getHostAddress());
-                }
-            }
+        super.start();
 
-            super.init();
-        } catch (LifecycleException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new LifecycleException(exception);
+        ssdp.alive();
+
+        if (! ssdp.isAlive()) {
+            ssdp.start();
         }
     }
 
     @Override
-    public void start() throws LifecycleException {
-        try {
-            addServlet(getLocation().getPath(), new LocationServlet());
+    public void stop() throws LifecycleException {
+        ssdp.byebye();
 
-            for (Service service : getServiceList()) {
-                addServlet(getSCPDPath(service),
-                           new SCPDServlet(service));
-                addServlet(getControlPath(service),
-                           new ControlServlet(service));
-                addServlet(getEventPath(service),
-                           new EventServlet(service));
-            }
-
-            addServlet(NIL, new RedirectServlet(getLocation().getPath()));
-
-            super.start();
-
-            thread.start();
-        } catch (LifecycleException exception) {
-            throw exception;
-        } catch (Exception exception) {
-            throw new LifecycleException(exception);
-        }
+        super.stop();
     }
 
-    private void addServlet(String path, HttpServlet servlet) {
-        addServlet(context(), path, servlet);
-        context().addServletMapping(path, path);
+    @Override
+    public Host getHost() {
+        synchronized (this) {
+            if (host == null) {
+                try {
+                    host = super.getHost();
+
+                    InetAddress localhost = InetAddress.getLocalHost();
+
+                    host.addAlias(localhost.getHostAddress());
+                    host.addAlias(localhost.getHostName());
+
+                    for (InetAddress address :
+                             NetworkInterfaceUtil.getInterfaceInetAddressList()) {
+                        if (address.isSiteLocalAddress()) {
+                            host.addAlias(address.getHostAddress());
+                        }
+
+                        if (address.isLoopbackAddress()) {
+                            host.addAlias(address.getHostAddress());
+                        }
+                    }
+                } catch (Exception exception) {
+                    throw new RuntimeException(exception);
+                }
+            }
+        }
+
+        return host;
+    }
+
+    @Override
+    public Server getServer() {
+        synchronized (this) {
+            if (server == null) {
+                server = super.getServer();
+                server.setPort(port + 1);
+            }
+        }
+
+        return server;
     }
 
     @Override
@@ -264,6 +246,36 @@ public abstract class Device extends Tomcat {
         @Override
         public JAXBDataSource getDataSource() {
             return new JAXBDataSource(new RootElement(Device.this));
+        }
+    }
+
+    private class ContextImpl extends StandardContext {
+        public ContextImpl() {
+            super();
+
+            setName(SLASH);
+            setPath(SLASH);
+            setDocBase(SLASH);
+            setConfigFile(getWebappConfigFile(SLASH, SLASH));
+
+            addLifecycleListener(new FixContextListener());
+
+            setSessionTimeout(30);
+
+            add(getLocation().getPath(), new LocationServlet());
+
+            for (Service service : getServiceList()) {
+                add(getSCPDPath(service), new SCPDServlet(service));
+                add(getControlPath(service), new ControlServlet(service));
+                add(getEventPath(service), new EventServlet(service));
+            }
+
+            add(SLASH, new RedirectServlet(getLocation().getPath()));
+        }
+
+        private void add(String path, Servlet servlet) {
+            Tomcat.addServlet(this, path, servlet);
+            addServletMapping(path, path);
         }
     }
 
