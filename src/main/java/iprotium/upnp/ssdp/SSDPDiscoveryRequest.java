@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp.ssdp;
 
@@ -26,7 +26,7 @@ public class SSDPDiscoveryRequest extends SSDPRequest {
     public SSDPDiscoveryRequest() {
         super(METHOD);
 
-        addHeader(HttpHeaders.HOST, toString(ADDRESS));
+        addHeader(HttpHeaders.HOST.toUpperCase(), toString(ADDRESS));
         addHeader(MAN, "\"ssdp:discover\"");
         addHeader(MX, String.valueOf(120));
         addHeader(ST, "ssdp:all");

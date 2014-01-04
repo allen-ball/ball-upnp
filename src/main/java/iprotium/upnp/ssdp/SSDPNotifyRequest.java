@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp.ssdp;
 
@@ -26,6 +26,6 @@ public class SSDPNotifyRequest extends SSDPRequest {
     public SSDPNotifyRequest() {
         super(METHOD);
 
-        addHeader(HttpHeaders.HOST, toString(ADDRESS));
+        addHeader(HttpHeaders.HOST.toUpperCase(), toString(ADDRESS));
     }
 }
