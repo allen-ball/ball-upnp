@@ -89,6 +89,8 @@ public class SSDPThread extends SSDPDiscoveryThread
      */
     protected void alive() {
         for (Device device : list) {
+            queue(new SSDPNotifyAliveRequest(device));
+
             for (Service service : device.getServiceList()) {
                 queue(new SSDPNotifyAliveRequest(service));
             }
@@ -102,6 +104,8 @@ public class SSDPThread extends SSDPDiscoveryThread
      */
     protected void byebye() {
         for (Device device : list) {
+            queue(new SSDPNotifyByeByeRequest(device));
+
             for (Service service : device.getServiceList()) {
                 queue(new SSDPNotifyByeByeRequest(service));
             }
@@ -123,6 +127,8 @@ public class SSDPThread extends SSDPDiscoveryThread
              */
             if (SSDPDiscoveryRequest.METHOD.equalsIgnoreCase(method)) {
                 for (Device device : list) {
+                    queue(new SSDPDiscoveryResponse(device));
+
                     for (Service service : device.getServiceList()) {
                         queue(new SSDPDiscoveryResponse(service));
                     }
@@ -132,40 +138,66 @@ public class SSDPThread extends SSDPDiscoveryThread
     }
 
     private class SSDPNotifyAliveRequest extends SSDPNotifyRequest {
+        public SSDPNotifyAliveRequest(Device device) {
+            this(device, device.getUDN(), device.getUDN());
+        }
+
         public SSDPNotifyAliveRequest(Service service) {
+            this(service.getDevice(),
+                 service.getServiceId(), service.getUSN());
+        }
+
+        private SSDPNotifyAliveRequest(Device device, URI nt, URI usn) {
             super();
 
-            addHeader(NT, service.getServiceId().toASCIIString());
+            addHeader(NT, nt.toASCIIString());
             addHeader(NTS, SSDP_ALIVE);
-            addHeader(USN, service.getUSN().toASCIIString());
-            addHeader(HttpHeaders.LOCATION,
-                      service.getDevice().getLocation().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL,
+            addHeader(USN, usn.toASCIIString());
+            addHeader(HttpHeaders.LOCATION.toUpperCase(),
+                      device.getLocation().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL.toUpperCase(),
                       MAX_AGE + "=" + String.valueOf(1800));
         }
     }
 
     private class SSDPNotifyByeByeRequest extends SSDPNotifyRequest {
+        public SSDPNotifyByeByeRequest(Device device) {
+            this(device.getUDN(), device.getUDN());
+        }
+
         public SSDPNotifyByeByeRequest(Service service) {
+            this(service.getServiceId(), service.getUSN());
+        }
+
+        private SSDPNotifyByeByeRequest(URI nt, URI usn) {
             super();
 
-            addHeader(NT, service.getServiceId().toASCIIString());
+            addHeader(NT, nt.toASCIIString());
             addHeader(NTS, SSDP_BYEBYE);
-            addHeader(USN, service.getUSN().toASCIIString());
+            addHeader(USN, usn.toASCIIString());
         }
     }
 
     private class SSDPDiscoveryResponse extends SSDPResponse {
+        public SSDPDiscoveryResponse(Device device) {
+            this(device, device.getUDN(), device.getUDN());
+        }
+
         public SSDPDiscoveryResponse(Service service) {
+            this(service.getDevice(),
+                 service.getServiceId(), service.getUSN());
+        }
+
+        private SSDPDiscoveryResponse(Device device, URI st, URI usn) {
             super(200, "OK");
 
-            addHeader(HttpHeaders.SERVER, "UPnP/1.0");
-            addHeader(ST, service.getServiceId().toASCIIString());
-            addHeader(HttpHeaders.LOCATION,
-                      service.getDevice().getLocation().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL,
+            addHeader(HttpHeaders.SERVER.toUpperCase(), "UPnP/1.0");
+            addHeader(ST, st.toASCIIString());
+            addHeader(HttpHeaders.LOCATION.toUpperCase(),
+                      device.getLocation().toASCIIString());
+            addHeader(HttpHeaders.CACHE_CONTROL.toUpperCase(),
                       MAX_AGE + "=" + String.valueOf(1800));
-            addHeader(USN, service.getUSN().toASCIIString());
+            addHeader(USN, usn.toASCIIString());
             addHeader(EXT, null);
         }
     }

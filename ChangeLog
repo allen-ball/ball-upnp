@@ -10,6 +10,7 @@
 
 	* src/main/java/iprotium/upnp/SSDPThread.java:
 	Added alive() method.
+	Provide notify requests and responses for Devices.
 
 2013-12-31  Allen D. Ball  <ball@10-0-1-2.lan>
 
