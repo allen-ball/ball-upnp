@@ -22,13 +22,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.apache.catalina.Host;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Server;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.velocity.tools.view.VelocityViewServlet;
 
 import static iprotium.io.Directory.TMPDIR;
-//import static iprotium.util.StringUtil.NIL;
+import static iprotium.util.StringUtil.NIL;
 
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
@@ -169,30 +174,6 @@ public abstract class Device extends Tomcat {
     }
 
     @Override
-    public void start() throws LifecycleException {
-        if (context == null) {
-            context = new ContextImpl();
-
-            getHost().addChild(context);
-        }
-
-        super.start();
-
-        ssdp.alive();
-
-        if (! ssdp.isAlive()) {
-            ssdp.start();
-        }
-    }
-
-    @Override
-    public void stop() throws LifecycleException {
-        ssdp.byebye();
-
-        super.stop();
-    }
-
-    @Override
     public Host getHost() {
         synchronized (this) {
             if (host == null) {
@@ -228,7 +209,7 @@ public abstract class Device extends Tomcat {
         synchronized (this) {
             if (server == null) {
                 server = super.getServer();
-                server.setPort(port + 1);
+                server.addLifecycleListener(new LifecycleListenerImpl());
             }
         }
 
@@ -238,18 +219,39 @@ public abstract class Device extends Tomcat {
     @Override
     public String toString() { return getDeviceType().toString(); }
 
-    private class LocationServlet extends DataSourceServlet {
-        private static final long serialVersionUID = -3666209110730272906L;
-
-        public LocationServlet() { super(null); }
+    private class LifecycleListenerImpl implements LifecycleListener {
+        public LifecycleListenerImpl() { }
 
         @Override
-        public JAXBDataSource getDataSource() {
-            return new JAXBDataSource(new RootElement(Device.this));
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
+                if (context == null) {
+                    context = new ContextImpl();
+                    getHost().addChild(context);
+                }
+
+                getServer().setPort(port + 1);
+            }
+
+            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
+                ssdp.alive();
+
+                if (! ssdp.isAlive()) {
+                    ssdp.start();
+                }
+            }
+
+            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
+                ssdp.byebye();
+            }
         }
+
+        @Override
+        public String toString() { return getClass().getName(); }
     }
 
-    private class ContextImpl extends StandardContext {
+    private class ContextImpl extends StandardContext
+                              implements LifecycleListener {
         public ContextImpl() {
             super();
 
@@ -259,23 +261,66 @@ public abstract class Device extends Tomcat {
             setConfigFile(getWebappConfigFile(SLASH, SLASH));
 
             addLifecycleListener(new FixContextListener());
+            addLifecycleListener(this);
 
             setSessionTimeout(30);
 
-            add(getLocation().getPath(), new LocationServlet());
-
             for (Service service : getServiceList()) {
-                add(getSCPDPath(service), new SCPDServlet(service));
-                add(getControlPath(service), new ControlServlet(service));
-                add(getEventPath(service), new EventServlet(service));
+                addServlet(new SCPDServlet(service))
+                    .addMapping(getSCPDPath(service));
+                addServlet(new ControlServlet(service))
+                    .addMapping(getControlPath(service));
+                addServlet(new EventServlet(service))
+                    .addMapping(getEventPath(service));
             }
 
-            add(SLASH, new RedirectServlet(getLocation().getPath()));
+            addServlet(new LocationServlet())
+                .addMapping(getLocation().getPath());
+            addServlet(new RedirectServlet(getLocation().getPath()))
+                .addMapping(NIL);
+
+            addServlet(VelocityViewServlet.class)
+                .addMapping("*.html");
         }
 
-        private void add(String path, Servlet servlet) {
-            Tomcat.addServlet(this, path, servlet);
-            addServletMapping(path, path);
+        private Wrapper addServlet(Servlet servlet) {
+            Wrapper wrapper = new ExistingStandardWrapper(servlet);
+
+            wrapper.setName(servlet.toString());
+
+            addChild(wrapper);
+
+            return wrapper;
+        }
+
+        private Wrapper addServlet(Class<? extends Servlet> type) {
+            Wrapper wrapper = createWrapper();
+
+            wrapper.setName(type.getCanonicalName());
+            wrapper.setParentClassLoader(type.getClassLoader());
+            wrapper.setServletClass(type.getName());
+
+            addChild(wrapper);
+
+            return wrapper;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.AFTER_INIT_EVENT.equals(event.getType())) {
+                getServletContext().setAttribute("device", Device.this);
+            }
+        }
+    }
+
+    private class LocationServlet extends DataSourceServlet {
+        private static final long serialVersionUID = -3666209110730272906L;
+
+        public LocationServlet() { super(null); }
+
+        @Override
+        public JAXBDataSource getDataSource() {
+            return new JAXBDataSource(new RootElement(Device.this));
         }
     }
 

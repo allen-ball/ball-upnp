@@ -1,0 +1,23 @@
+## $Id$ ##
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- saved from url=(0014)about:internet -->
+  </head>
+  <body>
+    <table>
+#foreach($entry in $device.SSDPThread.SSDPDiscoveryCache.entrySet())
+      <tr>
+        <td>
+          <table>
+            <tr><pre>$entry.key</pre></tr>
+#set($url = $entry.value.SSDPMessage.location)
+            <tr><a href="$url"><pre>$url</pre><a></tr>
+          </table>
+        <td><pre>$entry.value.SSDPMessage.toString().trim()</pre></td>
+      </tr>
+#end
+    </table>
+  </body>
+</html>
