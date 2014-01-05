@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp;
 
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class MediaServer extends Device {
     public static final String TYPE =
-        "urn:schemas-upnp-org:device:MediaServer:1";
+        "urn:schemas-upnp-org:device:MediaServer:4";
 
     private final RootDevice root;
     private final ContentDirectory directory;

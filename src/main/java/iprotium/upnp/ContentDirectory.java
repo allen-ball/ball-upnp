@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp;
 
@@ -24,7 +24,7 @@ import java.net.URI;
  */
 public class ContentDirectory extends Service {
     public static final String TYPE =
-        "urn:schemas-upnp-org:service:ContentDirectory:1";
+        "urn:schemas-upnp-org:service:ContentDirectory:4";
     public static final String ID =
         "urn:upnp-org:serviceId:ContentDirectory";
 
