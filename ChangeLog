@@ -1,3 +1,9 @@
+2014-01-05  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* src/main/java/iprotium/upnp/SSDPThread.java:
+	Implement LifecycleListener and replace alive() and byebye()
+	callbacks with add(Device...) and remove(Device...) methods.
+
 2014-01-03  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* Added <tomcat/> build target and Ant Task.

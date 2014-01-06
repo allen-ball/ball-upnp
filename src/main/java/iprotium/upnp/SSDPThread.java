@@ -14,9 +14,12 @@ import iprotium.upnp.ssdp.SSDPRequest;
 import iprotium.upnp.ssdp.SSDPResponse;
 import java.net.SocketException;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.http.HttpHeaders;
 
 /**
@@ -27,8 +30,9 @@ import org.apache.http.HttpHeaders;
  * @version $Revision$
  */
 public class SSDPThread extends SSDPDiscoveryThread
-                                implements SSDPDiscoveryThread.Listener {
-    private final List<Device> list;
+                        implements SSDPDiscoveryThread.Listener,
+                                   LifecycleListener {
+    private final ArrayList<Device> list = new ArrayList<Device>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
     /**
@@ -40,11 +44,7 @@ public class SSDPThread extends SSDPDiscoveryThread
         super(60);
 
         if (devices != null) {
-            list = Arrays.asList(devices);
-
-            if (list.isEmpty()) {
-                throw new IllegalArgumentException("devices");
-            }
+            add(devices);
         } else {
             throw new NullPointerException("devices");
         }
@@ -60,6 +60,50 @@ public class SSDPThread extends SSDPDiscoveryThread
      * @return  The {@link SSDPDiscoveryThread}.
      */
     public SSDPDiscoveryCache getSSDPDiscoveryCache() { return cache; }
+
+    /**
+     * Method to add local {@link Device}s.  Sends
+     * {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
+     * {@link SSDPNotifyRequest}s for each {@link Service} in each
+     * {@link Device} added,
+     *
+     * @param   devices         The {@link Device}s to add.
+     */
+    protected void add(Device... devices) {
+        for (Device device : devices) {
+            if (! list.contains(device)) {
+                list.add(device);
+
+                queue(new SSDPNotifyAliveRequest(device));
+
+                for (Service service : device.getServiceList()) {
+                    queue(new SSDPNotifyAliveRequest(service));
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to remove local {@link Device}s.  Sends
+     * {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
+     * {@link SSDPNotifyRequest}s for each {@link Service} in each
+     * {@link Device} removed.
+     *
+     * @param   devices         The {@link Device}s to remove.
+     */
+    protected void remove(Device... devices) {
+        for (Device device : devices) {
+            if (list.contains(device)) {
+                list.remove(device);
+
+                queue(new SSDPNotifyByeByeRequest(device));
+
+                for (Service service : device.getServiceList()) {
+                    queue(new SSDPNotifyByeByeRequest(service));
+                }
+            }
+        }
+    }
 
     @Override
     protected void ping() {
@@ -81,36 +125,6 @@ public class SSDPThread extends SSDPDiscoveryThread
     }
 
     private long now() { return System.currentTimeMillis(); }
-
-    /**
-     * Method to send {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
-     * {@link SSDPNotifyRequest}s for each {@link Service} in each
-     * {@link Device} known to this {@code this} {@link SSDPThread}.
-     */
-    protected void alive() {
-        for (Device device : list) {
-            queue(new SSDPNotifyAliveRequest(device));
-
-            for (Service service : device.getServiceList()) {
-                queue(new SSDPNotifyAliveRequest(service));
-            }
-        }
-    }
-
-    /**
-     * Method to send {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
-     * {@link SSDPNotifyRequest}s for each {@link Service} in each
-     * {@link Device} known to this {@code this} {@link SSDPThread}.
-     */
-    protected void byebye() {
-        for (Device device : list) {
-            queue(new SSDPNotifyByeByeRequest(device));
-
-            for (Service service : device.getServiceList()) {
-                queue(new SSDPNotifyByeByeRequest(service));
-            }
-        }
-    }
 
     @Override
     public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
@@ -134,6 +148,19 @@ public class SSDPThread extends SSDPDiscoveryThread
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
+            if (! isAlive()) {
+                start();
+            }
+        }
+
+        if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
+            remove(list.toArray(new Device[] { }));
         }
     }
 
