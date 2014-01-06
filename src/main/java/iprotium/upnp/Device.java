@@ -78,7 +78,7 @@ public abstract class Device extends Tomcat {
                 new URI(HTTP, null,
                         InetAddress.getLocalHost().getHostAddress(), port,
                         SLASH, null, null);
-            ssdp = new SSDPThread(this);
+            ssdp = new SSDPThread();
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -210,6 +210,7 @@ public abstract class Device extends Tomcat {
             if (server == null) {
                 server = super.getServer();
                 server.addLifecycleListener(new LifecycleListenerImpl());
+                server.addLifecycleListener(ssdp);
             }
         }
 
@@ -231,18 +232,6 @@ public abstract class Device extends Tomcat {
                 }
 
                 getServer().setPort(port + 1);
-            }
-
-            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
-                ssdp.alive();
-
-                if (! ssdp.isAlive()) {
-                    ssdp.start();
-                }
-            }
-
-            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
-                ssdp.byebye();
             }
         }
 
@@ -309,6 +298,10 @@ public abstract class Device extends Tomcat {
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.AFTER_INIT_EVENT.equals(event.getType())) {
                 getServletContext().setAttribute("device", Device.this);
+            }
+
+            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
+                ssdp.add(Device.this);
             }
         }
     }
