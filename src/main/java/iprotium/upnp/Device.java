@@ -7,7 +7,6 @@ package iprotium.upnp;
 
 import iprotium.activation.JAXBDataSource;
 import iprotium.io.Directory;
-import iprotium.util.NetworkInterfaceUtil;
 import iprotium.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
@@ -21,18 +20,20 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import org.apache.catalina.Context;
 import org.apache.catalina.Host;
-import org.apache.catalina.Server;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
 import static iprotium.io.Directory.TMPDIR;
+import static iprotium.util.NetworkInterfaceUtil.getInterfaceInetAddressList;
 import static iprotium.util.StringUtil.NIL;
 
 /**
@@ -55,7 +56,7 @@ public abstract class Device extends Tomcat {
     private final URI udn;
     private final URI uri;
     private final SSDPThread ssdp;
-    private ContextImpl context = null;
+    private RootContext context = null;
 
     /**
      * Sole constructor.
@@ -185,8 +186,7 @@ public abstract class Device extends Tomcat {
                     host.addAlias(localhost.getHostAddress());
                     host.addAlias(localhost.getHostName());
 
-                    for (InetAddress address :
-                             NetworkInterfaceUtil.getInterfaceInetAddressList()) {
+                    for (InetAddress address : getInterfaceInetAddressList()) {
                         if (address.isSiteLocalAddress()) {
                             host.addAlias(address.getHostAddress());
                         }
@@ -220,6 +220,29 @@ public abstract class Device extends Tomcat {
     @Override
     public String toString() { return getDeviceType().toString(); }
 
+    private Wrapper addServlet(Context context, Servlet servlet) {
+        Wrapper wrapper = new ExistingStandardWrapper(servlet);
+
+        wrapper.setName(servlet.toString());
+
+        context.addChild(wrapper);
+
+        return wrapper;
+    }
+
+    private Wrapper addServlet(Context context,
+                               Class<? extends Servlet> type) {
+        Wrapper wrapper = context.createWrapper();
+
+        wrapper.setName(type.getCanonicalName());
+        wrapper.setParentClassLoader(type.getClassLoader());
+        wrapper.setServletClass(type.getName());
+
+        context.addChild(wrapper);
+
+        return wrapper;
+    }
+
     private class LifecycleListenerImpl implements LifecycleListener {
         public LifecycleListenerImpl() { }
 
@@ -227,7 +250,7 @@ public abstract class Device extends Tomcat {
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
                 if (context == null) {
-                    context = new ContextImpl();
+                    context = new RootContext();
                     getHost().addChild(context);
                 }
 
@@ -239,9 +262,9 @@ public abstract class Device extends Tomcat {
         public String toString() { return getClass().getName(); }
     }
 
-    private class ContextImpl extends StandardContext
+    private class RootContext extends StandardContext
                               implements LifecycleListener {
-        public ContextImpl() {
+        public RootContext() {
             super();
 
             setName(SLASH);
@@ -255,49 +278,28 @@ public abstract class Device extends Tomcat {
             setSessionTimeout(30);
 
             for (Service service : getServiceList()) {
-                addServlet(new SCPDServlet(service))
+                addServlet(this, new SCPDServlet(service))
                     .addMapping(getSCPDPath(service));
-                addServlet(new ControlServlet(service))
+                addServlet(this, new ControlServlet(service))
                     .addMapping(getControlPath(service));
-                addServlet(new EventServlet(service))
+                addServlet(this, new EventServlet(service))
                     .addMapping(getEventPath(service));
             }
 
-            addServlet(new LocationServlet())
+            addServlet(this, new LocationServlet())
                 .addMapping(getLocation().getPath());
-            addServlet(new RedirectServlet(getLocation().getPath()))
+            addServlet(this, new RedirectServlet(getLocation().getPath()))
                 .addMapping(NIL);
 
-            addServlet(VelocityViewServlet.class)
+            addServlet(this, VelocityViewServlet.class)
                 .addMapping("*.html");
-        }
-
-        private Wrapper addServlet(Servlet servlet) {
-            Wrapper wrapper = new ExistingStandardWrapper(servlet);
-
-            wrapper.setName(servlet.toString());
-
-            addChild(wrapper);
-
-            return wrapper;
-        }
-
-        private Wrapper addServlet(Class<? extends Servlet> type) {
-            Wrapper wrapper = createWrapper();
-
-            wrapper.setName(type.getCanonicalName());
-            wrapper.setParentClassLoader(type.getClassLoader());
-            wrapper.setServletClass(type.getName());
-
-            addChild(wrapper);
-
-            return wrapper;
         }
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.AFTER_INIT_EVENT.equals(event.getType())) {
                 getServletContext().setAttribute("device", Device.this);
+                getServletContext().setAttribute("cache", ssdp.getSSDPDiscoveryCache());
             }
 
             if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
@@ -327,7 +329,6 @@ public abstract class Device extends Tomcat {
         private static final SpecVersionElement VERSION =
             new SpecVersionElement(1, 0);
 
-        private Device device = null;
         private final DeviceElement element;
 
         /**
@@ -336,12 +337,6 @@ public abstract class Device extends Tomcat {
          * @param       device          The {@link Device}.
          */
         public RootElement(Device device) {
-            if (device != null) {
-                this.device = device;
-            } else {
-                throw new NullPointerException("device");
-            }
-
             element = (device != null) ? new DeviceElement(device) : null;
         }
 
@@ -364,7 +359,7 @@ public abstract class Device extends Tomcat {
          */
         @XmlType(propOrder = { "deviceType", "UDN", "serviceList" })
         protected static class DeviceElement {
-            private Device device = null;
+            private final Device device;
 
             /**
              * Sole public constructor.
@@ -400,7 +395,7 @@ public abstract class Device extends Tomcat {
          * {@code <serviceList/>}
          */
         protected static class ServiceListElement {
-            private Device device = null;
+            private final Device device;
 
             /**
              * Sole public constructor.
