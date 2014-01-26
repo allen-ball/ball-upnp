@@ -24,11 +24,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
@@ -56,7 +54,6 @@ public abstract class Device extends Tomcat {
     private final URI udn;
     private final URI uri;
     private final SSDPThread ssdp;
-    private RootContext context = null;
 
     /**
      * Sole constructor.
@@ -249,12 +246,46 @@ public abstract class Device extends Tomcat {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
-                if (context == null) {
-                    context = new RootContext();
-                    getHost().addChild(context);
+                Context context = addWebapp(null, SLASH, SLASH);
+
+                addServlet(context, VelocityViewServlet.class)
+                    .addMapping("*.html");
+                /*
+                 * Device
+                 */
+                for (Service service : getServiceList()) {
+                    addServlet(context, new SCPDServlet(service))
+                        .addMapping(getSCPDPath(service));
+                    addServlet(context, new ControlServlet(service))
+                        .addMapping(getControlPath(service));
+                    addServlet(context, new EventServlet(service))
+                        .addMapping(getEventPath(service));
                 }
 
+                addServlet(context, new DeviceDescriptionServlet())
+                    .addMapping(getLocation().getPath());
+
+                context.getServletContext()
+                    .setAttribute("device", Device.this);
+                /*
+                 * SSDP Cache
+                 */
+                context.getServletContext()
+                    .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
+
+                addServlet(context,
+                           new RedirectServlet(getLocation().getPath()))
+                    .addMapping(NIL);
+
                 getServer().setPort(port + 1);
+            }
+
+            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
+                ssdp.add(Device.this);
+            }
+
+            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
+                ssdp.remove(Device.this);
             }
         }
 
@@ -262,56 +293,10 @@ public abstract class Device extends Tomcat {
         public String toString() { return getClass().getName(); }
     }
 
-    private class RootContext extends StandardContext
-                              implements LifecycleListener {
-        public RootContext() {
-            super();
+    private class DeviceDescriptionServlet extends DataSourceServlet {
+        private static final long serialVersionUID = -9035211222687481083L;
 
-            setName(SLASH);
-            setPath(SLASH);
-            setDocBase(SLASH);
-            setConfigFile(getWebappConfigFile(SLASH, SLASH));
-
-            addLifecycleListener(new FixContextListener());
-            addLifecycleListener(this);
-
-            setSessionTimeout(30);
-
-            for (Service service : getServiceList()) {
-                addServlet(this, new SCPDServlet(service))
-                    .addMapping(getSCPDPath(service));
-                addServlet(this, new ControlServlet(service))
-                    .addMapping(getControlPath(service));
-                addServlet(this, new EventServlet(service))
-                    .addMapping(getEventPath(service));
-            }
-
-            addServlet(this, new LocationServlet())
-                .addMapping(getLocation().getPath());
-            addServlet(this, new RedirectServlet(getLocation().getPath()))
-                .addMapping(NIL);
-
-            addServlet(this, VelocityViewServlet.class)
-                .addMapping("*.html");
-        }
-
-        @Override
-        public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.AFTER_INIT_EVENT.equals(event.getType())) {
-                getServletContext().setAttribute("device", Device.this);
-                getServletContext().setAttribute("cache", ssdp.getSSDPDiscoveryCache());
-            }
-
-            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
-                ssdp.add(Device.this);
-            }
-        }
-    }
-
-    private class LocationServlet extends DataSourceServlet {
-        private static final long serialVersionUID = -3666209110730272906L;
-
-        public LocationServlet() { super(null); }
+        public DeviceDescriptionServlet() { super(null); }
 
         @Override
         public JAXBDataSource getDataSource() {

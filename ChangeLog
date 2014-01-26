@@ -1,3 +1,8 @@
+2014-01-26  Allen D. Ball  <ball@10-0-1-2.lan>
+
+	* src/main/java/iprotium/upnp/Device.java:
+	Configure web application Context in LifecycleListenerImpl.
+
 2014-01-05  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* src/main/java/iprotium/upnp/SSDPThread.java:
