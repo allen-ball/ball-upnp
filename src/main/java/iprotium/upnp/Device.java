@@ -247,9 +247,6 @@ public abstract class Device extends Tomcat {
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
                 Context context = addWebapp(null, SLASH, SLASH);
-
-                addServlet(context, VelocityViewServlet.class)
-                    .addMapping("*.html");
                 /*
                  * Device
                  */
@@ -272,11 +269,20 @@ public abstract class Device extends Tomcat {
                  */
                 context.getServletContext()
                     .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
-
+                /*
+                 * Resources
+                 */
+                addServlet(context, VelocityViewServlet.class)
+                    .addMapping("*.html");
+                /*
+                 * Redirect to the Device description
+                 */
                 addServlet(context,
                            new RedirectServlet(getLocation().getPath()))
                     .addMapping(NIL);
-
+                /*
+                 * Set the port for the shutdown command
+                 */
                 getServer().setPort(port + 1);
             }
 
