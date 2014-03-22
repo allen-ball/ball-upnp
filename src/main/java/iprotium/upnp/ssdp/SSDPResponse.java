@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
 package iprotium.upnp.ssdp;
 
@@ -39,10 +39,10 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     }
 
     private SSDPResponse(String[] lines) {
-        super(PARSER.parseStatusLine(lines[0], PARSER));
+        super(BasicLineParser.parseStatusLine(lines[0], PARSER));
 
         for (int i = 1; i < lines.length; i += 1) {
-            addHeader(PARSER.parseHeader(lines[i], PARSER));
+            addHeader(BasicLineParser.parseHeader(lines[i], PARSER));
         }
     }
 
