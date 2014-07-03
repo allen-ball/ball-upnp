@@ -1,9 +1,9 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp.ssdp;
+package ball.upnp.ssdp;
 
 import java.net.URI;
 import java.util.Date;
@@ -15,8 +15,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
-import static iprotium.upnp.ssdp.SSDPMessage.MAX_AGE;
-import static iprotium.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
+import static ball.upnp.ssdp.SSDPMessage.MAX_AGE;
+import static ball.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
 
 /**
  * SSDP discovery cache implementation.
@@ -27,7 +27,7 @@ import static iprotium.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryThread.Listener {
-    private static final long serialVersionUID = 437339045307811099L;
+    private static final long serialVersionUID = -383765398333867476L;
 
     /**
      * Sole constructor.
@@ -149,7 +149,7 @@ public class SSDPDiscoveryCache
     }
 
     private class CacheControlDirectiveMap extends TreeMap<String,String> {
-        private static final long serialVersionUID = 6243101589812178932L;
+        private static final long serialVersionUID = -7901522510091761313L;
 
         public CacheControlDirectiveMap(String string) {
             super(String.CASE_INSENSITIVE_ORDER);

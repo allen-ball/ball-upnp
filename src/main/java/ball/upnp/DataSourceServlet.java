@@ -1,11 +1,11 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
-import iprotium.io.IOUtil;
+import ball.io.IOUtil;
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
  * @version $Revision$
  */
 public class DataSourceServlet extends HttpServlet {
-    private static final long serialVersionUID = 360854166101066804L;
+    private static final long serialVersionUID = 4471660723759189225L;
 
     private DataSource ds = null;
 

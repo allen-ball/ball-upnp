@@ -3,11 +3,11 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
-import iprotium.activation.JAXBDataSource;
-import iprotium.io.Directory;
-import iprotium.util.UUIDFactory;
+import ball.activation.JAXBDataSource;
+import ball.io.Directory;
+import ball.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
 import java.net.URI;
@@ -30,9 +30,9 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
-import static iprotium.io.Directory.TMPDIR;
-import static iprotium.util.NetworkInterfaceUtil.getInterfaceInetAddressList;
-import static iprotium.util.StringUtil.NIL;
+import static ball.io.Directory.TMPDIR;
+import static ball.util.NetworkInterfaceUtil.getInterfaceInetAddressList;
+import static ball.util.StringUtil.NIL;
 
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
@@ -300,7 +300,7 @@ public abstract class Device extends Tomcat {
     }
 
     private class DeviceDescriptionServlet extends DataSourceServlet {
-        private static final long serialVersionUID = -9035211222687481083L;
+        private static final long serialVersionUID = 5705073073449470828L;
 
         public DeviceDescriptionServlet() { super(null); }
 

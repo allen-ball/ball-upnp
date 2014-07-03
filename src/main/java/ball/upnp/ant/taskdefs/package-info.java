@@ -4,6 +4,6 @@
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  */
 @ManifestSection
-package iprotium.upnp.ant.taskdefs;
+package ball.upnp.ant.taskdefs;
 
-import iprotium.annotation.ManifestSection;
+import ball.annotation.ManifestSection;

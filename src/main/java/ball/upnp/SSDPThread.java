@@ -3,15 +3,15 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
-import iprotium.upnp.ssdp.SSDPDiscoveryCache;
-import iprotium.upnp.ssdp.SSDPDiscoveryRequest;
-import iprotium.upnp.ssdp.SSDPDiscoveryThread;
-import iprotium.upnp.ssdp.SSDPMessage;
-import iprotium.upnp.ssdp.SSDPNotifyRequest;
-import iprotium.upnp.ssdp.SSDPRequest;
-import iprotium.upnp.ssdp.SSDPResponse;
+import ball.upnp.ssdp.SSDPDiscoveryCache;
+import ball.upnp.ssdp.SSDPDiscoveryRequest;
+import ball.upnp.ssdp.SSDPDiscoveryThread;
+import ball.upnp.ssdp.SSDPMessage;
+import ball.upnp.ssdp.SSDPNotifyRequest;
+import ball.upnp.ssdp.SSDPRequest;
+import ball.upnp.ssdp.SSDPResponse;
 import java.net.SocketException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class SSDPThread extends SSDPDiscoveryThread
 
     /**
      * Method to add local {@link Device}s.  Sends
-     * {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
+     * {@value ball.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
      * {@link SSDPNotifyRequest}s for each {@link Service} in each
      * {@link Device} added,
      *
@@ -85,7 +85,7 @@ public class SSDPThread extends SSDPDiscoveryThread
 
     /**
      * Method to remove local {@link Device}s.  Sends
-     * {@value iprotium.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
+     * {@value ball.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
      * {@link SSDPNotifyRequest}s for each {@link Service} in each
      * {@link Device} removed.
      *

@@ -3,7 +3,7 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp.ssdp;
+package ball.upnp.ssdp;
 
 import java.net.DatagramPacket;
 import java.net.SocketException;

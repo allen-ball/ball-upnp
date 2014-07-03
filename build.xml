@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="iprotium-upnp" basedir="." default="jar"
+<project name="ball-upnp" basedir="." default="jar"
          xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
   <description>
-    iprotium-upnp.jar
+    ball-upnp.jar
     ---------------------------
     UPnP Implementation Classes
 
@@ -21,8 +21,6 @@
 
   <property name="target.dir"           location="target"/>
   <property name="target.classes.dir"   location="${target.dir}/classes"/>
-
-  <property name="vendor"               value="iprotium.com"/>
 
   <path id="build.classpath">
     <pathelement location="${target.classes.dir}"/>
@@ -72,7 +70,7 @@
   </target>
 
   <target name="jar"
-          description="--> Construct iprotium-upnp.jar."
+          description="--> Construct ball-upnp.jar."
           depends="classes">
     <zip destfile="${target.dir}/${artifact}">
       <fileset dir="${target.classes.dir}"/>
@@ -92,7 +90,7 @@
           description="--> Invokes &lt;media-server/&gt; task."
           depends="classes">
     <taskdef classpathref="build.classpath"
-             resource="iprotium/upnp/ant/defaults.properties"/>
+             resource="ball/upnp/ant/defaults.properties"/>
     <media-server silent="${silent}" port="${port}" verbose="${verbose}"/>
   </target>
 
@@ -100,7 +98,7 @@
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="classes">
     <taskdef classpathref="build.classpath"
-             resource="iprotium/upnp/ant/defaults.properties"/>
+             resource="ball/upnp/ant/defaults.properties"/>
     <ssdp-discover/>
   </target>
 
@@ -108,7 +106,7 @@
           description="--> Invokes &lt;tomcat/&gt; task."
           depends="classes">
     <taskdef classpathref="build.classpath"
-             resource="iprotium/upnp/ant/defaults.properties"/>
+             resource="ball/upnp/ant/defaults.properties"/>
     <tomcat type="${type}" silent="${silent}" port="${port}"/>
   </target>
 

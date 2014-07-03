@@ -1,21 +1,21 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
 import javax.servlet.http.HttpServlet;
 
 /**
- * {@link HttpServlet} implementation to serve {@link Service} Control
- * Protocol Descriptions.
+ * {@link HttpServlet} implementation to handle {@link Service} control
+ * requests.
  *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public class SCPDServlet extends HttpServlet {
-    private static final long serialVersionUID = -1595387597799529203L;
+public class ControlServlet extends HttpServlet {
+    private static final long serialVersionUID = -2772890237290331348L;
 
     private final Service service;
 
@@ -24,7 +24,7 @@ public class SCPDServlet extends HttpServlet {
      *
      * @param   service         The {@link Service}.
      */
-    public SCPDServlet(Service service) {
+    public ControlServlet(Service service) {
         super();
 
         if (service != null) {

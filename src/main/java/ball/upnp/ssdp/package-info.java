@@ -5,6 +5,6 @@
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  */
 @ManifestSection
-package iprotium.upnp.ssdp;
+package ball.upnp.ssdp;
 
-import iprotium.annotation.ManifestSection;
+import ball.annotation.ManifestSection;

@@ -1,9 +1,9 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
 import javax.servlet.http.HttpServlet;
 
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServlet;
  * @version $Revision$
  */
 public class EventServlet extends HttpServlet {
-    private static final long serialVersionUID = -9219469886349601815L;
+    private static final long serialVersionUID = 9076240759844163156L;
 
     private final Service service;
 

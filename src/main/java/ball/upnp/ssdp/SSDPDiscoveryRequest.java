@@ -3,7 +3,7 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp.ssdp;
+package ball.upnp.ssdp;
 
 import org.apache.http.HttpHeaders;
 
@@ -13,19 +13,22 @@ import org.apache.http.HttpHeaders;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public class SSDPNotifyRequest extends SSDPRequest {
+public class SSDPDiscoveryRequest extends SSDPRequest {
 
     /**
      * {@link SSDPRequest} method name ({@value #METHOD})
      */
-    public static final String METHOD = "NOTIFY";
+    public static final String METHOD = "M-SEARCH";
 
     /**
      * Sole constructor.
      */
-    public SSDPNotifyRequest() {
+    public SSDPDiscoveryRequest() {
         super(METHOD);
 
         addHeader(HttpHeaders.HOST.toUpperCase(), toString(ADDRESS));
+        addHeader(MAN, "\"ssdp:discover\"");
+        addHeader(MX, String.valueOf(120));
+        addHeader(ST, "ssdp:all");
     }
 }

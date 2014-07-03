@@ -1,3 +1,7 @@
+2014-07-02  Allen D. Ball  <ball@sol.local>
+
+	* Renamed iprotium.upnp to ball.upnp.
+
 2014-03-22  Allen D. Ball  <ball@sol.local>
 
 	* Silence JDK 1.7 compilation warnings.

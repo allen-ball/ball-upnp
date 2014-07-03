@@ -1,9 +1,9 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
  * @version $Revision$
  */
 public class RedirectServlet extends HttpServlet {
-    private static final long serialVersionUID = 73813484811256646L;
+    private static final long serialVersionUID = 2685222049618705078L;
 
     private final String path;
 

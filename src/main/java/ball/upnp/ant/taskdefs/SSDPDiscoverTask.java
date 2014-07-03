@@ -3,16 +3,16 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp.ant.taskdefs;
+package ball.upnp.ant.taskdefs;
 
-import iprotium.annotation.AntTask;
-import iprotium.text.ArrayListTableModel;
-import iprotium.text.TextTable;
-import iprotium.upnp.ssdp.SSDPDiscoveryCache;
-import iprotium.upnp.ssdp.SSDPDiscoveryRequest;
-import iprotium.upnp.ssdp.SSDPDiscoveryThread;
-import iprotium.upnp.ssdp.SSDPMessage;
-import iprotium.util.ant.taskdefs.AbstractClasspathTask;
+import ball.annotation.AntTask;
+import ball.text.ArrayListTableModel;
+import ball.text.TextTable;
+import ball.upnp.ssdp.SSDPDiscoveryCache;
+import ball.upnp.ssdp.SSDPDiscoveryRequest;
+import ball.upnp.ssdp.SSDPDiscoveryThread;
+import ball.upnp.ssdp.SSDPMessage;
+import ball.util.ant.taskdefs.AbstractClasspathTask;
 import org.apache.http.HttpHeaders;
 import org.apache.tools.ant.BuildException;
 
@@ -77,7 +77,7 @@ public class SSDPDiscoverTask extends AbstractClasspathTask
 
     private class TableModelImpl
                   extends ArrayListTableModel<SSDPDiscoveryCache.Value> {
-        private static final long serialVersionUID = 2124313343329997817L;
+        private static final long serialVersionUID = 5540353564214745627L;
 
         public TableModelImpl(Iterable<SSDPDiscoveryCache.Value> iterable) {
             super(iterable,

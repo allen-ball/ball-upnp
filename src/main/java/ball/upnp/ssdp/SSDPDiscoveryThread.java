@@ -1,11 +1,11 @@
 /*
  * $Id$
  *
- * Copyright 2013 Allen D. Ball.  All rights reserved.
+ * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp.ssdp;
+package ball.upnp.ssdp;
 
-import iprotium.io.IOUtil;
+import ball.io.IOUtil;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

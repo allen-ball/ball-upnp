@@ -3,7 +3,7 @@
  *
  * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
  */
-package iprotium.upnp;
+package ball.upnp;
 
 import java.net.URI;
 import java.util.Arrays;
