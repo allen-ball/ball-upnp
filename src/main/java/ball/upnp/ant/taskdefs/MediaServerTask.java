@@ -10,6 +10,7 @@ import ball.upnp.MediaServer;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
+import java.awt.Desktop;
 import org.apache.tools.ant.BuildException;
 
 /**
@@ -71,6 +72,14 @@ public class MediaServerTask extends AbstractClasspathTask
                 log(String.valueOf(server.getServer().getAddress())
                     + ":" + String.valueOf(server.getServer().getPort())
                     + " " + String.valueOf(server.getServer().getShutdown()));
+            }
+
+            try {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().browse(server.getLocation());
+                }
+            } catch (Exception exception) {
+                log("Could not launch browser");
             }
 
             server.getServer().await();

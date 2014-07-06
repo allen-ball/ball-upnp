@@ -1,5 +1,8 @@
 2014-07-05  Allen D. Ball  <ball@sol.local>
 
+	* src/main/java/ball/upnp/ant/taskdefs/MediaServerTask.java:
+	Launch web browser after starting the server.
+
 	* pom.xml: Specify JRE dependency,
 
 2014-07-02  Allen D. Ball  <ball@sol.local>
