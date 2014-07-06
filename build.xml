@@ -14,8 +14,6 @@
   <property name="build.properties.file" location="build.properties"/>
   <property file="${build.properties.file}"/>
   <property name="build.sysclasspath"   value="ignore"/>
-  <available classname="${build.compiler.adapter}"
-             property="build.compiler" value="${build.compiler.adapter}"/>
 
   <property name="src.dir"              location="src"/>
 
