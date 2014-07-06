@@ -18,6 +18,11 @@
   <packaging>jar</packaging>
   <dependencies verbose="true">
     <dependency>
+      <groupId>java</groupId>
+      <artifactId>jre</artifactId>
+      <version>${java.specification.version}</version>
+    </dependency>
+    <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
