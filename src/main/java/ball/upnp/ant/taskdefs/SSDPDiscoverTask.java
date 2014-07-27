@@ -5,7 +5,6 @@
  */
 package ball.upnp.ant.taskdefs;
 
-import ball.annotation.AntTask;
 import ball.text.ArrayListTableModel;
 import ball.text.TextTable;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
@@ -13,6 +12,7 @@ import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
+import ball.util.ant.taskdefs.AntTask;
 import org.apache.http.HttpHeaders;
 import org.apache.tools.ant.BuildException;
 

@@ -5,9 +5,9 @@
  */
 package ball.upnp.ant.taskdefs;
 
-import ball.annotation.AntTask;
 import ball.util.Factory;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
+import ball.util.ant.taskdefs.AntTask;
 import java.io.File;
 import org.apache.catalina.Server;
 import org.apache.catalina.startup.Tomcat;

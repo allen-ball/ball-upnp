@@ -5,11 +5,11 @@
  */
 package ball.upnp.ant.taskdefs;
 
-import ball.annotation.AntTask;
 import ball.upnp.MediaServer;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
+import ball.util.ant.taskdefs.AntTask;
 import java.awt.Desktop;
 import org.apache.tools.ant.BuildException;
 
