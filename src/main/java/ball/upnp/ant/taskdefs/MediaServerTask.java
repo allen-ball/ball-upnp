@@ -10,6 +10,7 @@ import ball.upnp.ssdp.SSDPDiscoveryThread;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
 import ball.util.ant.taskdefs.AntTask;
+import ball.util.ant.taskdefs.NotNull;
 import java.awt.Desktop;
 import org.apache.tools.ant.BuildException;
 
@@ -34,20 +35,19 @@ public class MediaServerTask extends AbstractClasspathTask
      */
     public MediaServerTask() { super(); }
 
-    protected boolean isSilent() { return silent; }
+    public boolean isSilent() { return silent; }
     public void setSilent(boolean silent) { this.silent = silent; }
 
-    protected Integer getPort() { return port; }
+    @NotNull
+    public Integer getPort() { return port; }
     public void setPort(Integer port) { this.port = port; }
 
-    protected boolean isVerbose() { return verbose; }
+    public boolean isVerbose() { return verbose; }
     public void setVerbose(boolean verbose) { this.verbose = verbose; }
 
     @Override
     public void execute() throws BuildException {
-        if (getPort() == null) {
-            throw new BuildException("`port' attribute must be specified");
-        }
+        super.execute();
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 

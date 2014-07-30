@@ -8,6 +8,7 @@ package ball.upnp.ant.taskdefs;
 import ball.util.Factory;
 import ball.util.ant.taskdefs.AbstractClasspathTask;
 import ball.util.ant.taskdefs.AntTask;
+import ball.util.ant.taskdefs.NotNull;
 import java.io.File;
 import org.apache.catalina.Server;
 import org.apache.catalina.startup.Tomcat;
@@ -34,23 +35,23 @@ public class TomcatTask extends AbstractClasspathTask {
      */
     public TomcatTask() { super(); }
 
-    protected String getType() { return type; }
+    @NotNull
+    public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
-    protected boolean isSilent() { return silent; }
+    public boolean isSilent() { return silent; }
     public void setSilent(boolean silent) { this.silent = silent; }
 
-    protected File getBasedir() { return basedir; }
+    public File getBasedir() { return basedir; }
     public void setBasedir(File basedir) { this.basedir = basedir; }
 
-    protected Integer getPort() { return port; }
+    @NotNull
+    public Integer getPort() { return port; }
     public void setPort(Integer port) { this.port = port; }
 
     @Override
     public void execute() throws BuildException {
-        if (getPort() == null) {
-            throw new BuildException("`port' attribute must be specified");
-        }
+        super.execute();
 
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 

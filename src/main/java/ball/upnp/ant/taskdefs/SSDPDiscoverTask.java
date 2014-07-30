@@ -35,11 +35,13 @@ public class SSDPDiscoverTask extends AbstractClasspathTask
      */
     public SSDPDiscoverTask() { super(); }
 
-    protected int getTimeout() { return timeout; }
+    public int getTimeout() { return timeout; }
     public void setTimeout(int timeout) { this.timeout = timeout; }
 
     @Override
     public void execute() throws BuildException {
+        super.execute();
+
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         try {

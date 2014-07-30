@@ -1,3 +1,9 @@
+2014-07-29  Allen D. Ball  <ball@sol.local>
+
+	* Changed all Ant Task implementations to call
+	AnnotatedTask.validate() in execute() and applied
+	AntTaskAttributeConstraint annotations.
+
 2014-07-05  Allen D. Ball  <ball@sol.local>
 
 	* src/main/java/ball/upnp/ant/taskdefs/MediaServerTask.java:
