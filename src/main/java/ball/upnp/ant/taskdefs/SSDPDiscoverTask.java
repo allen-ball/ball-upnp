@@ -5,8 +5,7 @@
  */
 package ball.upnp.ant.taskdefs;
 
-import ball.text.ArrayListTableModel;
-import ball.text.TextTable;
+import ball.swing.table.ArrayListTableModel;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
@@ -56,7 +55,7 @@ public class SSDPDiscoverTask extends AbstractClasspathTask
 
             Thread.sleep(getTimeout() * 1000);
 
-            log(new TextTable(new TableModelImpl(cache.values())));
+            log(new TableModelImpl(cache.values()));
         } catch (BuildException exception) {
             throw exception;
         } catch (Throwable throwable) {
