@@ -28,6 +28,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
 import static ball.io.Directory.TMPDIR;
@@ -44,10 +45,9 @@ public abstract class Device extends Tomcat {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
 
+    private static final String ASTERISK = "*";
     private static final String COLON = ":";
     private static final String SLASH = "/";
-
-    private static final String DOT_XML = ".xml";
 
     private final URI deviceType;
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
@@ -111,7 +111,9 @@ public abstract class Device extends Tomcat {
      *
      * @return  The location {@link URI}.
      */
-    public URI getLocation() { return uri.resolve(getPath() + DOT_XML); }
+    public URI getLocation() {
+        return uri.resolve(getPath() + SLASH + "device.xml");
+    }
 
     private String getPath() {
         return SLASH + getClass().getSimpleName();
@@ -136,7 +138,7 @@ public abstract class Device extends Tomcat {
     }
 
     private String getSCPDPath(Service service) {
-        return getPath(service) + DOT_XML;
+        return getPath(service) + SLASH + "scpd.xml";
     }
 
     private String getControlPath(Service service) {
@@ -247,23 +249,19 @@ public abstract class Device extends Tomcat {
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
                 Context context = addWebapp(null, SLASH, SLASH);
-                /*
-                 * Device
-                 */
-                for (Service service : getServiceList()) {
-                    addServlet(context, new SCPDServlet(service))
-                        .addMapping(getSCPDPath(service));
-                    addServlet(context, new ControlServlet(service))
-                        .addMapping(getControlPath(service));
-                    addServlet(context, new EventServlet(service))
-                        .addMapping(getEventPath(service));
-                }
-
-                addServlet(context, new DeviceDescriptionServlet())
-                    .addMapping(getLocation().getPath());
 
                 context.getServletContext()
                     .setAttribute("device", Device.this);
+                /*
+                 * Device
+                 *
+                 * Note: DeviceDescriptionServlet functionality should be
+                 * included in CXFServlet / Spring implementation.
+                 */
+                addServlet(context, new DeviceDescriptionServlet())
+                    .addMapping(getLocation().getPath());
+                addServlet(context, new CXFServlet())
+                    .addMapping(getPath() + SLASH + ASTERISK);
                 /*
                  * SSDP Cache
                  */

@@ -1,3 +1,8 @@
+2014-09-27  Allen D. Ball  <ball@sol.local>
+
+	* (Interim check-in) Add Apache CXF and Spring framework
+	dependencies.
+
 2014-07-29  Allen D. Ball  <ball@sol.local>
 
 	* Changed all Ant Task implementations to call
