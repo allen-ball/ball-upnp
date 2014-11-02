@@ -1,3 +1,7 @@
+2014-11-01  Allen D. Ball  <ball@sol.local>
+
+	* Use diamond ("<>") operator where possible.
+
 2014-09-27  Allen D. Ball  <ball@sol.local>
 
 	* (Interim check-in) Add Apache CXF and Spring framework

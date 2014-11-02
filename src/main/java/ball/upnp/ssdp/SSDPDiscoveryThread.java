@@ -25,9 +25,9 @@ public class SSDPDiscoveryThread extends Thread {
     protected final int interval;
     private final DatagramSocket socket;
     private final CopyOnWriteArrayList<Listener> list =
-        new CopyOnWriteArrayList<Listener>();
+        new CopyOnWriteArrayList<>();
     private final ConcurrentLinkedQueue<SSDPMessage> queue =
-        new ConcurrentLinkedQueue<SSDPMessage>();
+        new ConcurrentLinkedQueue<>();
     private final SSDPDiscoveryRequest request = new SSDPDiscoveryRequest();
 
     /**

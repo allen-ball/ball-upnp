@@ -32,7 +32,7 @@ import org.apache.http.HttpHeaders;
 public class SSDPThread extends SSDPDiscoveryThread
                         implements SSDPDiscoveryThread.Listener,
                                    LifecycleListener {
-    private final ArrayList<Device> list = new ArrayList<Device>();
+    private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
     /**

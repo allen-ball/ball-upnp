@@ -121,7 +121,7 @@ public abstract class Device extends Tomcat {
 
     private String getPath(Service service) {
         String name = service.getClass().getSimpleName();
-        ArrayList<Service> list = new ArrayList<Service>(getServiceList());
+        ArrayList<Service> list = new ArrayList<>(getServiceList());
         Iterator<Service> iterator = list.iterator();
 
         while (iterator.hasNext()) {
@@ -403,8 +403,7 @@ public abstract class Device extends Tomcat {
 
             @XmlElement
             public List<ServiceElement> getService() {
-                ArrayList<ServiceElement> list =
-                    new ArrayList<ServiceElement>();
+                ArrayList<ServiceElement> list = new ArrayList<>();
 
                 for (Service service : device.getServiceList()) {
                     list.add(new ServiceElement(service));
