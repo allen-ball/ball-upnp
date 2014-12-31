@@ -19,6 +19,8 @@
 
   <property name="target.dir"           location="target"/>
   <property name="target.classes.dir"   location="${target.dir}/classes"/>
+  <property name="target.headers.dir"   location="${target.dir}/headers"/>
+  <property name="target.objects.dir"   location="${target.dir}/objects"/>
 
   <path id="build.classpath">
     <pathelement location="${target.classes.dir}"/>
@@ -48,8 +50,8 @@
               value="${pom.artifactId}-${pom.version}.jar"/>
   </target>
 
-  <target name="classes"
-          description="--> Compile Java source."
+  <target name="resources"
+          description="--> Copy resources."
           depends="depend">
     <mkdir dir="${target.classes.dir}"/>
     <filter token="POM.ARTIFACTID" value="${pom.artifactId}"/>
@@ -57,6 +59,11 @@
           todir="${target.classes.dir}">
       <fileset dir="${src.dir}/main/resources"/>
     </copy>
+  </target>
+
+  <target name="classes"
+          description="--> Compile Java source."
+          depends="resources">
     <javac destdir="${target.classes.dir}">
       <compilerarg compiler="modern" value="-Xlint"/>
       <compilerarg compiler="modern" value="-g:source,lines,vars"/>
@@ -65,6 +72,12 @@
       </classpath>
       <src path="${src.dir}/main/java"/>
     </javac>
+    <taskdef classpathref="build.classpath"
+             resource="ball/util/ant/defaults.properties"/>
+    <jni-classes classpathref="build.classpath"
+                 basedir="${target.classes.dir}" property="jni.classes">
+      <src path="${src.dir}/main/java"/>
+    </jni-classes>
   </target>
 
   <target name="jar"
@@ -76,11 +89,47 @@
     <jarlib-display file="${target.dir}/${artifact}"/>
   </target>
 
+  <target name="headers"
+          description="--> Compile JNI headers."
+          depends="classes" if="jni.classes">
+    <mkdir dir="${target.headers.dir}"/>
+    <javah classpathref="build.classpath" class="${jni.classes}"
+           destdir="${target.headers.dir}"/>
+  </target>
+
+  <target name="objects"
+          description="--> Compile JNI objects."
+          depends="headers" if="jni.classes">
+    <mkdir dir="${target.objects.dir}"/>
+    <taskdef classpathref="build.classpath"
+             resource="ball/util/ant/defaults.properties"/>
+    <jni-cc include="${target.headers.dir}" dest="${target.objects.dir}">
+      <fileset dir="${src.dir}/main/c" includes="*.c"/>
+      <mapper type="glob" from="*.c" to="*.o"/>
+    </jni-cc>
+  </target>
+
+  <target name="jnilib"
+          description="--> Compile JNI library."
+          depends="objects" if="jni.classes">
+    <taskdef classpathref="build.classpath"
+             resource="ball/util/ant/defaults.properties"/>
+    <jni-ld destdir="${target.dir}" libname="${pom.artifactId}"
+            property="jnilib">
+      <fileset dir="${target.objects.dir}" includes="**/*.o"/>
+    </jni-ld>
+  </target>
+
   <target name="install"
           description="--> Installs pom.xml and artifacts to local repository."
-          depends="jar">
+          depends="jar,jnilib">
+    <jnilib-suffix property="jnilib.suffix"/>
     <artifact:install file="${target.dir}/${artifact}">
       <pom refid="pom"/>
+      <!--
+      <attach file="${target.dir}/${jnilib}"
+              classifier="${os.name}-${os.arch}" type="${jnilib.suffix}"/>
+      -->
     </artifact:install>
   </target>
 
