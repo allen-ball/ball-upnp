@@ -123,6 +123,8 @@
   <target name="install"
           description="--> Installs pom.xml and artifacts to local repository."
           depends="jar,jnilib">
+    <taskdef classpathref="build.classpath"
+             resource="ball/util/ant/defaults.properties"/>
     <jnilib-suffix property="jnilib.suffix"/>
     <artifact:install file="${target.dir}/${artifact}">
       <pom refid="pom"/>
