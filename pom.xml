@@ -16,11 +16,14 @@
   <name>UPnP Implementation Classes</name>
   <version>1.0</version>
   <packaging>jar</packaging>
+  <properties>
+    <jre.version>1.7</jre.version>
+  </properties>
   <dependencies verbose="true">
     <dependency>
       <groupId>java</groupId>
       <artifactId>jre</artifactId>
-      <version>${java.specification.version}</version>
+      <version>${jre.version}</version>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
