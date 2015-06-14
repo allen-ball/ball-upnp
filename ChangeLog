@@ -41,8 +41,6 @@
 
 2014-01-03  Allen D. Ball  <ball@10-0-1-2.lan>
 
-	* Added <tomcat/> build target and Ant Task.
-
 	* src/main/java/iprotium/upnp/Device.java:
 	Call SSDPThread.byebye() on Tomcat stop.
 	Configure and install Servlets in a StandardContext subclass.

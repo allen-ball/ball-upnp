@@ -27,6 +27,10 @@
     </dependency>
     <dependency>
       <groupId>ball</groupId>
+      <artifactId>ball-tomcat</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
     <dependency>
@@ -50,30 +54,6 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-ant-tasks</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-logging-juli</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-jasper</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper-el</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jsp-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>

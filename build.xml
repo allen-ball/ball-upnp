@@ -157,7 +157,7 @@
           description="--> Invokes &lt;tomcat/&gt; task."
           depends="classes">
     <taskdef classpathref="build.classpath"
-             resource="ball/upnp/ant/defaults.properties"/>
+             resource="ball/tomcat/ant/defaults.properties"/>
     <tomcat type="${type}" silent="${silent}" port="${port}"/>
   </target>
 
