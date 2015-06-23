@@ -1,12 +1,13 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
 import ball.activation.JAXBDataSource;
 import ball.io.Directory;
+import ball.tomcat.EmbeddedTomcat;
 import ball.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
@@ -21,18 +22,13 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.apache.catalina.Context;
-import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
-import org.apache.catalina.Wrapper;
-import org.apache.catalina.startup.Tomcat;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
-import static ball.io.Directory.TMPDIR;
-import static ball.util.NetworkInterfaceUtil.getInterfaceInetAddressList;
 import static ball.util.StringUtil.NIL;
 
 /**
@@ -41,7 +37,7 @@ import static ball.util.StringUtil.NIL;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public abstract class Device extends Tomcat {
+public abstract class Device extends EmbeddedTomcat {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
 
@@ -158,52 +154,6 @@ public abstract class Device extends Tomcat {
     public SSDPThread getSSDPThread() { return ssdp; }
 
     @Override
-    protected void initBaseDir() {
-        synchronized (this) {
-            if (basedir == null) {
-                Directory home =
-                    TMPDIR.getChildDirectory(getClass().getSimpleName()
-                                             + COLON + port);
-
-                home.mkdirs();
-                basedir = home.getAbsolutePath();
-            }
-
-            super.initBaseDir();
-        }
-    }
-
-    @Override
-    public Host getHost() {
-        synchronized (this) {
-            if (host == null) {
-                try {
-                    host = super.getHost();
-
-                    InetAddress localhost = InetAddress.getLocalHost();
-
-                    host.addAlias(localhost.getHostAddress());
-                    host.addAlias(localhost.getHostName());
-
-                    for (InetAddress address : getInterfaceInetAddressList()) {
-                        if (address.isSiteLocalAddress()) {
-                            host.addAlias(address.getHostAddress());
-                        }
-
-                        if (address.isLoopbackAddress()) {
-                            host.addAlias(address.getHostAddress());
-                        }
-                    }
-                } catch (Exception exception) {
-                    throw new RuntimeException(exception);
-                }
-            }
-        }
-
-        return host;
-    }
-
-    @Override
     public Server getServer() {
         synchronized (this) {
             if (server == null) {
@@ -219,36 +169,13 @@ public abstract class Device extends Tomcat {
     @Override
     public String toString() { return getDeviceType().toString(); }
 
-    private Wrapper addServlet(Context context, Servlet servlet) {
-        Wrapper wrapper = new ExistingStandardWrapper(servlet);
-
-        wrapper.setName(servlet.toString());
-
-        context.addChild(wrapper);
-
-        return wrapper;
-    }
-
-    private Wrapper addServlet(Context context,
-                               Class<? extends Servlet> type) {
-        Wrapper wrapper = context.createWrapper();
-
-        wrapper.setName(type.getCanonicalName());
-        wrapper.setParentClassLoader(type.getClassLoader());
-        wrapper.setServletClass(type.getName());
-
-        context.addChild(wrapper);
-
-        return wrapper;
-    }
-
     private class LifecycleListenerImpl implements LifecycleListener {
         public LifecycleListenerImpl() { }
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
-                Context context = addWebapp(null, SLASH, SLASH);
+                Context context = getContext();
 
                 context.getServletContext()
                     .setAttribute("device", Device.this);
@@ -265,6 +192,8 @@ public abstract class Device extends Tomcat {
                 /*
                  * SSDP Cache
                  */
+                context.getServletContext()
+                    .setAttribute("ssdp", ssdp);
                 context.getServletContext()
                     .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
                 /*

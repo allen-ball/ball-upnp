@@ -1,3 +1,8 @@
+2015-06-22  Allen D. Ball  <ball@sol.local>
+
+	* src/main/java/ball/upnp/Device.java:
+	Re-factored as a subclass of ball.tomcat.EmbeddedTomcat.
+
 2014-11-01  Allen D. Ball  <ball@sol.local>
 
 	* Use diamond ("<>") operator where possible.
