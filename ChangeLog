@@ -1,3 +1,7 @@
+2015-07-18  Allen D. Ball  <ball@sol.local>
+
+	* Removed <media-server/> Task; renamed SSDPThread to SSDP.
+
 2015-06-22  Allen D. Ball  <ball@sol.local>
 
 	* src/main/java/ball/upnp/Device.java:

@@ -137,14 +137,6 @@
     </artifact:install>
   </target>
 
-  <target name="media-server"
-          description="--> Invokes &lt;media-server/&gt; task."
-          depends="classes">
-    <taskdef classpathref="build.classpath"
-             resource="ball/upnp/ant/defaults.properties"/>
-    <media-server silent="${silent}" port="${port}" verbose="${verbose}"/>
-  </target>
-
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="classes">

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -29,9 +29,8 @@ import org.apache.http.HttpHeaders;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public class SSDPThread extends SSDPDiscoveryThread
-                        implements SSDPDiscoveryThread.Listener,
-                                   LifecycleListener {
+public class SSDP extends SSDPDiscoveryThread
+                  implements SSDPDiscoveryThread.Listener, LifecycleListener {
     private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
@@ -40,7 +39,7 @@ public class SSDPThread extends SSDPDiscoveryThread
      *
      * @param   devices         The {@link Device}s.
      */
-    public SSDPThread(Device... devices) throws SocketException {
+    public SSDP(Device... devices) throws SocketException {
         super(60);
 
         if (devices != null) {

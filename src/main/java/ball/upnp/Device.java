@@ -49,7 +49,7 @@ public abstract class Device extends EmbeddedTomcat {
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
     private final URI uri;
-    private final SSDPThread ssdp;
+    private final SSDP ssdp;
 
     /**
      * Sole constructor.
@@ -72,7 +72,7 @@ public abstract class Device extends EmbeddedTomcat {
                 new URI(HTTP, null,
                         InetAddress.getLocalHost().getHostAddress(), port,
                         SLASH, null, null);
-            ssdp = new SSDPThread();
+            ssdp = new SSDP();
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -146,12 +146,12 @@ public abstract class Device extends EmbeddedTomcat {
     }
 
     /**
-     * Method to get the {@link SSDPThread} associated with this
+     * Method to get the {@link SSDP} associated with this
      * {@link Device}.
      *
-     * @return  The {@link SSDPThread}.
+     * @return  The {@link SSDP}.
      */
-    public SSDPThread getSSDPThread() { return ssdp; }
+    public SSDP getSSDP() { return ssdp; }
 
     @Override
     public Server getServer() {
