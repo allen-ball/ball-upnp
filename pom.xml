@@ -14,7 +14,6 @@
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
   <name>UPnP Implementation Classes</name>
-  <version>1.0</version>
   <packaging>jar</packaging>
   <properties>
     <jre.version>1.7</jre.version>
