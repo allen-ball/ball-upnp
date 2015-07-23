@@ -7,7 +7,10 @@ package ball.upnp;
 
 import ball.activation.JAXBDataSource;
 import ball.io.Directory;
+import ball.tomcat.EmbeddedContextConfigurator;
+import ball.tomcat.EmbeddedLifecycleListener;
 import ball.tomcat.EmbeddedTomcat;
+import ball.tomcat.EmbeddedTomcatConfigurator;
 import ball.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
@@ -29,6 +32,7 @@ import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
+import static ball.tomcat.EmbeddedTomcat.addServlet;
 import static ball.util.StringUtil.NIL;
 
 /**
@@ -37,7 +41,9 @@ import static ball.util.StringUtil.NIL;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public abstract class Device extends EmbeddedTomcat {
+public abstract class Device implements EmbeddedTomcatConfigurator,
+                                        EmbeddedContextConfigurator,
+                                        EmbeddedLifecycleListener {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
 
@@ -49,7 +55,6 @@ public abstract class Device extends EmbeddedTomcat {
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
     private final URI uri;
-    private final SSDP ssdp;
 
     /**
      * Sole constructor.
@@ -58,8 +63,6 @@ public abstract class Device extends EmbeddedTomcat {
      */
     @ConstructorProperties({ "deviceType" })
     protected Device(URI deviceType) {
-        super();
-
         if (deviceType != null) {
             this.deviceType = deviceType;
         } else {
@@ -70,9 +73,8 @@ public abstract class Device extends EmbeddedTomcat {
             udn = new URI(UUID, uuid.toString().toUpperCase(), null);
             uri =
                 new URI(HTTP, null,
-                        InetAddress.getLocalHost().getHostAddress(), port,
+                        InetAddress.getLocalHost().getHostAddress(), 8080,
                         SLASH, null, null);
-            ssdp = new SSDP();
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
@@ -145,86 +147,62 @@ public abstract class Device extends EmbeddedTomcat {
         return getPath(service) + SLASH + "event";
     }
 
-    /**
-     * Method to get the {@link SSDP} associated with this
-     * {@link Device}.
-     *
-     * @return  The {@link SSDP}.
-     */
-    public SSDP getSSDP() { return ssdp; }
+    @Override
+    public void configure(EmbeddedTomcat tomcat) throws Exception {
+        String host = uri.getHost();
+        int port = uri.getPort();
+
+        tomcat.setHostname(host);
+        tomcat.setPort(port);
+
+        tomcat.getServer().setAddress(host);
+        tomcat.getServer().setPort(port + 1);
+    }
 
     @Override
-    public Server getServer() {
-        synchronized (this) {
-            if (server == null) {
-                server = super.getServer();
-                server.addLifecycleListener(new LifecycleListenerImpl());
-                server.addLifecycleListener(ssdp);
+    public void configure(Context context) throws Exception {
+        context.getServletContext()
+            .setAttribute("device", this);
+        /*
+         * Device
+         *
+         * Note: DeviceDescriptionServlet functionality should be included
+         * in CXFServlet / Spring implementation.
+         */
+        addServlet(context, new DeviceDescriptionServlet())
+            .addMapping(getLocation().getPath());
+        addServlet(context, new CXFServlet())
+            .addMapping(getPath() + SLASH + ASTERISK);
+        /*
+         * Resources
+         */
+        addServlet(context, VelocityViewServlet.class)
+            .addMapping("*.html");
+        /*
+         * Redirect to the Device description
+         */
+        addServlet(context, new RedirectServlet(getLocation().getPath()))
+            .addMapping(NIL);
+
+        context.setConfigured(true);
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getLifecycle() instanceof Server) {
+            Server server = (Server) event.getLifecycle();
+
+            for (LifecycleListener listener :
+                     server.findLifecycleListeners()) {
+                if (listener instanceof SSDP) {
+                    ((SSDP) listener).add(this);
+                }
             }
         }
-
-        return server;
     }
 
     @Override
     public String toString() { return getDeviceType().toString(); }
-
-    private class LifecycleListenerImpl implements LifecycleListener {
-        public LifecycleListenerImpl() { }
-
-        @Override
-        public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
-                Context context = getContext();
-
-                context.getServletContext()
-                    .setAttribute("device", Device.this);
-                /*
-                 * Device
-                 *
-                 * Note: DeviceDescriptionServlet functionality should be
-                 * included in CXFServlet / Spring implementation.
-                 */
-                addServlet(context, new DeviceDescriptionServlet())
-                    .addMapping(getLocation().getPath());
-                addServlet(context, new CXFServlet())
-                    .addMapping(getPath() + SLASH + ASTERISK);
-                /*
-                 * SSDP Cache
-                 */
-                context.getServletContext()
-                    .setAttribute("ssdp", ssdp);
-                context.getServletContext()
-                    .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
-                /*
-                 * Resources
-                 */
-                addServlet(context, VelocityViewServlet.class)
-                    .addMapping("*.html");
-                /*
-                 * Redirect to the Device description
-                 */
-                addServlet(context,
-                           new RedirectServlet(getLocation().getPath()))
-                    .addMapping(NIL);
-                /*
-                 * Set the port for the shutdown command
-                 */
-                getServer().setPort(port + 1);
-            }
-
-            if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
-                ssdp.add(Device.this);
-            }
-
-            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
-                ssdp.remove(Device.this);
-            }
-        }
-
-        @Override
-        public String toString() { return getClass().getName(); }
-    }
 
     private class DeviceDescriptionServlet extends DataSourceServlet {
         private static final long serialVersionUID = 5705073073449470828L;

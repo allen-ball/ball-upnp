@@ -150,7 +150,7 @@
           depends="classes">
     <taskdef classpathref="build.classpath"
              resource="ball/tomcat/ant/defaults.properties"/>
-    <tomcat type="${type}" silent="${silent}" port="${port}"/>
+    <tomcat type="${type}" silent="${silent}"/>
   </target>
 
 </project>

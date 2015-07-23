@@ -5,6 +5,9 @@
  */
 package ball.upnp;
 
+import ball.annotation.ServiceProviderFor;
+import ball.tomcat.EmbeddedContextConfigurator;
+import ball.tomcat.EmbeddedLifecycleListener;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
@@ -17,9 +20,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.http.HttpHeaders;
 
 /**
@@ -29,14 +33,21 @@ import org.apache.http.HttpHeaders;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
+@ServiceProviderFor({ EmbeddedContextConfigurator.class, EmbeddedLifecycleListener.class })
+@EmbeddedLifecycleListener.For({ Server.class })
 public class SSDP extends SSDPDiscoveryThread
-                  implements SSDPDiscoveryThread.Listener, LifecycleListener {
+                  implements EmbeddedContextConfigurator,
+                             EmbeddedLifecycleListener,
+                             SSDPDiscoveryThread.Listener {
     private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
     /**
-     * Sole constructor.
-     *
+     * No-argument constructor.
+     */
+    public SSDP() throws SocketException { this((Device[]) null); }
+
+    /**
      * @param   devices         The {@link Device}s.
      */
     public SSDP(Device... devices) throws SocketException {
@@ -44,8 +55,6 @@ public class SSDP extends SSDPDiscoveryThread
 
         if (devices != null) {
             add(devices);
-        } else {
-            throw new NullPointerException("devices");
         }
 
         addListener(cache);
@@ -105,6 +114,29 @@ public class SSDP extends SSDPDiscoveryThread
     }
 
     @Override
+    public void configure(Context context) throws Exception {
+        start();
+
+        context.getServletContext()
+            .setAttribute("ssdp", this);
+        context.getServletContext()
+            .setAttribute("cache", getSSDPDiscoveryCache());
+
+        context.setConfigured(true);
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getLifecycle() instanceof Server) {
+            Server server = (Server) event.getLifecycle();
+
+            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
+                remove(list.toArray(new Device[] { }));
+            }
+        }
+    }
+
+    @Override
     protected void ping() {
         SSDPDiscoveryCache cache = getSSDPDiscoveryCache();
         Map.Entry<URI,SSDPDiscoveryCache.Value> entry = cache.firstEntry();
@@ -147,19 +179,6 @@ public class SSDP extends SSDPDiscoveryThread
                     }
                 }
             }
-        }
-    }
-
-    @Override
-    public void lifecycleEvent(LifecycleEvent event) {
-        if (Lifecycle.AFTER_START_EVENT.equals(event.getType())) {
-            if (! isAlive()) {
-                start();
-            }
-        }
-
-        if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
-            remove(list.toArray(new Device[] { }));
         }
     }
 

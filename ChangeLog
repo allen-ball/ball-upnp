@@ -1,3 +1,7 @@
+2015-07-23  Allen D. Ball  <ball@sol.local>
+
+	* Re-factored MediaServer and SSDP as EmbeddedLifecycleListeners.
+
 2015-07-18  Allen D. Ball  <ball@sol.local>
 
 	* Removed <media-server/> Task; renamed SSDPThread to SSDP.
