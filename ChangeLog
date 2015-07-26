@@ -3,6 +3,9 @@
 	* src/main/java/ball/upnp/SSDP.java:
 	Added Content-Length and Date headers to SSDPDiscoveryResponse.
 
+	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
+	Use Date header in expiration calculation if it is provided.
+
 2015-07-25  Allen D. Ball  <ball@sol.local>
 
 	* Made SSDP a singleton resource.

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp.ssdp;
 
@@ -67,9 +67,9 @@ public class SSDPDiscoveryCache
 
     @Override
     public void receiveEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
-        long expiration = 0;
-
         try {
+            long time = now();
+            long expiration = 0;
             Header header = message.getFirstHeader(HttpHeaders.CACHE_CONTROL);
 
             if (header != null) {
@@ -78,7 +78,18 @@ public class SSDPDiscoveryCache
                 String value = map.get(MAX_AGE);
 
                 if (value != null) {
-                    expiration = now() + (Long.decode(value) * 1000);
+                    try {
+                        header = message.getFirstHeader(HttpHeaders.DATE);
+
+                        if (header != null) {
+                            time =
+                                DateUtils.parseDate(header.getValue())
+                                .getTime();
+                        }
+                    } catch (Exception exception) {
+                    }
+
+                    expiration = time + (Long.decode(value) * 1000);
                 }
             } else {
                 header = message.getFirstHeader(HttpHeaders.EXPIRES);
@@ -92,11 +103,11 @@ public class SSDPDiscoveryCache
                     }
                 }
             }
-        } catch (Exception exception) {
-        }
 
-        if (expiration > now()) {
-            put(message.getUSN(), new Value(message, expiration));
+            if (expiration > time) {
+                put(message.getUSN(), new Value(message, expiration));
+            }
+        } catch (Exception exception) {
         }
 
         if (message instanceof SSDPRequest) {
