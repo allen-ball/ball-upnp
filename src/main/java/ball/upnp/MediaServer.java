@@ -12,7 +12,7 @@ import ball.tomcat.EmbeddedTomcatConfigurator;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.catalina.Server;
+import org.apache.catalina.Context;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link MediaServer}
@@ -29,7 +29,7 @@ import org.apache.catalina.Server;
  * @version $Revision$
  */
 @ServiceProviderFor({ EmbeddedTomcatConfigurator.class, EmbeddedContextConfigurator.class, EmbeddedLifecycleListener.class })
-@EmbeddedLifecycleListener.For({ Server.class })
+@EmbeddedLifecycleListener.For({ Context.class })
 public class MediaServer extends Device {
     public static final String TYPE =
         "urn:schemas-upnp-org:device:MediaServer:4";

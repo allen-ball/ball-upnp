@@ -1,3 +1,7 @@
+2015-07-25  Allen D. Ball  <ball@sol.local>
+
+	* Made SSDP a singleton resource.
+
 2015-07-23  Allen D. Ball  <ball@sol.local>
 
 	* Re-factored MediaServer and SSDP as EmbeddedLifecycleListeners.

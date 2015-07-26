@@ -28,7 +28,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
@@ -174,6 +173,13 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
         addServlet(context, new CXFServlet())
             .addMapping(getPath() + SLASH + ASTERISK);
         /*
+         * SSDP
+         */
+        context.getServletContext()
+            .setAttribute("ssdp", SSDP.INSTANCE);
+        context.getServletContext()
+            .setAttribute("cache", SSDP.INSTANCE.getSSDPDiscoveryCache());
+        /*
          * Resources
          */
         addServlet(context, VelocityViewServlet.class)
@@ -183,20 +189,26 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
          */
         addServlet(context, new RedirectServlet(getLocation().getPath()))
             .addMapping(NIL);
-
-        context.setConfigured(true);
     }
 
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        if (event.getLifecycle() instanceof Server) {
-            Server server = (Server) event.getLifecycle();
+        if (event.getLifecycle() instanceof Context) {
+            Context context = (Context) event.getLifecycle();
 
-            for (LifecycleListener listener :
-                     server.findLifecycleListeners()) {
-                if (listener instanceof SSDP) {
-                    ((SSDP) listener).add(this);
-                }
+            switch (context.getState()) {
+            case STARTED:
+            case STARTING:
+                SSDP.INSTANCE.add(this);
+                break;
+
+            case STOPPED:
+            case STOPPING:
+                SSDP.INSTANCE.remove(this);
+                break;
+
+            default:
+                break;
             }
         }
     }

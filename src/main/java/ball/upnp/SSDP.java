@@ -5,9 +5,6 @@
  */
 package ball.upnp;
 
-import ball.annotation.ServiceProviderFor;
-import ball.tomcat.EmbeddedContextConfigurator;
-import ball.tomcat.EmbeddedLifecycleListener;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
@@ -18,12 +15,9 @@ import ball.upnp.ssdp.SSDPResponse;
 import java.net.SocketException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.catalina.Context;
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.Server;
 import org.apache.http.HttpHeaders;
 
 /**
@@ -33,29 +27,28 @@ import org.apache.http.HttpHeaders;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-@ServiceProviderFor({ EmbeddedContextConfigurator.class, EmbeddedLifecycleListener.class })
-@EmbeddedLifecycleListener.For({ Server.class })
 public class SSDP extends SSDPDiscoveryThread
-                  implements EmbeddedContextConfigurator,
-                             EmbeddedLifecycleListener,
-                             SSDPDiscoveryThread.Listener {
+                  implements SSDPDiscoveryThread.Listener {
+
+    /**
+     * Singleton instance of {@link SSDP}.
+     */
+    public static final SSDP INSTANCE;
+
+    static {
+        try {
+            INSTANCE = new SSDP();
+            INSTANCE.start();
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
+
     private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
-    /**
-     * No-argument constructor.
-     */
-    public SSDP() throws SocketException { this((Device[]) null); }
-
-    /**
-     * @param   devices         The {@link Device}s.
-     */
-    public SSDP(Device... devices) throws SocketException {
+    private SSDP() throws SocketException {
         super(60);
-
-        if (devices != null) {
-            add(devices);
-        }
 
         addListener(cache);
         addListener(this);
@@ -78,14 +71,16 @@ public class SSDP extends SSDPDiscoveryThread
      * @param   devices         The {@link Device}s to add.
      */
     protected void add(Device... devices) {
-        for (Device device : devices) {
-            if (! list.contains(device)) {
-                list.add(device);
+        synchronized (list) {
+            for (Device device : devices) {
+                if (! list.contains(device)) {
+                    list.add(device);
 
-                queue(new SSDPNotifyAliveRequest(device));
+                    queue(new SSDPNotifyAliveRequest(device));
 
-                for (Service service : device.getServiceList()) {
-                    queue(new SSDPNotifyAliveRequest(service));
+                    for (Service service : device.getServiceList()) {
+                        queue(new SSDPNotifyAliveRequest(service));
+                    }
                 }
             }
         }
@@ -100,39 +95,18 @@ public class SSDP extends SSDPDiscoveryThread
      * @param   devices         The {@link Device}s to remove.
      */
     protected void remove(Device... devices) {
-        for (Device device : devices) {
-            if (list.contains(device)) {
-                list.remove(device);
+        synchronized (list) {
+            for (Device device : devices) {
+                if (list.remove(device)) {
+                    for (Service service : device.getServiceList()) {
+                        queue(new SSDPNotifyByeByeRequest(service));
+                    }
 
-                queue(new SSDPNotifyByeByeRequest(device));
-
-                for (Service service : device.getServiceList()) {
-                    queue(new SSDPNotifyByeByeRequest(service));
+                    queue(new SSDPNotifyByeByeRequest(device));
                 }
             }
-        }
-    }
 
-    @Override
-    public void configure(Context context) throws Exception {
-        start();
-
-        context.getServletContext()
-            .setAttribute("ssdp", this);
-        context.getServletContext()
-            .setAttribute("cache", getSSDPDiscoveryCache());
-
-        context.setConfigured(true);
-    }
-
-    @Override
-    public void lifecycleEvent(LifecycleEvent event) {
-        if (event.getLifecycle() instanceof Server) {
-            Server server = (Server) event.getLifecycle();
-
-            if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
-                remove(list.toArray(new Device[] { }));
-            }
+            list.removeAll(Arrays.asList(devices));
         }
     }
 
