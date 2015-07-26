@@ -16,9 +16,11 @@ import java.net.SocketException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.utils.DateUtils;
 
 /**
  * {@link SSDPDiscoveryThread} implementation that also announces
@@ -218,6 +220,8 @@ public class SSDP extends SSDPDiscoveryThread
                       MAX_AGE + "=" + String.valueOf(1800));
             addHeader(USN, usn.toASCIIString());
             addHeader(EXT, null);
+            addHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(0));
+            addHeader(HttpHeaders.DATE, DateUtils.formatDate(new Date(now())));
         }
     }
 }
