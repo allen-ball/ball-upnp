@@ -8,7 +8,6 @@ package ball.upnp;
 import ball.activation.JAXBDataSource;
 import ball.io.Directory;
 import ball.tomcat.EmbeddedContextConfigurator;
-import ball.tomcat.EmbeddedLifecycleListener;
 import ball.tomcat.EmbeddedTomcat;
 import ball.tomcat.EmbeddedTomcatConfigurator;
 import ball.util.UUIDFactory;
@@ -42,7 +41,7 @@ import static ball.util.StringUtil.NIL;
  */
 public abstract class Device implements EmbeddedTomcatConfigurator,
                                         EmbeddedContextConfigurator,
-                                        EmbeddedLifecycleListener {
+                                        LifecycleListener {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
 
@@ -160,6 +159,8 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
 
     @Override
     public void configure(Context context) throws Exception {
+        context.addLifecycleListener(this);
+
         context.getServletContext()
             .setAttribute("device", this);
         /*

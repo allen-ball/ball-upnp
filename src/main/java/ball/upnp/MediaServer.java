@@ -6,13 +6,10 @@
 package ball.upnp;
 
 import ball.annotation.ServiceProviderFor;
-import ball.tomcat.EmbeddedContextConfigurator;
-import ball.tomcat.EmbeddedLifecycleListener;
-import ball.tomcat.EmbeddedTomcatConfigurator;
+import ball.tomcat.EmbeddedWebXmlFragment;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.catalina.Context;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link MediaServer}
@@ -28,8 +25,7 @@ import org.apache.catalina.Context;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-@ServiceProviderFor({ EmbeddedTomcatConfigurator.class, EmbeddedContextConfigurator.class, EmbeddedLifecycleListener.class })
-@EmbeddedLifecycleListener.For({ Context.class })
+@ServiceProviderFor({ EmbeddedWebXmlFragment.class })
 public class MediaServer extends Device {
     public static final String TYPE =
         "urn:schemas-upnp-org:device:MediaServer:4";
