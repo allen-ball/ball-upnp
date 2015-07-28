@@ -5,6 +5,9 @@
  */
 package ball.upnp;
 
+import ball.annotation.ServiceProviderFor;
+import ball.tomcat.EmbeddedServerConfigurator;
+import ball.tomcat.EmbeddedWebXmlFragment;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
@@ -19,6 +22,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
@@ -29,27 +36,18 @@ import org.apache.http.client.utils.DateUtils;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
+@ServiceProviderFor({ EmbeddedWebXmlFragment.class })
 public class SSDP extends SSDPDiscoveryThread
-                  implements SSDPDiscoveryThread.Listener {
-
-    /**
-     * Singleton instance of {@link SSDP}.
-     */
-    public static final SSDP INSTANCE;
-
-    static {
-        try {
-            INSTANCE = new SSDP();
-            INSTANCE.start();
-        } catch (Exception exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
-
+                          implements EmbeddedServerConfigurator,
+                                     LifecycleListener,
+                                     SSDPDiscoveryThread.Listener {
     private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
 
-    private SSDP() throws SocketException {
+    /**
+     * Sole constructor.
+     */
+    public SSDP() throws SocketException {
         super(60);
 
         addListener(cache);
@@ -109,6 +107,36 @@ public class SSDP extends SSDPDiscoveryThread
             }
 
             list.removeAll(Arrays.asList(devices));
+        }
+    }
+
+
+    @Override
+    public void configure(Server server) throws Exception {
+        server.addLifecycleListener(this);
+    }
+
+    @Override
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getLifecycle() instanceof Server) {
+            Server server = (Server) event.getLifecycle();
+
+            switch (server.getState()) {
+            case STARTING:
+            case STARTED:
+                if (! isAlive()) {
+                    start();
+                }
+                break;
+
+            case STOPPING:
+            case STOPPED:
+                remove(list.toArray(new Device[] { }));
+                break;
+
+            default:
+                break;
+            }
         }
     }
 
@@ -174,9 +202,9 @@ public class SSDP extends SSDPDiscoveryThread
             addHeader(NT, nt.toASCIIString());
             addHeader(NTS, SSDP_ALIVE);
             addHeader(USN, usn.toASCIIString());
-            addHeader(HttpHeaders.LOCATION.toUpperCase(),
+            addHeader(HttpHeaders.LOCATION,
                       device.getLocation().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL.toUpperCase(),
+            addHeader(HttpHeaders.CACHE_CONTROL,
                       MAX_AGE + "=" + String.valueOf(1800));
         }
     }
@@ -212,11 +240,11 @@ public class SSDP extends SSDPDiscoveryThread
         private SSDPDiscoveryResponse(Device device, URI st, URI usn) {
             super(200, "OK");
 
-            addHeader(HttpHeaders.SERVER.toUpperCase(), "UPnP/1.0");
+            addHeader(HttpHeaders.SERVER, "UPnP/1.0");
             addHeader(ST, st.toASCIIString());
-            addHeader(HttpHeaders.LOCATION.toUpperCase(),
+            addHeader(HttpHeaders.LOCATION,
                       device.getLocation().toASCIIString());
-            addHeader(HttpHeaders.CACHE_CONTROL.toUpperCase(),
+            addHeader(HttpHeaders.CACHE_CONTROL,
                       MAX_AGE + "=" + String.valueOf(1800));
             addHeader(USN, usn.toASCIIString());
             addHeader(EXT, null);

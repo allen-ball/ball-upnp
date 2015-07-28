@@ -15,6 +15,7 @@ import java.beans.ConstructorProperties;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -27,10 +28,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.velocity.tools.view.VelocityViewServlet;
 
 import static ball.tomcat.EmbeddedTomcat.addServlet;
+import static ball.util.IterableUtil.filter;
 import static ball.util.StringUtil.NIL;
 
 /**
@@ -53,6 +56,8 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
     private final URI uri;
+    private Server server = null;
+    private SSDP ssdp = null;
 
     /**
      * Sole constructor.
@@ -153,8 +158,14 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
         tomcat.setHostname(host);
         tomcat.setPort(port);
 
-        tomcat.getServer().setAddress(host);
-        tomcat.getServer().setPort(port + 1);
+        Server server = tomcat.getServer();
+
+        server.setAddress(host);
+        server.setPort(port + 1);
+
+        ssdp =
+            filter(SSDP.class, Arrays.asList(server.findLifecycleListeners()))
+            .iterator().next();
     }
 
     @Override
@@ -177,9 +188,9 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
          * SSDP
          */
         context.getServletContext()
-            .setAttribute("ssdp", SSDP.INSTANCE);
+            .setAttribute("ssdp", ssdp);
         context.getServletContext()
-            .setAttribute("cache", SSDP.INSTANCE.getSSDPDiscoveryCache());
+            .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
         /*
          * Resources
          */
@@ -198,14 +209,14 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
             Context context = (Context) event.getLifecycle();
 
             switch (context.getState()) {
-            case STARTED:
             case STARTING:
-                SSDP.INSTANCE.add(this);
+            case STARTED:
+                ssdp.add(this);
                 break;
 
-            case STOPPED:
             case STOPPING:
-                SSDP.INSTANCE.remove(this);
+            case STOPPED:
+                ssdp.remove(this);
                 break;
 
             default:

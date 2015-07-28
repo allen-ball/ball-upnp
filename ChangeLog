@@ -1,3 +1,8 @@
+2015-07-27  Allen D. Ball  <ball@sol.local>
+
+	* Completed re-factoring Device and SSDP as service providers for
+	EmbeddedWebXmlFragment.
+
 2015-07-26  Allen D. Ball  <ball@sol.local>
 
 	* src/main/java/ball/upnp/SSDP.java:
@@ -6,22 +11,9 @@
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
 	Use Date header in expiration calculation if it is provided.
 
-2015-07-25  Allen D. Ball  <ball@sol.local>
-
-	* Made SSDP a singleton resource.
-
-2015-07-23  Allen D. Ball  <ball@sol.local>
-
-	* Re-factored MediaServer and SSDP as EmbeddedLifecycleListeners.
-
 2015-07-18  Allen D. Ball  <ball@sol.local>
 
 	* Removed <media-server/> Task; renamed SSDPThread to SSDP.
-
-2015-06-22  Allen D. Ball  <ball@sol.local>
-
-	* src/main/java/ball/upnp/Device.java:
-	Re-factored as a subclass of ball.tomcat.EmbeddedTomcat.
 
 2014-11-01  Allen D. Ball  <ball@sol.local>
 
