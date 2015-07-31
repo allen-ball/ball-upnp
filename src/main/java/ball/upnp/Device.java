@@ -7,7 +7,6 @@ package ball.upnp;
 
 import ball.activation.JAXBDataSource;
 import ball.io.Directory;
-import ball.tomcat.EmbeddedContextConfigurator;
 import ball.tomcat.EmbeddedTomcat;
 import ball.tomcat.EmbeddedTomcatConfigurator;
 import ball.util.UUIDFactory;
@@ -30,10 +29,8 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.apache.velocity.tools.view.VelocityViewServlet;
 
 import static ball.tomcat.EmbeddedTomcat.addServlet;
-import static ball.util.IterableUtil.filter;
 import static ball.util.StringUtil.NIL;
 
 /**
@@ -43,7 +40,6 @@ import static ball.util.StringUtil.NIL;
  * @version $Revision$
  */
 public abstract class Device implements EmbeddedTomcatConfigurator,
-                                        EmbeddedContextConfigurator,
                                         LifecycleListener {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
@@ -57,7 +53,6 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
     private final URI udn;
     private final URI uri;
     private Server server = null;
-    private SSDP ssdp = null;
 
     /**
      * Sole constructor.
@@ -163,13 +158,8 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
         server.setAddress(host);
         server.setPort(port + 1);
 
-        ssdp =
-            filter(SSDP.class, Arrays.asList(server.findLifecycleListeners()))
-            .iterator().next();
-    }
+        Context context = tomcat.getContext();
 
-    @Override
-    public void configure(Context context) throws Exception {
         context.addLifecycleListener(this);
 
         context.getServletContext()
@@ -185,18 +175,6 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
         addServlet(context, new CXFServlet())
             .addMapping(getPath() + SLASH + ASTERISK);
         /*
-         * SSDP
-         */
-        context.getServletContext()
-            .setAttribute("ssdp", ssdp);
-        context.getServletContext()
-            .setAttribute("cache", ssdp.getSSDPDiscoveryCache());
-        /*
-         * Resources
-         */
-        addServlet(context, VelocityViewServlet.class)
-            .addMapping("*.html");
-        /*
          * Redirect to the Device description
          */
         addServlet(context, new RedirectServlet(getLocation().getPath()))
@@ -211,12 +189,14 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
             switch (context.getState()) {
             case STARTING:
             case STARTED:
-                ssdp.add(this);
+                ((SSDP) context.getServletContext().getAttribute("ssdp"))
+                    .add(this);
                 break;
 
             case STOPPING:
             case STOPPED:
-                ssdp.remove(this);
+                ((SSDP) context.getServletContext().getAttribute("ssdp"))
+                    .remove(this);
                 break;
 
             default:

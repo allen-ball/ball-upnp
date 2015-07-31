@@ -6,7 +6,8 @@
 package ball.upnp;
 
 import ball.annotation.ServiceProviderFor;
-import ball.tomcat.EmbeddedServerConfigurator;
+import ball.tomcat.EmbeddedTomcat;
+import ball.tomcat.EmbeddedTomcatConfigurator;
 import ball.tomcat.EmbeddedWebXmlFragment;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
@@ -22,12 +23,16 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
+import org.apache.velocity.tools.view.VelocityViewServlet;
+
+import static ball.tomcat.EmbeddedTomcat.addServlet;
 
 /**
  * {@link SSDPDiscoveryThread} implementation that also announces
@@ -38,7 +43,7 @@ import org.apache.http.client.utils.DateUtils;
  */
 @ServiceProviderFor({ EmbeddedWebXmlFragment.class })
 public class SSDP extends SSDPDiscoveryThread
-                          implements EmbeddedServerConfigurator,
+                          implements EmbeddedTomcatConfigurator,
                                      LifecycleListener,
                                      SSDPDiscoveryThread.Listener {
     private final ArrayList<Device> list = new ArrayList<>();
@@ -110,10 +115,21 @@ public class SSDP extends SSDPDiscoveryThread
         }
     }
 
-
     @Override
-    public void configure(Server server) throws Exception {
+    public void configure(EmbeddedTomcat tomcat) throws Exception {
+        Server server = tomcat.getServer();
+
         server.addLifecycleListener(this);
+
+        Context context = tomcat.getContext();
+
+        context.getServletContext()
+            .setAttribute("ssdp", this);
+        context.getServletContext()
+            .setAttribute("cache", getSSDPDiscoveryCache());
+
+        addServlet(context, VelocityViewServlet.class)
+            .addMapping("*.html");
     }
 
     @Override
