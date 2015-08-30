@@ -51,6 +51,7 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
     private final URI deviceType;
     private final UUID uuid = UUIDFactory.getDefault().generateTime();
     private final URI udn;
+    private final int port;
     private final URI uri;
     private Server server = null;
 
@@ -69,9 +70,10 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
 
         try {
             udn = new URI(UUID, uuid.toString().toUpperCase(), null);
+            port = 8080;
             uri =
                 new URI(HTTP, null,
-                        InetAddress.getLocalHost().getHostAddress(), 8080,
+                        InetAddress.getLocalHost().getHostAddress(), port,
                         SLASH, null, null);
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);

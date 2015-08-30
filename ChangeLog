@@ -1,3 +1,9 @@
+2015-08-29  Allen D. Ball  <ball@sol.local>
+
+	* src/main/java/ball/upnp/MediaServer.java:
+	Re-factored MediaServer configuration and start to static main
+	function.
+
 2015-07-27  Allen D. Ball  <ball@sol.local>
 
 	* Completed re-factoring Device and SSDP as service providers for

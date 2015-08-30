@@ -137,20 +137,22 @@
     </artifact:install>
   </target>
 
+  <target name="main"
+          description="--> Invokes &lt;main/&gt; task."
+          depends="classes">
+    <taskdef classpathref="build.classpath"
+             resource="ball/util/ant/defaults.properties"/>
+    <main classpathref="build.classpath" type="${type}">
+      <argument>-p</argument><argument>${port}</argument>
+    </main>
+  </target>
+
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="classes">
     <taskdef classpathref="build.classpath"
              resource="ball/upnp/ant/defaults.properties"/>
     <ssdp-discover/>
-  </target>
-
-  <target name="tomcat"
-          description="--> Invokes &lt;tomcat/&gt; task."
-          depends="classes">
-    <taskdef classpathref="build.classpath"
-             resource="ball/tomcat/ant/defaults.properties"/>
-    <tomcat type="${type}" silent="${silent}"/>
   </target>
 
 </project>

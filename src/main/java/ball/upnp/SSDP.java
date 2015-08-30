@@ -5,10 +5,8 @@
  */
 package ball.upnp;
 
-import ball.annotation.ServiceProviderFor;
 import ball.tomcat.EmbeddedTomcat;
 import ball.tomcat.EmbeddedTomcatConfigurator;
-import ball.tomcat.EmbeddedWebXmlFragment;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryThread;
@@ -41,7 +39,6 @@ import static ball.tomcat.EmbeddedTomcat.addServlet;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-@ServiceProviderFor({ EmbeddedWebXmlFragment.class })
 public class SSDP extends SSDPDiscoveryThread
                           implements EmbeddedTomcatConfigurator,
                                      LifecycleListener,
