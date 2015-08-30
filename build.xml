@@ -10,6 +10,10 @@
     $Id$
   </description>
 
+  <tstamp prefix="build">
+    <format property="timestamp" timezone="UTC" pattern="yyyyMMddHHmmssSSS"/>
+  </tstamp>
+
   <property environment="env"/>
   <property name="build.properties.file" location="build.properties"/>
   <property file="${build.properties.file}"/>
@@ -59,6 +63,18 @@
           todir="${target.classes.dir}">
       <fileset dir="${src.dir}/main/resources"/>
     </copy>
+    <manifest mode="update" file="${target.classes.dir}/META-INF/MANIFEST.MF">
+      <attribute name="Built-By" value="${user.name}"/>
+      <attribute name="Build-Jdk" value="${java.version}"/>
+      <section name="Build-Information">
+        <attribute name="Build-Time" value="${build.timestamp}"/>
+        <attribute name="Java-Vendor" value="${java.vendor}"/>
+        <attribute name="Java-Version" value="${java.version}"/>
+        <attribute name="Os-Arch" value="${os.arch}"/>
+        <attribute name="Os-Name" value="${os.name}"/>
+        <attribute name="Os-Version" value="${os.version}"/>
+      </section>
+    </manifest>
   </target>
 
   <target name="classes"
