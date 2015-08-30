@@ -18,7 +18,7 @@
 
   <target name="main"
           description="--> Invokes &lt;main/&gt; task."
-          depends="classes">
+          depends="jar-classes">
     <taskdef classpathref="build.classpath"
              resource="ball/util/ant/defaults.properties"/>
     <main classpathref="build.classpath" type="${type}">
@@ -28,7 +28,7 @@
 
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
-          depends="classes">
+          depends="jar-classes">
     <taskdef classpathref="build.classpath"
              resource="ball/upnp/ant/defaults.properties"/>
     <ssdp-discover/>
