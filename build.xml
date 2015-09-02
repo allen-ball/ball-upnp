@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ball-upnp" basedir="." default="jar"
-         xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+         xmlns:aether="antlib:org.eclipse.aether.ant">
 
   <description>
     ball-upnp.jar
@@ -10,10 +10,12 @@
     $Id$
   </description>
 
-  <artifact:dependencies>
-    <dependency groupId="ball"
-                artifactId="pom-build" type="xml" version="1.0"/>
-  </artifact:dependencies>
+  <aether:resolve>
+    <dependencies>
+      <dependency coords="ball:pom-build:1.0:xml:compile"/>
+    </dependencies>
+    <properties/>
+  </aether:resolve>
   <import file="${ball:pom-build:xml}"/>
 
   <target name="main"
