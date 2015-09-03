@@ -9,7 +9,7 @@
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
     <version>1.0</version>
-    <relativePath>../ball-parent/parent/pom.xml</relativePath>
+    <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
