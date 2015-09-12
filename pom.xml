@@ -66,22 +66,4 @@
       <artifactId>spring-web</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <groups>
-              <group>
-                <title>${project.name}</title>
-                <packages>ball.*</packages>
-              </group>
-            </groups>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>
