@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ball-upnp" basedir="." default="jar"
-         xmlns:aether="antlib:org.eclipse.aether.ant">
+<project xmlns:aether="antlib:org.eclipse.aether.ant"
+         name="ball-upnp" basedir="." default="jar">
 
   <description>
     ball-upnp.jar
