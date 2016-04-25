@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:aether="antlib:org.eclipse.aether.ant"
+         xmlns:ball="antlib:ball.util.ant"
          name="ball-upnp" basedir="." default="jar">
-
   <description>
     ball-upnp.jar
     ---------------------------
@@ -18,16 +18,6 @@
   </aether:resolve>
   <import file="${ball:parent:xml}"/>
 
-  <target name="main"
-          description="--> Invokes &lt;main/&gt; task."
-          depends="jar-classes">
-    <taskdef classpathref="build.classpath"
-             resource="ball/util/ant/defaults.properties"/>
-    <main classpathref="build.classpath" type="${type}">
-      <argument>-p</argument><argument>${port}</argument>
-    </main>
-  </target>
-
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="jar-classes">
@@ -36,4 +26,11 @@
     <ssdp-discover/>
   </target>
 
+  <target name="main"
+          description="--> Invokes &lt;main/&gt; task."
+          depends="jar-classes">
+    <ball:main classpathref="build.classpath" type="${type}">
+      <argument>-p</argument><argument>${port}</argument>
+    </ball:main>
+  </target>
 </project>
