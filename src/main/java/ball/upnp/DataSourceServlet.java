@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * {@link HttpServlet} implementation to serve a {@link DataSource}.
  *
- * {@bean-info}
+ * {@bean.info}
  *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$

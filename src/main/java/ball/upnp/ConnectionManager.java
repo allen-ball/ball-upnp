@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -17,7 +17,7 @@ import java.net.URI;
  *   <tr><td>{@link #ID}:</td><td>{@value #ID}</td></tr>
  * </table>
  *
- * {@bean-info}
+ * {@bean.info}
  *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$

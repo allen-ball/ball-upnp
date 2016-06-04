@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -29,7 +29,7 @@ import static ball.io.Directory.USER_HOME;
  *   <tr><td>{@link #TYPE}:</td><td>{@value #TYPE}</td></tr>
  * </table>
  *
- * {@bean-info}
+ * {@bean.info}
  *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
