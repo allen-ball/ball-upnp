@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp.ssdp;
 
@@ -98,6 +98,10 @@ public interface SSDPMessage extends HttpMessage {
      *
      * @return  The {@link DatagramPacket}.
      *
+     * @throws  SocketException
+     *                          If this {@link SSDPMessage} cannot be
+     *                          converted to a {@link DatagramPacket}.
+     *
      * @see #ADDRESS
      */
     public DatagramPacket toDatagramPacket() throws SocketException;
@@ -160,7 +164,13 @@ public interface SSDPMessage extends HttpMessage {
          * Method to encode {@code this} {@link SSDPRequest} to a
          * {@link DatagramPacket}.
          *
+         * @param       message The {@link SSDPMessage}.
+         *
          * @return      The {@link DatagramPacket}.
+         *
+         * @throws      SocketException
+         *                      If the {@link SSDPMessage} cannot be
+         *                      converted to a {@link DatagramPacket}.
          */
         public DatagramPacket toDatagramPacket(SSDPMessage message)
                                                 throws SocketException {

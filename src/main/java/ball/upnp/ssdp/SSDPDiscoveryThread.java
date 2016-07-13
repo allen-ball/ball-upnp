@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp.ssdp;
 
@@ -35,6 +35,10 @@ public class SSDPDiscoveryThread extends Thread {
      *
      * @param   interval        The minimum interval (in seconds) between
      *                          broadcast messages.
+     *
+     * @throws  SocketException
+     *                          If the underlying {@link DatagramSocket}
+     *                          cannot be conditioned.
      */
     public SSDPDiscoveryThread(int interval) throws SocketException {
         super();

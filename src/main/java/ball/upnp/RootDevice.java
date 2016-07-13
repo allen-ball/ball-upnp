@@ -12,7 +12,7 @@ import java.net.URI;
  * {@link.uri http://www.upnp.org/ UPnP} {@link RootDevice}
  * {@link Service}.
  *
- * <table>
+ * <table summary="">
  *   <tr><td>{@link #TYPE}:</td><td>{@value #TYPE}</td></tr>
  * </table>
  *

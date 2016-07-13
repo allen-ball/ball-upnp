@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -48,6 +48,10 @@ public class SSDP extends SSDPDiscoveryThread
 
     /**
      * Sole constructor.
+     *
+     * @throws  SocketException
+     *                          If {@link #addListener(Listener)} throws an
+     *                          exception.
      */
     public SSDP() throws SocketException {
         super(60);

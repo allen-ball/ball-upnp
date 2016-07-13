@@ -25,7 +25,7 @@ import static ball.io.Directory.USER_HOME;
  * {@link Device} which implements {@link ContentDirectory} and
  * {@link ConnectionManager} {@link Service}s.
  *
- * <table>
+ * <table summary="">
  *   <tr><td>{@link #TYPE}:</td><td>{@value #TYPE}</td></tr>
  * </table>
  *
