@@ -9,14 +9,6 @@
 	* Completed re-factoring Device and SSDP as service providers for
 	EmbeddedWebXmlFragment.
 
-2015-07-26  Allen D. Ball  <ball@sol.local>
-
-	* src/main/java/ball/upnp/SSDP.java:
-	Added Content-Length and Date headers to SSDPDiscoveryResponse.
-
-	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
-	Use Date header in expiration calculation if it is provided.
-
 2015-07-18  Allen D. Ball  <ball@sol.local>
 
 	* Removed <media-server/> Task; renamed SSDPThread to SSDP.
@@ -86,13 +78,6 @@
 	SSDPDiscoveryCache is empty or an entry is about to expire.
 	Added byebye() method.
 
-	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryThread.java:
-	Added ping() method and made interval member protected.
-
-	* src/main/java/iprotium/upnp/ssdp/SSDPMessage.java:
-	Changed Impl.getLocation(SSDPMessage) to use AL if
-	HttpHeaders.LOCATION is not set.
-
 2013-12-27  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* src/main/java/iprotium/upnp/Device.java:
@@ -111,12 +96,6 @@
 	* src/main/java/iprotium/upnp/DataSourceServlet.java:
 	Initial writing.
 
-	* iprotium.upnp.ssdp:
-	Added SSDPDiscoveryThread.queue(SSDPMessage) method.
-	SSDPMessage interface specifies toDatagramPacket() method.
-	Added SSDPDiscoveryThread parameter to
-	SSDPDiscoveryThread.Listener methods.
-
 2013-12-26  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* Interim check-in: Created UPnP Service and Device abstractions
@@ -132,23 +111,8 @@
 	* Annotated packages with @ManifestSection and use
 	ManifestSectionProcessor to generate JAR MANIFEST.MF.
 
-	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryCache.java:
-	Process send events to capture "local" changes.
-
-	* src/main/java/iprotium/upnp/ssdp/SSDPDiscoveryThread.java:
-	Changed Listener.sendEvent(SSDPDiscoveryRequest) interface method
-	to sendEvent(SSDPMessage).
-
-	* src/main/java/iprotium/upnp/ssdp/SSDPNotifyRequest.java:
-	Initial writing.
-
 2013-11-26  Allen D. Ball  <ball@10-0-1-2.lan>
 
 	* Imported XSDs from http://upnp.org/resources/upnpresources.zip
 	to META-INF/catalog/www.upnp.org.
-
-2013-11-25  Allen D. Ball  <ball@10-0-1-2.lan>
-
-	* Moved iprotium.upnp.ssdp from iprotium.media.ssdp (in
-	iprotium-media JAR).
 

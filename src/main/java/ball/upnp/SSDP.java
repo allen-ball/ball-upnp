@@ -1,19 +1,19 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2017 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
+import ball.ssdp.SSDPDiscoveryCache;
+import ball.ssdp.SSDPDiscoveryRequest;
+import ball.ssdp.SSDPDiscoveryThread;
+import ball.ssdp.SSDPMessage;
+import ball.ssdp.SSDPNotifyRequest;
+import ball.ssdp.SSDPRequest;
+import ball.ssdp.SSDPResponse;
 import ball.tomcat.EmbeddedTomcat;
 import ball.tomcat.EmbeddedTomcatConfigurator;
-import ball.upnp.ssdp.SSDPDiscoveryCache;
-import ball.upnp.ssdp.SSDPDiscoveryRequest;
-import ball.upnp.ssdp.SSDPDiscoveryThread;
-import ball.upnp.ssdp.SSDPMessage;
-import ball.upnp.ssdp.SSDPNotifyRequest;
-import ball.upnp.ssdp.SSDPRequest;
-import ball.upnp.ssdp.SSDPResponse;
 import java.net.SocketException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class SSDP extends SSDPDiscoveryThread
 
     /**
      * Method to add local {@link Device}s.  Sends
-     * {@value ball.upnp.ssdp.SSDPMessage#SSDP_ALIVE}
+     * {@value ball.ssdp.SSDPMessage#SSDP_ALIVE}
      * {@link SSDPNotifyRequest}s for each {@link Service} in each
      * {@link Device} added,
      *
@@ -94,7 +94,7 @@ public class SSDP extends SSDPDiscoveryThread
 
     /**
      * Method to remove local {@link Device}s.  Sends
-     * {@value ball.upnp.ssdp.SSDPMessage#SSDP_BYEBYE}
+     * {@value ball.ssdp.SSDPMessage#SSDP_BYEBYE}
      * {@link SSDPNotifyRequest}s for each {@link Service} in each
      * {@link Device} removed.
      *

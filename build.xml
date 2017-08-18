@@ -22,7 +22,7 @@
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="jar-classes">
     <taskdef classpathref="build.classpath"
-             resource="ball/upnp/ant/defaults.properties"/>
+             resource="ball/ssdp/ant/defaults.properties"/>
     <ssdp-discover/>
   </target>
 
@@ -33,4 +33,5 @@
       <argument>-p</argument><argument>${port}</argument>
     </ball:main>
   </target>
+
 </project>

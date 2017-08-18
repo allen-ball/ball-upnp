@@ -30,6 +30,10 @@
     </dependency>
     <dependency>
       <groupId>ball</groupId>
+      <artifactId>ball-ssdp</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ball</groupId>
       <artifactId>ball-tomcat</artifactId>
     </dependency>
     <dependency>
