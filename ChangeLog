@@ -1,3 +1,7 @@
+2018-03-11  Allen D. Ball  <ball@sol.local>
+
+	* Interim check-in: Re-factor to Spring Boot application.
+
 2015-08-29  Allen D. Ball  <ball@sol.local>
 
 	* src/main/java/ball/upnp/MediaServer.java:

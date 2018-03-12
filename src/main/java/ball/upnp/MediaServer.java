@@ -1,11 +1,10 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
-import ball.tomcat.EmbeddedTomcat;
 import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
@@ -84,18 +83,20 @@ public class MediaServer extends Device {
 
             composite.addConfiguration(new SystemConfiguration());
             composite.addConfiguration(plist);
-
-            EmbeddedTomcat tomcat = new EmbeddedTomcat();
-
-            tomcat.setSilent(false);
-            tomcat.getServer().setParentClassLoader(MAIN_CLASS.getClassLoader());
-            tomcat.setPort(8080);
-
-            new SSDP().configure(tomcat);
-            new MediaServer().configure(tomcat);
-
-            tomcat.start();
-            tomcat.getServer().await();
+            /*
+             *EmbeddedTomcat tomcat = new EmbeddedTomcat();
+             *
+             * tomcat.setSilent(false);
+             * tomcat.getServer()
+             *     .setParentClassLoader(MAIN_CLASS.getClassLoader());
+             * tomcat.setPort(8080);
+             *
+             * new SSDP().configure(tomcat);
+             * new MediaServer().configure(tomcat);
+             *
+             * tomcat.start();
+             * tomcat.getServer().await();
+             */
             System.exit(0);
         } catch (Throwable throwable) {
             new HelpFormatter().printHelp(MAIN_CLASS.getName(), OPTIONS);

@@ -16,7 +16,7 @@
   <name>UPnP Implementation Classes</name>
   <packaging>jar</packaging>
   <properties>
-    <jre.version>1.7</jre.version>
+    <jre.version>1.8</jre.version>
   </properties>
   <dependencies verbose="true">
     <dependency>
@@ -31,10 +31,6 @@
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-ssdp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-tomcat</artifactId>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
@@ -62,12 +58,16 @@
       <artifactId>cxf-rt-transports-http</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity-tools</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2017 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -12,8 +12,6 @@ import ball.ssdp.SSDPMessage;
 import ball.ssdp.SSDPNotifyRequest;
 import ball.ssdp.SSDPRequest;
 import ball.ssdp.SSDPResponse;
-import ball.tomcat.EmbeddedTomcat;
-import ball.tomcat.EmbeddedTomcatConfigurator;
 import java.net.SocketException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,9 +26,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.velocity.tools.view.VelocityViewServlet;
-
-import static ball.tomcat.EmbeddedTomcat.addServlet;
 
 /**
  * {@link SSDPDiscoveryThread} implementation that also announces
@@ -40,8 +35,7 @@ import static ball.tomcat.EmbeddedTomcat.addServlet;
  * @version $Revision$
  */
 public class SSDP extends SSDPDiscoveryThread
-                          implements EmbeddedTomcatConfigurator,
-                                     LifecycleListener,
+                          implements LifecycleListener,
                                      SSDPDiscoveryThread.Listener {
     private final ArrayList<Device> list = new ArrayList<>();
     private final SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
@@ -116,21 +110,23 @@ public class SSDP extends SSDPDiscoveryThread
         }
     }
 
-    @Override
-    public void configure(EmbeddedTomcat tomcat) throws Exception {
-        Server server = tomcat.getServer();
-
-        server.addLifecycleListener(this);
-
-        Context context = tomcat.getContext();
-
-        context.getServletContext()
-            .setAttribute("ssdp", this);
-        context.getServletContext()
-            .setAttribute("cache", getSSDPDiscoveryCache());
-
-        addServlet(context, VelocityViewServlet.class)
-            .addMapping("*.html");
+    /* @Override */
+    public void configure(/* EmbeddedTomcat tomcat */) throws Exception {
+        /*
+         * Server server = tomcat.getServer();
+         *
+         * server.addLifecycleListener(this);
+         *
+         * Context context = tomcat.getContext();
+         *
+         * context.getServletContext()
+         *     .setAttribute("ssdp", this);
+         * context.getServletContext()
+         *     .setAttribute("cache", getSSDPDiscoveryCache());
+         *
+         * addServlet(context, VelocityViewServlet.class)
+         *     .addMapping("*.html");
+         */
     }
 
     @Override

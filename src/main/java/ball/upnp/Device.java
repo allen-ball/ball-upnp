@@ -1,14 +1,12 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2015 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
 import ball.activation.JAXBDataSource;
 import ball.io.Directory;
-import ball.tomcat.EmbeddedTomcat;
-import ball.tomcat.EmbeddedTomcatConfigurator;
 import ball.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
@@ -30,7 +28,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
 
-import static ball.tomcat.EmbeddedTomcat.addServlet;
 import static ball.util.StringUtil.NIL;
 
 /**
@@ -39,8 +36,7 @@ import static ball.util.StringUtil.NIL;
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  * @version $Revision$
  */
-public abstract class Device implements EmbeddedTomcatConfigurator,
-                                        LifecycleListener {
+public abstract class Device implements LifecycleListener {
     private static final String HTTP = "http";
     private static final String UUID = "uuid";
 
@@ -147,40 +143,41 @@ public abstract class Device implements EmbeddedTomcatConfigurator,
         return getPath(service) + SLASH + "event";
     }
 
-    @Override
-    public void configure(EmbeddedTomcat tomcat) throws Exception {
+    /* @Override */
+    public void configure(/* EmbeddedTomcat tomcat */) throws Exception {
         String host = uri.getHost();
         int port = uri.getPort();
-
-        tomcat.setHostname(host);
-        tomcat.setPort(port);
-
-        Server server = tomcat.getServer();
-
-        server.setAddress(host);
-        server.setPort(port + 1);
-
-        Context context = tomcat.getContext();
-
-        context.addLifecycleListener(this);
-
-        context.getServletContext()
-            .setAttribute("device", this);
         /*
+         * tomcat.setHostname(host);
+         * tomcat.setPort(port);
+         *
+         * Server server = tomcat.getServer();
+         *
+         * server.setAddress(host);
+         * server.setPort(port + 1);
+         *
+         * Context context = tomcat.getContext();
+         *
+         * context.addLifecycleListener(this);
+         *
+         * context.getServletContext()
+         *      .setAttribute("device", this);
+         *
          * Device
          *
          * Note: DeviceDescriptionServlet functionality should be included
          * in CXFServlet / Spring implementation.
-         */
-        addServlet(context, new DeviceDescriptionServlet())
-            .addMapping(getLocation().getPath());
-        addServlet(context, new CXFServlet())
-            .addMapping(getPath() + SLASH + ASTERISK);
-        /*
+         *
+         * addServlet(context, new DeviceDescriptionServlet())
+         *     .addMapping(getLocation().getPath());
+         * addServlet(context, new CXFServlet())
+         *     .addMapping(getPath() + SLASH + ASTERISK);
+         *
          * Redirect to the Device description
+         *
+         * addServlet(context, new RedirectServlet(getLocation().getPath()))
+         *     .addMapping(NIL);
          */
-        addServlet(context, new RedirectServlet(getLocation().getPath()))
-            .addMapping(NIL);
     }
 
     @Override
