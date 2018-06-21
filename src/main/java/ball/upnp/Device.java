@@ -29,6 +29,7 @@ import org.apache.catalina.Server;
 import org.apache.cxf.transport.servlet.CXFServlet;
 
 import static ball.util.StringUtil.NIL;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
@@ -58,16 +59,12 @@ public abstract class Device implements LifecycleListener {
      */
     @ConstructorProperties({ "deviceType" })
     protected Device(URI deviceType) {
-        if (deviceType != null) {
-            this.deviceType = deviceType;
-        } else {
-            throw new NullPointerException("deviceType");
-        }
+        this.deviceType = requireNonNull(deviceType, "deviceType");
 
         try {
-            udn = new URI(UUID, uuid.toString().toUpperCase(), null);
-            port = 8080;
-            uri =
+            this.udn = new URI(UUID, uuid.toString().toUpperCase(), null);
+            this.port = 8080;
+            this.uri =
                 new URI(HTTP, null,
                         InetAddress.getLocalHost().getHostAddress(), port,
                         SLASH, null, null);
@@ -266,11 +263,7 @@ public abstract class Device implements LifecycleListener {
              * @param   device          The {@link Device}.
              */
             public DeviceElement(Device device) {
-                if (device != null) {
-                    this.device = device;
-                } else {
-                    throw new NullPointerException("device");
-                }
+                this.device = requireNonNull(device, "device");
             }
 
             private DeviceElement() { this(null); }
@@ -302,11 +295,7 @@ public abstract class Device implements LifecycleListener {
              * @param   device          The {@link Device}.
              */
             public ServiceListElement(Device device) {
-                if (device != null) {
-                    this.device = device;
-                } else {
-                    throw new NullPointerException("device");
-                }
+                this.device = requireNonNull(device, "device");
             }
 
             private ServiceListElement() { this(null); }
@@ -341,11 +330,7 @@ public abstract class Device implements LifecycleListener {
                  * @param   service         The {@link Service}.
                  */
                 public ServiceElement(Service service) {
-                    if (service != null) {
-                        this.service = service;
-                    } else {
-                        throw new NullPointerException("service");
-                    }
+                    this.service = requireNonNull(service, "service");
                 }
 
                 private ServiceElement() { this(null); }

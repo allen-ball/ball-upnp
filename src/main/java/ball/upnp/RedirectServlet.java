@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * {@link HttpServlet} implementation for redirects.
@@ -30,11 +32,7 @@ public class RedirectServlet extends HttpServlet {
     public RedirectServlet(String path) {
         super();
 
-        if (path != null) {
-            this.path = path;
-        } else {
-            throw new NullPointerException("path");
-        }
+        this.path = requireNonNull(path, "path");
     }
 
     @Override

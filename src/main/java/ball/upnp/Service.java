@@ -1,12 +1,14 @@
 /*
  * $Id$
  *
- * Copyright 2013, 2014 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
 import java.beans.ConstructorProperties;
 import java.net.URI;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} services.
@@ -33,25 +35,10 @@ public abstract class Service {
      */
     @ConstructorProperties({ "device", "serviceType", "serviceId" })
     protected Service(Device device, URI serviceType, URI serviceId) {
-        if (device != null) {
-            this.device = device;
-        } else {
-            throw new NullPointerException("device");
-        }
-
-        if (serviceType != null) {
-            this.serviceType = serviceType;
-        } else {
-            throw new NullPointerException("serviceType");
-        }
-
-        if (serviceId != null) {
-            this.serviceId = serviceId;
-        } else {
-            throw new NullPointerException("serviceId");
-        }
-
-        usn =
+        this.device = requireNonNull(device, "device");
+        this.serviceType = requireNonNull(serviceType, "serviceType");
+        this.serviceId = requireNonNull(serviceId, "serviceId");
+        this.usn =
             URI.create(getDevice().getUDN().toString()
                        + COLON + COLON + getServiceId().toString());
     }
