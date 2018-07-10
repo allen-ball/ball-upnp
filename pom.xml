@@ -4,6 +4,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
+  <name>UPnP Implementation Classes</name>
+  <groupId>ball</groupId>
+  <artifactId>ball-upnp</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>ball</groupId>
@@ -11,10 +16,6 @@
     <version>1.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
-  <groupId>ball</groupId>
-  <artifactId>ball-upnp</artifactId>
-  <name>UPnP Implementation Classes</name>
-  <packaging>jar</packaging>
   <properties>
     <jre.version>1.8</jre.version>
   </properties>
