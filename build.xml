@@ -12,7 +12,7 @@
 
   <aether:resolve>
     <dependencies>
-      <dependency coords="ball:parent:1.0:xml:compile"/>
+      <dependency coords="ball:parent:2.0:xml:compile"/>
     </dependencies>
     <properties/>
   </aether:resolve>
