@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * {@link SpringApplication} {@link Launcher}
@@ -20,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @SpringBootApplication
 @EnableWebMvc
 @ServletComponentScan
-public class Launcher {
+public class Launcher extends SpringBootServletInitializer {
 
     /**
      * Standard {@link SpringApplication} {@code main(String[])} entry
@@ -41,6 +43,11 @@ public class Launcher {
      * Sole constructor.
      */
     public Launcher() { }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Launcher.class);
+    }
 
     @Override
     public String toString() { return super.toString(); }
