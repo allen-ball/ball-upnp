@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>UPnP Implementation Classes</name>
+  <name>UPnP Server</name>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -13,17 +13,13 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2.0</version>
+    <version>4</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <properties>
     <jre.version>1.8</jre.version>
   </properties>
   <dependencies verbose="true">
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-http</artifactId>
-    </dependency>
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-ssdp</artifactId>
@@ -39,14 +35,6 @@
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

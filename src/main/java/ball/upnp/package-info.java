@@ -5,7 +5,8 @@
  */
 /**
  * Classes specific to
- * {@link.uri http://www.upnp.org/ Universal Plug and Play (UPnP)}.
+ * {@link.uri http://www.upnp.org/ Universal Plug and Play (UPnP)}
+ * (moved to {@link.uri https://openconnectivity.org/developer/specifications/upnp-resources/upnp-developer-resources}).
  *
  * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
  */

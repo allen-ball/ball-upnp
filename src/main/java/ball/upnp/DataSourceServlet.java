@@ -1,11 +1,10 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2019 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
-import ball.io.IOUtil;
 import java.beans.ConstructorProperties;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 
 /**
  * {@link HttpServlet} implementation to serve a {@link DataSource}.
@@ -51,20 +51,13 @@ public class DataSourceServlet extends HttpServlet {
         DataSource ds = getDataSource();
 
         if (ds != null) {
-            InputStream in = null;
-            ServletOutputStream out = null;
+            if (ds.getContentType() != null) {
+                response.setContentType(ds.getContentType());
+            }
 
-            try {
-                if (ds.getContentType() != null) {
-                    response.setContentType(ds.getContentType());
-                }
-
-                in = ds.getInputStream();
-                out = response.getOutputStream();
-                IOUtil.copy(in, out);
-            } finally {
-                IOUtil.close(in);
-                IOUtil.close(out);
+            try (InputStream in = ds.getInputStream();
+                 ServletOutputStream out = response.getOutputStream()) {
+                IOUtils.copy(in, out);
             }
         }
     }

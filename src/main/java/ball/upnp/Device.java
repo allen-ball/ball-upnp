@@ -1,12 +1,11 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2019 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
 import ball.activation.JAXBDataSource;
-import ball.io.Directory;
 import ball.util.UUIDFactory;
 import java.beans.ConstructorProperties;
 import java.net.InetAddress;
@@ -26,9 +25,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
-import org.apache.cxf.transport.servlet.CXFServlet;
 
-import static ball.util.StringUtil.NIL;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -173,7 +170,7 @@ public abstract class Device implements LifecycleListener {
          * Redirect to the Device description
          *
          * addServlet(context, new RedirectServlet(getLocation().getPath()))
-         *     .addMapping(NIL);
+         *     .addMapping(EMPTY);
          */
     }
 

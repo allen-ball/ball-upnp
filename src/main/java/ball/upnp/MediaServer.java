@@ -1,12 +1,13 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2019 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
@@ -16,8 +17,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 import org.apache.commons.configuration.plist.XMLPropertyListConfiguration;
-
-import static ball.io.Directory.USER_HOME;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link MediaServer}
@@ -75,8 +74,11 @@ public class MediaServer extends Device {
             }
 
             File file =
-                USER_HOME.getChildFile("Library", "Preferences",
-                                       MAIN_CLASS.getName() + ".plist");
+                Paths.get(System.getProperty("user.home"),
+                          "Library", "Preferences",
+                          MAIN_CLASS.getName() + ".plist")
+                .normalize()
+                .toFile();
             XMLPropertyListConfiguration plist =
                 new XMLPropertyListConfiguration(file);
             CompositeConfiguration composite = new CompositeConfiguration();

@@ -5,15 +5,15 @@
          name="ball-upnp" basedir="." default="jar">
   <description>
     ball-upnp.jar
-    ---------------------------
-    UPnP Implementation Classes
+    -------------
+    UPnP Server
 
     $Id$
   </description>
 
   <aether:resolve>
     <dependencies>
-      <dependency coords="ball:parent:2.0:xml:compile"/>
+      <dependency coords="ball:parent:4:xml:compile"/>
     </dependencies>
     <properties/>
   </aether:resolve>
@@ -23,14 +23,6 @@
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="jar-classes">
     <ssdp:ssdp-discover/>
-  </target>
-
-  <target name="main"
-          description="--> Invokes &lt;main/&gt; task."
-          depends="jar-classes">
-    <util:main classpathref="build.classpath" type="${type}">
-      <argument>-p</argument><argument>${port}</argument>
-    </util:main>
   </target>
 
 </project>
