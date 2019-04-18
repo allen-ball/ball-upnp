@@ -13,7 +13,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>4</version>
+    <version>5</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <properties>

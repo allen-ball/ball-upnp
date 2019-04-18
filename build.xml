@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:aether="antlib:org.eclipse.aether.ant"
+<project xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:ssdp="antlib:ball.ssdp.ant"
          xmlns:util="antlib:ball.util.ant"
          name="ball-upnp" basedir="." default="jar">
@@ -11,12 +11,12 @@
     $Id$
   </description>
 
-  <aether:resolve>
+  <resolver:resolve>
     <dependencies>
-      <dependency coords="ball:parent:4:xml:compile"/>
+      <dependency coords="ball:parent:5:xml:compile"/>
     </dependencies>
     <properties/>
-  </aether:resolve>
+  </resolver:resolve>
   <import file="${ball:parent:xml}"/>
 
   <target name="ssdp-discover"
