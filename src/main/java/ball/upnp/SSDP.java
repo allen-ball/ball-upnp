@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2018 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2019 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -31,7 +31,7 @@ import org.apache.http.client.utils.DateUtils;
  * {@link SSDPDiscoveryThread} implementation that also announces
  * {@link Service}s provided by the specified {@link Device}s.
  *
- * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 public class SSDP extends SSDPDiscoveryThread

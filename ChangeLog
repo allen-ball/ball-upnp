@@ -1,3 +1,8 @@
+2019-04-19  Allen D. Ball  <ball@sol.local>
+
+	* Removed static main(String[]) entry point in favor of Spring
+	Boot mechanisms.
+
 2018-03-11  Allen D. Ball  <ball@sol.local>
 
 	* Interim check-in: Re-factor to Spring Boot application.

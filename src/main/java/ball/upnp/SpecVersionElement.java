@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2013 - 2016 Allen D. Ball.  All rights reserved.
+ * Copyright 2013 - 2019 Allen D. Ball.  All rights reserved.
  */
 package ball.upnp;
 
@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  *
  * {@bean.info}
  *
- * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @XmlType(propOrder = { "major", "minor" })

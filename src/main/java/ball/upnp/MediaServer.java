@@ -5,18 +5,9 @@
  */
 package ball.upnp;
 
-import java.io.File;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.SystemConfiguration;
-import org.apache.commons.configuration.plist.XMLPropertyListConfiguration;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link MediaServer}
@@ -29,7 +20,7 @@ import org.apache.commons.configuration.plist.XMLPropertyListConfiguration;
  *
  * {@bean.info}
  *
- * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 public class MediaServer extends Device {
@@ -56,54 +47,4 @@ public class MediaServer extends Device {
 
     @Override
     public List<? extends Service> getServiceList() { return list; }
-
-    private static Class<?> MAIN_CLASS = MediaServer.class;
-    private static Options OPTIONS = new Options();
-
-    /**
-     * Static {@code main} entry point for a {@link MediaServer}.
-     *
-     * @param   argv            Array of command arguments.
-     */
-    public static void main(String[] argv) {
-        try {
-            CommandLine line = new DefaultParser().parse(OPTIONS, argv);
-
-            if (! line.getArgList().isEmpty()) {
-                throw new IllegalArgumentException(String.valueOf(line.getArgList()));
-            }
-
-            File file =
-                Paths.get(System.getProperty("user.home"),
-                          "Library", "Preferences",
-                          MAIN_CLASS.getName() + ".plist")
-                .normalize()
-                .toFile();
-            XMLPropertyListConfiguration plist =
-                new XMLPropertyListConfiguration(file);
-            CompositeConfiguration composite = new CompositeConfiguration();
-
-            composite.addConfiguration(new SystemConfiguration());
-            composite.addConfiguration(plist);
-            /*
-             *EmbeddedTomcat tomcat = new EmbeddedTomcat();
-             *
-             * tomcat.setSilent(false);
-             * tomcat.getServer()
-             *     .setParentClassLoader(MAIN_CLASS.getClassLoader());
-             * tomcat.setPort(8080);
-             *
-             * new SSDP().configure(tomcat);
-             * new MediaServer().configure(tomcat);
-             *
-             * tomcat.start();
-             * tomcat.getServer().await();
-             */
-            System.exit(0);
-        } catch (Throwable throwable) {
-            new HelpFormatter().printHelp(MAIN_CLASS.getName(), OPTIONS);
-            throwable.printStackTrace(System.err);
-            System.exit(-1);
-        }
-    }
 }

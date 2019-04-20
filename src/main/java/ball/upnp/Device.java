@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
  *
- * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 public abstract class Device implements LifecycleListener {

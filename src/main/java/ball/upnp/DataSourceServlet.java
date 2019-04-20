@@ -21,7 +21,7 @@ import org.apache.commons.io.IOUtils;
  *
  * {@bean.info}
  *
- * @author {@link.uri mailto:ball@iprotium.com Allen D. Ball}
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 public class DataSourceServlet extends HttpServlet {
