@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:resolver="antlib:org.apache.maven.resolver.ant"
-         xmlns:ssdp="antlib:ball.ssdp.ant"
          xmlns:util="antlib:ball.util.ant"
          name="ball-upnp" basedir="." default="jar">
   <description>
@@ -22,7 +21,9 @@
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
           depends="jar-classes">
-    <ssdp:ssdp-discover/>
+    <taskdef classpathref="build.classpath"
+             resource="ball/upnp/ant/defaults.properties"/>
+    <ssdp-discover/>
   </target>
 
 </project>

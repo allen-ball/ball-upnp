@@ -5,10 +5,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>UPnP Server</name>
+  <name>UPnP/SSDP Implementation Classes</name>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>ball</groupId>
@@ -22,29 +22,11 @@
   <dependencies verbose="true">
     <dependency>
       <groupId>ball</groupId>
-      <artifactId>ball-ssdp</artifactId>
+      <artifactId>ball-http</artifactId>
     </dependency>
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
   </dependencies>
 </project>
