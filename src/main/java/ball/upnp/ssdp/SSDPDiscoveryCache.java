@@ -130,6 +130,8 @@ public class SSDPDiscoveryCache
     /**
      * {@link SSDPDiscoveryCache} {@link java.util.Map} {@link Value}
      * (expiration and {@link SSDPMessage})
+     *
+     * {@bean.info}
      */
     public class Value {
         private final SSDPMessage message;

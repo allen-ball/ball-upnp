@@ -17,6 +17,8 @@ import org.apache.http.ParseException;
 /**
  * SSDP discovery {@link Thread} implementation.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */

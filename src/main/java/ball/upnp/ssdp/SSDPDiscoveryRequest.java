@@ -10,6 +10,8 @@ import org.apache.http.HttpHeaders;
 /**
  * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */

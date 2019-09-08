@@ -16,6 +16,8 @@ import org.apache.http.message.BasicLineParser;
 /**
  * SSDP {@link org.apache.http.HttpRequest} implementation.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
