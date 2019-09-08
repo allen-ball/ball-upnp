@@ -6,6 +6,7 @@
 package ball.upnp.ssdp;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.util.regex.Pattern;
 import org.apache.http.Header;
 import org.apache.http.HttpVersion;
@@ -15,11 +16,15 @@ import org.apache.http.message.BasicLineParser;
 /**
  * SSDP {@link org.apache.http.HttpResponse} implementation.
  *
+ * {@bean.info}
+ *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     private static final BasicLineParser PARSER = BasicLineParser.INSTANCE;
+
+    private final InetAddress from;
 
     /**
      * Sole public constructor.
@@ -28,20 +33,22 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      *                          {@link SSDPResponse}.
      */
     public SSDPResponse(DatagramPacket packet) {
-        this(packet.getData(), packet.getOffset(), packet.getLength());
+        this(packet, toString(packet).split(Pattern.quote(CRLF)));
     }
 
-    private SSDPResponse(byte[] data, int offset, int length) {
-        this(new String(data, offset, length, CHARSET)
-             .split(Pattern.quote(CRLF)));
-    }
-
-    private SSDPResponse(String[] lines) {
+    private SSDPResponse(DatagramPacket packet, String[] lines) {
         super(BasicLineParser.parseStatusLine(lines[0], PARSER));
 
         for (int i = 1; i < lines.length; i += 1) {
             addHeader(BasicLineParser.parseHeader(lines[i], PARSER));
         }
+
+        from = packet.getAddress();
+    }
+
+    private static String toString(DatagramPacket packet) {
+        return new String(packet.getData(),
+                          packet.getOffset(), packet.getLength(), CHARSET);
     }
 
     /**
@@ -52,7 +59,16 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      */
     protected SSDPResponse(int code, String reason) {
         super(HttpVersion.HTTP_1_1, code, reason);
+
+        from = null;
     }
+
+    /**
+     * Method to get the sender {@link InetAddress}.
+     *
+     * @return  The sender {@link InetAddress} (may be {@code null}).
+     */
+    public InetAddress getInetAddress() { return from; }
 
     @Override
     public String toString() {
