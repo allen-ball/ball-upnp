@@ -8,7 +8,7 @@
   <name>UPnP/SSDP Implementation Classes</name>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>ball</groupId>

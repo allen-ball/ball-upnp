@@ -1,5 +1,7 @@
 2019-09-08  Allen D. Ball  <ball@sol.local>
 
+	* pom.xml: Released version 1.0.1.
+
 	* src/main/java/ball/upnp/ssdp/SSDPResponse.java:
 	Record the InetAddress from the DatagramPacket.
 
