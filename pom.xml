@@ -8,12 +8,12 @@
   <name>UPnP/SSDP Implementation Classes</name>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20191206.0</version>
+    <version>20200102.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <properties>
