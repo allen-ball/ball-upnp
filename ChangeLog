@@ -1,3 +1,7 @@
+2020-01-07  Allen D. Ball  <ball@hcf.dev>
+
+	* Initial support for UPNP service and device annotations.
+
 2020-01-06  Allen D. Ball  <ball@hcf.dev>
 
 	* pom.xml: Started development of 1.1-SNAPSHOT.
