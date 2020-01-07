@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<root xmlns:th="http://www.thymeleaf.org" th:xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType th:text="${device.deviceType}"/>
+    <friendlyName th:text="${device.friendlyName}"/>
+    <manufacturer th:text="${device.manufacturer}"/>
+    <manufacturerURL th:text="${device.manufacturerURL}"/>
+    <modelDescription th:text="${device.modelDescription}"/>
+    <modelName th:text="${device.modelName}"/>
+    <modelNumber th:text="${device.modelNumber}"/>
+    <modelURL th:text="${device.modelURL}"/>
+    <serialNumber th:text="${device.serialNumber}"/>
+    <UDN th:text="${device.UDN}"/>
+    <iconList th:if="${! device.iconList.isEmpty()}">
+      <icon th:each="icon : ${device.iconList}">
+        <mimetype th:text="${icon.mimetype}"/>
+        <width th:text="${icon.width}"/>
+        <height th:text="${icon.height}"/>
+        <depth th:text="${icon.depth}"/>
+        <url th:text="${icon.url}"/>
+      </icon>
+    </iconList>
+    <serviceList th:if="${! device.serviceList.isEmpty()}">
+      <service th:each="service : ${device.serviceList}">
+        <serviceType th:text="${service.serviceType}"/>
+        <serviceId th:text="${service.serviceId}"/>
+        <controlURL th:text="${service.controlURL}"/>
+        <eventSubURL th:text="${service.eventSubURL}"/>
+        <SCPDURL th:text="${service.SCPDURL}"/>
+      </service>
+    </serviceList>
+    <deviceList th:if="${! device.deviceList.isEmpty()}">
+      <device th:each="device : ${device.deviceList}">
+        <deviceType th:text="${device.deviceType}"/>
+        <friendlyName th:text="${device.friendlyName}"/>
+        <manufacturer th:text="${device.manufacturer}"/>
+        <manufacturerURL th:text="${device.manufacturerURL}"/>
+        <modelDescription th:text="${device.modelDescription}"/>
+        <modelName th:text="${device.modelName}"/>
+        <modelNumber th:text="${device.modelNumber}"/>
+        <modelURL th:text="${device.modelURL}"/>
+        <serialNumber th:text="${device.serialNumber}"/>
+        <UDN th:text="${device.UDN}"/>
+        <UPC th:text="${device.UPC}"/>
+        <serviceList th:if="${! device.serviceList.isEmpty()}">
+          <service th:each="service : ${device.serviceList}">
+            <serviceType th:text="${service.serviceType}"/>
+            <serviceId th:text="${service.serviceId}"/>
+            <controlURL th:text="${service.controlURL}"/>
+            <eventSubURL th:text="${service.eventSubURL}"/>
+            <SCPDURL th:text="${service.SCPDURL}"/>
+          </service>
+        </serviceList>
+        <deviceList th:if="${! device.deviceList.isEmpty()}">
+          <device  th:each="device : ${device.deviceList}">
+            <deviceType th:text="${device.deviceType}"/>
+            <friendlyName th:text="${device.friendlyName}"/>
+            <manufacturer th:text="${device.manufacturer}"/>
+            <manufacturerURL th:text="${device.manufacturerURL}"/>
+            <modelDescription th:text="${device.modelDescription}"/>
+            <modelName th:text="${device.modelName}"/>
+            <modelNumber th:text="${device.modelNumber}"/>
+            <modelURL th:text="${device.modelURL}"/>
+            <serialNumber th:text="${device.serialNumber}"/>
+            <UDN th:text="${device.UDN}"/>
+            <UPC th:text="${device.UPC}"/>
+            <serviceList th:if="${! device.serviceList.isEmpty()}">
+              <service th:each="service : ${device.serviceList}">
+                <serviceType th:text="${service.serviceType}"/>
+                <serviceId th:text="${service.serviceId}"/>
+                <controlURL th:text="${service.controlURL}"/>
+                <eventSubURL th:text="${service.eventSubURL}"/>
+                <SCPDURL th:text="${service.SCPDURL}"/>
+              </service>
+            </serviceList>
+          </device>
+        </deviceList>
+      </device>
+    </deviceList>
+    <presentationURL th:text="${device.presentationURL}"/>
+  </device>
+</root>
