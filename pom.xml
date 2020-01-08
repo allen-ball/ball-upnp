@@ -28,5 +28,10 @@
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>ball</groupId>
+      <artifactId>ball-util</artifactId>
+      <classifier>${os}${bit-model}</classifier>
+    </dependency>
   </dependencies>
 </project>

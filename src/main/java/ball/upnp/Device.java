@@ -28,7 +28,11 @@ public abstract class Device implements AnnotatedDevice {
     @Getter
     private final UUID UUID = UUIDFactory.getDefault().generateTime();
     @Getter
+    private final List<Icon> iconList = new LinkedList<>();
+    @Getter
     private final List<Service> serviceList = new LinkedList<>();
+    @Getter
+    private final List<Device> deviceList = new LinkedList<>();
 
     /**
      * Method to get {@link.this} {@link Service}s UDN.
