@@ -9,8 +9,7 @@ import ball.upnp.annotation.DeviceType;
 import java.net.URI;
 
 /**
- * {@link AbstractDevice} support for {@link DeviceType} and related
- * annotations.
+ * {@link Device} support for {@link DeviceType} and related annotations.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$

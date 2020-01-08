@@ -10,8 +10,7 @@ import ball.upnp.annotation.ServiceType;
 import java.net.URI;
 
 /**
- * {@link AbstractService} support for {@link ServiceType} and related
- * annotations.
+ * {@link Service} support for {@link ServiceType} and related annotations.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
