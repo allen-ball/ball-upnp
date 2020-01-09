@@ -6,6 +6,8 @@
 package ball.upnp;
 
 import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,10 @@ import static lombok.AccessLevel.PROTECTED;
 public abstract class Service implements AnnotatedService {
     @NonNull @Getter
     private final Device device;
+    @Getter
+    private final List<Action> actionList = new LinkedList<>();
+    @Getter
+    private final List<StateVariable> serviceStateTable = new LinkedList<>();
 
     /**
      * Method to get the USN {@link URI}.  The {@link URI} is calculated by
