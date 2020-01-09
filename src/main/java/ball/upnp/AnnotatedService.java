@@ -18,7 +18,7 @@ import java.net.URI;
 public interface AnnotatedService {
 
     /**
-     * Method to get the URN {{@link URI}) describing this
+     * Method to get the URN ({@link URI}) describing this
      * {@link AnnotatedService}'s service type.
      *
      * @return  The service type.

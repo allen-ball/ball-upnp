@@ -17,7 +17,7 @@ import java.net.URI;
 public interface AnnotatedDevice {
 
     /**
-     * Method to get the URN {{@link URI}) describing this
+     * Method to get the URN ({@link URI}) describing this
      * {@link AnnotatedDevice}'s device type.
      *
      * @return  The service type.
