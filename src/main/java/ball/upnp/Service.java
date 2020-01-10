@@ -8,6 +8,7 @@ package ball.upnp;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
+@XmlRootElement(name = "scpd", namespace = "urn:schemas-upnp-org:service-1-0")
 @RequiredArgsConstructor(access = PROTECTED)
 public abstract class Service implements AnnotatedService {
     @NonNull @Getter
