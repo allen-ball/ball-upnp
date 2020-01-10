@@ -26,7 +26,7 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @XmlRootElement(name = "root", namespace = "urn:schemas-upnp-org:device-1-0")
 @NoArgsConstructor(access = PROTECTED)
-public abstract class Device implements AnnotatedDevice {
+public abstract class Device implements AnnotatedDevice, XmlDocument {
     @Getter
     private final UUID UUID = UUIDFactory.getDefault().generateTime();
     @Getter

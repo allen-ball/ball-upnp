@@ -8,6 +8,7 @@ package ball.upnp;
 import ball.upnp.annotation.ServiceId;
 import ball.upnp.annotation.ServiceType;
 import java.net.URI;
+import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * {@link Service} support for {@link ServiceType} and related annotations.
@@ -24,7 +25,8 @@ public interface AnnotatedService {
      * @return  The service type.
      */
     default URI getServiceType() {
-        ServiceType annotation = getClass().getAnnotation(ServiceType.class);
+        ServiceType annotation =
+            AnnotationUtils.findAnnotation(getClass(), ServiceType.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : null;
     }
@@ -36,7 +38,8 @@ public interface AnnotatedService {
      * @return  The service type.
      */
     default URI getServiceId() {
-        ServiceId annotation = getClass().getAnnotation(ServiceId.class);
+        ServiceId annotation =
+            AnnotationUtils.findAnnotation(getClass(), ServiceId.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : getServiceType();
     }

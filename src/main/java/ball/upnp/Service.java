@@ -25,7 +25,7 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @XmlRootElement(name = "scpd", namespace = "urn:schemas-upnp-org:service-1-0")
 @RequiredArgsConstructor(access = PROTECTED)
-public abstract class Service implements AnnotatedService {
+public abstract class Service implements AnnotatedService, XmlDocument {
     @NonNull @Getter
     private final Device device;
     @Getter

@@ -7,6 +7,7 @@ package ball.upnp;
 
 import ball.upnp.annotation.DeviceType;
 import java.net.URI;
+import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * {@link Device} support for {@link DeviceType} and related annotations.
@@ -23,7 +24,8 @@ public interface AnnotatedDevice {
      * @return  The service type.
      */
     default URI getDeviceType() {
-        DeviceType annotation = getClass().getAnnotation(DeviceType.class);
+        DeviceType annotation =
+            AnnotationUtils.findAnnotation(getClass(), DeviceType.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : null;
     }
