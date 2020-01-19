@@ -11,7 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * {@link StateVariable}
+ * {@link StateVariable}.
  *
  * {@bean.info}
  *
