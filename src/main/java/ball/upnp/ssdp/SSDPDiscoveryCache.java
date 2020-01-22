@@ -7,7 +7,6 @@ package ball.upnp.ssdp;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
@@ -47,15 +46,7 @@ public class SSDPDiscoveryCache
                     } catch (InterruptedException exception) {
                     }
 
-                    Iterator<Value> iterator = values().iterator();
-
-                    while (iterator.hasNext()) {
-                        Value value = iterator.next();
-
-                        if (now() > value.getExpiration()) {
-                            iterator.remove();
-                        }
-                    }
+                    values().removeIf(t -> now() > t.getExpiration());
                 }
             }
         }.start();

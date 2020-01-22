@@ -1,3 +1,8 @@
+2020-01-21  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
+	Use Collection.removeIf(Predicate).
+
 2020-01-07  Allen D. Ball  <ball@hcf.dev>
 
 	* Initial support for UPNP service and device annotations.
