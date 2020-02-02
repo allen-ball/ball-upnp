@@ -6,6 +6,7 @@
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>UPnP/SSDP Implementation Classes</name>
+  <description></description>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
   <version>1.1-SNAPSHOT</version>
@@ -16,6 +17,7 @@
     <version>20200130.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
+  <inceptionYear>2013</inceptionYear>
   <properties>
     <jre.version>1.8</jre.version>
   </properties>
