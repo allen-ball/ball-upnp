@@ -1,3 +1,7 @@
+2020-02-03  Allen D. Ball  <ball@hcf.dev>
+
+	* License under Apache License, Version 2.0.
+
 2020-01-21  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
