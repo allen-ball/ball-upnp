@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ################################apache_v2################################
+  ##########################################################################
+  SPDX-License-Identifier: Apache-2.0
+
   $Id$
   %%
   Copyright (C) 2013 - 2020 Allen D. Ball
@@ -16,15 +18,15 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-  ################################apache_v2################################
+  ##########################################################################
   -->
 <project xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:util="antlib:ball.util.ant"
          name="ball-upnp" basedir="." default="jar">
   <description>
     ball-upnp.jar
-    -------------
-    UPnP Server
+    --------------------------------
+    UPnP/SSDP Implementation Classes
 
     $Id$
   </description>
