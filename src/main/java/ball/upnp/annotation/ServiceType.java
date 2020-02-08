@@ -1,11 +1,4 @@
-/**
- * Classes specific to
- * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@Manifest.Section
-package ball.upnp.ssdp;
+package ball.upnp.annotation;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -27,4 +20,23 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.Manifest;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+/**
+ * {@link ball.upnp.AnnotatedService} service type
+ * {@link java.lang.annotation.Annotation}.
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ * @version $Revision$
+ */
+@Documented
+@Retention(RUNTIME)
+@Target({ TYPE })
+public @interface ServiceType {
+    String value();
+}

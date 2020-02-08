@@ -1,11 +1,4 @@
-/**
- * Classes specific to
- * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@Manifest.Section
-package ball.upnp.ssdp;
+package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -27,4 +20,19 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.Manifest;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+/**
+ * {@link Action}.
+ *
+ * {@bean.info}
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ * @version $Revision$
+ */
+@NoArgsConstructor @Getter @Setter @ToString
+public class Action {
+}

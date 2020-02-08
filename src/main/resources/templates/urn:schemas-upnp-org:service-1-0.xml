@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<scpd xmlns:th="http://www.thymeleaf.org" th:xmlns="${#execInfo.templateName}">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <actionList th:if="${! service.actionList.isEmpty()}">
+    <action th:each="action : ${service.actionList}">
+      <name th:text="${action.name}"/>
+      <argumentList th:if="${! action.argumentList.isEmpty()}">
+        <argument th:each="argument : ${action.argumentList}">
+          <name th:text="${argument.name}"/>
+          <direction th:text="${argument.direction}"/>
+          <relatedStateVariable th:text="${argument.relatedStateVariable}"/>
+        </argument>
+      </argumentList>
+    </action>
+  </actionList>
+  <serviceStateTable th:if="${! service.serviceStateTable.isEmpty()}">
+    <stateVariable th:each="stateVariable : ${service.serviceStateTable}" th:attr="sendEvents=${stateVariable.sendEvents ? 'yes' : 'no'}">
+      <name th:text="${stateVariable.name}"/>
+      <dataType th:text="${stateVariable.dataType}"/>
+      <allowedValueList th:if="${! stateVariable.allowedValueList.isEmpty()}">
+        <allowedValue th:each="allowedValue : ${stateVariable.allowedValueList}" th:text="${allowedValue}"/>
+      </allowedValueList>
+    </stateVariable>
+  </serviceStateTable>
+</scpd>

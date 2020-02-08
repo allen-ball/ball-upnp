@@ -1,11 +1,4 @@
-/**
- * Classes specific to
- * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@Manifest.Section
-package ball.upnp.ssdp;
+package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -27,4 +20,28 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.Manifest;
+import ball.upnp.annotation.DeviceType;
+import java.net.URI;
+import org.springframework.core.annotation.AnnotationUtils;
+
+/**
+ * {@link Device} support for {@link DeviceType} and related annotations.
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ * @version $Revision$
+ */
+public interface AnnotatedDevice {
+
+    /**
+     * Method to get the URN ({@link URI}) describing this
+     * {@link AnnotatedDevice}'s device type.
+     *
+     * @return  The service type.
+     */
+    default URI getDeviceType() {
+        DeviceType annotation =
+            AnnotationUtils.findAnnotation(getClass(), DeviceType.class);
+
+        return (annotation != null) ? URI.create(annotation.value()) : null;
+    }
+}

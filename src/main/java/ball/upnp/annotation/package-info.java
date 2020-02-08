@@ -1,11 +1,13 @@
 /**
- * Classes specific to
- * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}.
+ * Provides {@link java.lang.annotation.Annotation} implementation classes.
+ *
+ * @see java.lang.annotation.Annotation
+ * @see javax.annotation
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 @Manifest.Section
-package ball.upnp.ssdp;
+package ball.upnp.annotation;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes

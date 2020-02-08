@@ -1,11 +1,4 @@
-/**
- * Classes specific to
- * {@link.uri http://tools.ietf.org/id/draft-cai-ssdp-v1-03.txt Simple Service Discovery Protocol 1.0 (SSDP)}.
- *
- * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- */
-@Manifest.Section
-package ball.upnp.ssdp;
+package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -27,4 +20,24 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.annotation.Manifest;
+import javax.xml.bind.annotation.XmlRootElement;
+import org.springframework.core.annotation.AnnotationUtils;
+
+/**
+ * Support for {@link XmlRootElement} and related annotations.
+ *
+ * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
+ * @version $Revision$
+ */
+public interface XmlDocument {
+
+    /**
+     * Method to get the {@link XmlRootElement} annotation.
+     *
+     * @return  The {@link XmlRootElement} annotation.
+     */
+    default XmlRootElement getXmlRootElement() {
+        return AnnotationUtils.findAnnotation(getClass(),
+                                              XmlRootElement.class);
+    }
+}
