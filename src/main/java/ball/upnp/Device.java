@@ -20,7 +20,6 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.util.UUIDFactory;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +42,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class Device implements AnnotatedDevice, XmlDocument {
     @Getter
-    private final UUID UUID = UUIDFactory.getDefault().generateTime();
+    private final UUID UUID = java.util.UUID.randomUUID();
     @Getter
     private final List<Icon> iconList = new LinkedList<>();
     @Getter
