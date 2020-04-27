@@ -60,7 +60,7 @@ public class ServiceIdProcessor extends AbstractAnnotationProcessor {
                     print(ERROR,
                           element,
                           element.getKind() + " annotated with "
-                          + AT + annotation.getSimpleName()
+                          + "@" + annotation.getSimpleName()
                           + " but cannot convert `" + String.valueOf(string)
                           + "' to " + URI.class.getName());
                 }
@@ -68,7 +68,7 @@ public class ServiceIdProcessor extends AbstractAnnotationProcessor {
                 print(ERROR,
                       element,
                       element.getKind() + " annotated with "
-                      + AT + annotation.getSimpleName()
+                      + "@" + annotation.getSimpleName()
                       + " but does not implement "
                       + AnnotatedService.class.getName());
             }
@@ -76,7 +76,7 @@ public class ServiceIdProcessor extends AbstractAnnotationProcessor {
             print(ERROR,
                   element,
                   element.getKind() + " annotated with "
-                  + AT + annotation.getSimpleName()
+                  + "@" + annotation.getSimpleName()
                   + " but does not specify value()");
         }
     }
