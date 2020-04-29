@@ -57,27 +57,21 @@ public class ServiceTypeProcessor extends AbstractAnnotationProcessor {
                 try {
                     new URI(string);
                 } catch (Exception exception) {
-                    print(ERROR,
-                          element,
-                          element.getKind() + " annotated with "
-                          + "@" + annotation.getSimpleName()
-                          + " but cannot convert `" + String.valueOf(string)
-                          + "' to " + URI.class.getName());
+                    print(ERROR, element,
+                          "%s annotated with @%s but cannot convert '%s' to %s",
+                          element.getKind(), annotation.getSimpleName(),
+                          string, URI.class.getName());
                 }
             } else {
-                print(ERROR,
-                      element,
-                      element.getKind() + " annotated with "
-                      + "@" + annotation.getSimpleName()
-                      + " but does not implement "
-                      + AnnotatedService.class.getName());
+                print(ERROR, element,
+                      "%s annotated with @%s but does not implement %s",
+                      element.getKind(), annotation.getSimpleName(),
+                      AnnotatedService.class.getName());
             }
         } else {
-            print(ERROR,
-                  element,
-                  element.getKind() + " annotated with "
-                  + "@" + annotation.getSimpleName()
-                  + " but does not specify value()");
+            print(ERROR, element,
+                  "%s annotated with @%s but does not specify value()",
+                  element.getKind(), annotation.getSimpleName());
         }
     }
 }
