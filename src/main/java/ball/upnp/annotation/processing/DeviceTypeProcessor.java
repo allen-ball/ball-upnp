@@ -48,8 +48,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 public class DeviceTypeProcessor extends AbstractAnnotationProcessor {
     @Override
     protected void process(RoundEnvironment env,
-                           TypeElement annotation,
-                           Element element) throws Exception {
+                           TypeElement annotation, Element element) {
         String string = element.getAnnotation(DeviceType.class).value();
 
         if (isNotEmpty(string)) {
