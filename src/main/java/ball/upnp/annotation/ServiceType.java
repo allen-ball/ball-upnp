@@ -20,6 +20,8 @@ package ball.upnp.annotation;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.processing.MustExtend;
+import ball.upnp.AnnotatedService;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -37,6 +39,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
+@MustExtend(AnnotatedService.class)
 public @interface ServiceType {
     String value();
 }

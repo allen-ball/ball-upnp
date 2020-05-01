@@ -61,11 +61,6 @@ public class ServiceIdProcessor extends AbstractAnnotationProcessor {
                           element.getKind(), annotation.getSimpleName(),
                           string, URI.class.getName());
                 }
-            } else {
-                print(ERROR, element,
-                      "%s annotated with @%s but does not implement %s",
-                      element.getKind(), annotation.getSimpleName(),
-                      AnnotatedService.class.getName());
             }
         } else {
             print(ERROR, element,
