@@ -21,7 +21,7 @@ package ball.upnp.annotation.processing;
  * ##########################################################################
  */
 import ball.annotation.ServiceProviderFor;
-import ball.annotation.processing.AbstractAnnotationProcessor;
+import ball.annotation.processing.AnnotatedProcessor;
 import ball.annotation.processing.For;
 import ball.upnp.AnnotatedDevice;
 import ball.upnp.annotation.DeviceType;
@@ -45,7 +45,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @ServiceProviderFor({ Processor.class })
 @For({ DeviceType.class })
 @NoArgsConstructor @ToString
-public class DeviceTypeProcessor extends AbstractAnnotationProcessor {
+public class DeviceTypeProcessor extends AnnotatedProcessor {
     @Override
     protected void process(RoundEnvironment env,
                            TypeElement annotation, Element element) {
