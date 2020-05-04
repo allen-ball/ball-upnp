@@ -21,6 +21,7 @@ package ball.upnp.annotation;
  * ##########################################################################
  */
 import ball.annotation.processing.AnnotatedTypeMustExtend;
+import ball.annotation.processing.AnnotationValueMustBeURI;
 import ball.upnp.AnnotatedDevice;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -40,6 +41,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({ TYPE })
 @AnnotatedTypeMustExtend(AnnotatedDevice.class)
+@AnnotationValueMustBeURI
 public @interface DeviceType {
-    String value();
+    String value() default "";
 }

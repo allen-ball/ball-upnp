@@ -23,18 +23,10 @@ package ball.upnp.annotation.processing;
 import ball.annotation.ServiceProviderFor;
 import ball.annotation.processing.AnnotatedProcessor;
 import ball.annotation.processing.For;
-import ball.upnp.AnnotatedService;
 import ball.upnp.annotation.ServiceId;
-import java.net.URI;
 import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import static javax.tools.Diagnostic.Kind.ERROR;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
  * {@link ServiceId} annotation {@link Processor}.
@@ -46,28 +38,4 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @For({ ServiceId.class })
 @NoArgsConstructor @ToString
 public class ServiceIdProcessor extends AnnotatedProcessor {
-    @Override
-    protected void process(RoundEnvironment roundEnv,
-                           TypeElement annotation, Element element) {
-        super.process(roundEnv, annotation, element);
-
-        String string = element.getAnnotation(ServiceId.class).value();
-
-        if (isNotEmpty(string)) {
-            if (isAssignable(element.asType(), AnnotatedService.class)) {
-                try {
-                    new URI(string);
-                } catch (Exception exception) {
-                    print(ERROR, element,
-                          "%s annotated with @%s but cannot convert '%s' to %s",
-                          element.getKind(), annotation.getSimpleName(),
-                          string, URI.class.getName());
-                }
-            }
-        } else {
-            print(ERROR, element,
-                  "%s implements %s but does not specify value()",
-                  element.getKind(), annotation.getSimpleName());
-        }
-    }
 }
