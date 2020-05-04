@@ -47,8 +47,10 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @NoArgsConstructor @ToString
 public class ServiceIdProcessor extends AnnotatedProcessor {
     @Override
-    protected void process(RoundEnvironment env,
+    protected void process(RoundEnvironment roundEnv,
                            TypeElement annotation, Element element) {
+        super.process(roundEnv, annotation, element);
+
         String string = element.getAnnotation(ServiceId.class).value();
 
         if (isNotEmpty(string)) {
