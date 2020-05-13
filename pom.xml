@@ -28,12 +28,12 @@
   <description></description>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>1.1.2</version>
+  <version>1.2.0</version>
   <packaging>jar</packaging>
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>20200412.0</version>
+    <version>20200513.0</version>
     <relativePath>../ball/parent/pom.xml</relativePath>
   </parent>
   <inceptionYear>2013</inceptionYear>
@@ -55,11 +55,6 @@
     <dependency>
       <groupId>ball</groupId>
       <artifactId>ball-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ball</groupId>
-      <artifactId>ball-util</artifactId>
-      <classifier>${os}${bit-model}</classifier>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

@@ -20,9 +20,13 @@ package ball.upnp.annotation;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.processing.AnnotatedTypeMustExtend;
+import ball.annotation.processing.AnnotationValueMustConvertTo;
+import ball.upnp.AnnotatedDevice;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.net.URI;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -37,6 +41,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
+@AnnotatedTypeMustExtend(AnnotatedDevice.class)
+@AnnotationValueMustConvertTo(URI.class)
 public @interface DeviceType {
     String value();
 }
