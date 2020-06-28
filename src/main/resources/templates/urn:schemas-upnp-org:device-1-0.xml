@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- $Id$ -->
+<!--/* $Id$ */-->
 <root xmlns:th="http://www.thymeleaf.org" th:xmlns="${#execInfo.templateName}">
   <specVersion>
     <major>1</major>
     <minor>0</minor>
   </specVersion>
   <device>
-    <!-- <deviceType th:text="${device.deviceType}"/> -->
-    <!-- <friendlyName th:text="${device.friendlyName}"/> -->
-    <!-- <manufacturer th:text="${device.manufacturer}"/> -->
-    <!-- <manufacturerURL th:text="${device.manufacturerURL}"/> -->
-    <!-- <modelDescription th:text="${device.modelDescription}"/> -->
-    <!-- <modelName th:text="${device.modelName}"/> -->
-    <!-- <modelNumber th:text="${device.modelNumber}"/> -->
-    <!-- <modelURL th:text="${device.modelURL}"/> -->
-    <!-- <serialNumber th:text="${device.serialNumber}"/> -->
+    <!--/* <deviceType th:text="${device.deviceType}"/> */-->
+    <!--/* <friendlyName th:text="${device.friendlyName}"/> */-->
+    <!--/* <manufacturer th:text="${device.manufacturer}"/> */-->
+    <!--/* <manufacturerURL th:text="${device.manufacturerURL}"/> */-->
+    <!--/* <modelDescription th:text="${device.modelDescription}"/> */-->
+    <!--/* <modelName th:text="${device.modelName}"/> */-->
+    <!--/* <modelNumber th:text="${device.modelNumber}"/> */-->
+    <!--/* <modelURL th:text="${device.modelURL}"/> */-->
+    <!--/* <serialNumber th:text="${device.serialNumber}"/> */-->
     <UDN th:text="${device.UDN}"/>
     <iconList th:if="${! device.iconList.isEmpty()}">
       <icon th:each="icon : ${device.iconList}">
@@ -29,9 +29,9 @@
       <service th:each="service : ${device.serviceList}">
         <serviceType th:text="${service.serviceType}"/>
         <serviceId th:text="${service.serviceId}"/>
-        <!-- <controlURL th:text="${service.controlURL}"/> -->
-        <!-- <eventSubURL th:text="${service.eventSubURL}"/> -->
-        <!-- <SCPDURL th:text="${service.SCPDURL}"/> -->
+        <!--/* <controlURL th:text="${service.controlURL}"/> */-->
+        <!--/* <eventSubURL th:text="${service.eventSubURL}"/> */-->
+        <!--/* <SCPDURL th:text="${service.SCPDURL}"/> */-->
       </service>
     </serviceList>
     <deviceList th:if="${! device.deviceList.isEmpty()}">
@@ -82,6 +82,6 @@
         </deviceList>
       </device>
     </deviceList>
-    <!-- <presentationURL th:text="${device.presentationURL}"/> -->
+    <!--/* <presentationURL th:text="${device.presentationURL}"/> */-->
   </device>
 </root>

@@ -20,28 +20,46 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.upnp.annotation.DeviceType;
-import java.net.URI;
+import ball.upnp.annotation.Template;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * {@link Device} support for {@link DeviceType} and related annotations.
+ * {@link Templated} support for {@link Template} annotation.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface AnnotatedDevice extends Templated {
+public interface Templated {
 
     /**
-     * Method to get the URN ({@link URI}) describing this
-     * {@link AnnotatedDevice}'s device type.
-     *
-     * @return  The service type.
+     * {@link #TEMPLATE} = {@value #TEMPLATE}
      */
-    default URI getDeviceType() {
-        DeviceType annotation =
-            AnnotationUtils.findAnnotation(getClass(), DeviceType.class);
+    public static final String TEMPLATE = "/templates/%s.xml";
 
-        return (annotation != null) ? URI.create(annotation.value()) : null;
+    /**
+     * Method to get the {@link Template}'s name.
+     *
+     * @return  The name.
+     */
+    default String getTemplate() {
+        Template annotation =
+            AnnotationUtils.findAnnotation(getClass(), Template.class);
+
+        return (annotation != null) ? annotation.value() : null;
+    }
+
+    /**
+     * Method to get the {@link Template}'s resource path.
+     *
+     * @return  The resource path.
+     *
+     * @throws  NullPointerException
+     *                          If {@link #getTemplate()} returns
+     *                          {@code null}.
+     */
+    default String getTemplatePath() {
+        return String.format(TEMPLATE, requireNonNull(getTemplate()));
     }
 }

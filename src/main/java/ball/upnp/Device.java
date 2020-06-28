@@ -20,11 +20,11 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.upnp.annotation.Template;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,9 +38,9 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@XmlRootElement(name = "root", namespace = "urn:schemas-upnp-org:device-1-0")
+@Template("urn:schemas-upnp-org:device-1-0")
 @NoArgsConstructor(access = PROTECTED)
-public abstract class Device implements AnnotatedDevice, XmlDocument {
+public abstract class Device implements AnnotatedDevice {
     @Getter
     private final UUID UUID = java.util.UUID.randomUUID();
     @Getter

@@ -1,4 +1,4 @@
-package ball.upnp;
+package ball.upnp.annotation;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -20,24 +20,29 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import javax.xml.bind.annotation.XmlRootElement;
-import org.springframework.core.annotation.AnnotationUtils;
+import ball.annotation.processing.AnnotationValueMustConvertTo;
+import ball.annotation.processing.TargetMustExtend;
+import ball.upnp.AnnotatedDevice;
+import ball.upnp.Templated;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.net.URI;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Support for {@link XmlRootElement} and related annotations.
+ * {@link ball.upnp.Templated} {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface XmlDocument {
-
-    /**
-     * Method to get the {@link XmlRootElement} annotation.
-     *
-     * @return  The {@link XmlRootElement} annotation.
-     */
-    default XmlRootElement getXmlRootElement() {
-        return AnnotationUtils.findAnnotation(getClass(),
-                                              XmlRootElement.class);
-    }
+@Documented
+@Retention(RUNTIME)
+@Target({ TYPE })
+@TargetMustExtend(Templated.class)
+@AnnotationValueMustConvertTo(URI.class)
+public @interface Template {
+    String value();
 }

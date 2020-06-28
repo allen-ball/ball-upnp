@@ -24,8 +24,8 @@
          name="ball-upnp" basedir="." default="jar">
   <description>
     ball-upnp.jar
-    --------------------------------
-    UPnP/SSDP Implementation Classes
+    -------------
+    UPnP/SSDP API
 
     $Id$
   </description>

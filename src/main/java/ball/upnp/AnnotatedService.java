@@ -31,7 +31,7 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface AnnotatedService {
+public interface AnnotatedService extends Templated {
 
     /**
      * Method to get the URN ({@link URI}) describing this

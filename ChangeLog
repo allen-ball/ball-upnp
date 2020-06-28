@@ -1,5 +1,10 @@
 2020-06-28  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/Templated.java,
+	src/main/java/ball/upnp/annotation/Template.java,
+	src/main/java/ball/upnp/annotation/processing/TemplateProcessor.java:
+	Initial writing.
+
 	* pom.xml: Started development of 2.0-SNAPSHOT.
 
 2020-06-12  Allen D. Ball  <ball@hcf.dev>
@@ -16,9 +21,7 @@
 
 2020-02-12  Allen D. Ball  <ball@hcf.dev>
 
-	* pom.xml:
-	Released version 1.1.1.
-	Updated dependencies through parent POM 20200212.0.
+	* pom.xml: Released version 1.1.1.
 
 2020-02-07  Allen D. Ball  <ball@hcf.dev>
 
@@ -41,21 +44,13 @@
 
 	* Initial support for UPNP service and device annotations.
 
-2020-01-06  Allen D. Ball  <ball@hcf.dev>
-
-	* pom.xml: Started development of 1.1-SNAPSHOT.
-
 2020-01-02  Allen D. Ball  <ball@hcf.dev>
 
-	* pom.xml:
-	Released version 1.0.3.
-	Use ball:parent:20200102.0.
+	* pom.xml: Released version 1.0.3.
 
 2019-12-06  Allen D. Ball  <ball@hcf.dev>
 
-	* pom.xml:
-	Released version 1.0.2.
-	Use ball:parent:20191206.0.
+	* pom.xml: Released version 1.0.2.
 
 2019-09-08  Allen D. Ball  <ball@sol.local>
 
