@@ -40,7 +40,7 @@ public interface Service extends Templated {
     public URI getServiceType();
 
     /**
-     * Method to get the URN {{@link URI}) describing this {@link Service}'s
+     * Method to get the URN ({@link URI}) describing this {@link Service}'s
      * service ID.
      *
      * @return  The service type.
