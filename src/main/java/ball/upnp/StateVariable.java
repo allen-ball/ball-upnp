@@ -38,5 +38,5 @@ public class StateVariable {
     private boolean sendEvents = false;
     private String name = null;
     private String dataType = null;
-    private List</* AllowedValue */ String> allowedValueList = new LinkedList<>();
+    private List<AllowedValue> allowedValueList = new LinkedList<>();
 }
