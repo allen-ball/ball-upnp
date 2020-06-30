@@ -32,6 +32,14 @@ import java.util.List;
 public interface Service extends Templated {
 
     /**
+     * Method to get the {@link Device} hosting {@link.this}
+     * {@link Service}.
+     *
+     * @return  The {@link Device}.
+     */
+    public Device getDevice();
+
+    /**
      * Method to get the URN ({@link URI}) describing {@link.this}
      * {@link Service}'s service type.
      *
@@ -47,13 +55,9 @@ public interface Service extends Templated {
      */
     public URI getServiceId();
 
-    /**
-     * Method to get the {@link Device} hosting {@link.this}
-     * {@link Service}.
-     *
-     * @return  The {@link Device}.
-     */
-    public Device getDevice();
+    public URI getSCPDURL();
+    public URI getControlURL();
+    public URI getEventSubURL();
 
     /**
      * Method to get {@link.this} {@link Service}'s {@link Action}s.

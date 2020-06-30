@@ -20,6 +20,7 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.URI;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,5 +38,5 @@ public class Icon {
     private Integer width = null;
     private Integer height = null;
     private Integer depth = null;
-    private String uri = null;
+    private URI url = null;
 }

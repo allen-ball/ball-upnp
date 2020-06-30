@@ -20,23 +20,13 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import java.util.LinkedList;
-import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * {@link StateVariable}.
- *
- * {@bean.info}
+ * {@link Argument} {@link Direction}s.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Data
-public class StateVariable {
-    private boolean sendEvents = false;
-    private String name = null;
-    private String dataType = null;
-    private List</* AllowedValue */ String> allowedValueList = new LinkedList<>();
+public enum Direction {
+    IN, OUT;
 }

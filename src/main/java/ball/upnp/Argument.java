@@ -20,13 +20,11 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import java.util.LinkedList;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * {@link StateVariable}.
+ * {@link Argument}.
  *
  * {@bean.info}
  *
@@ -34,9 +32,8 @@ import lombok.NoArgsConstructor;
  * @version $Revision$
  */
 @NoArgsConstructor @Data
-public class StateVariable {
-    private boolean sendEvents = false;
+public class Argument {
     private String name = null;
-    private String dataType = null;
-    private List</* AllowedValue */ String> allowedValueList = new LinkedList<>();
+    private Direction direction = null;
+    private String relatedStateVariable = null;
 }

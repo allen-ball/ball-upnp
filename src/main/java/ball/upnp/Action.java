@@ -20,6 +20,8 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.util.LinkedList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,4 +35,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor @Data
 public class Action {
+    private String name = null;
+    private List<Argument> argumentList = new LinkedList<>();
 }

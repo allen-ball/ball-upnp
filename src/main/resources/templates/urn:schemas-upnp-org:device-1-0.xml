@@ -29,9 +29,9 @@
       <service th:each="service : ${device.serviceList}">
         <serviceType th:text="${service.serviceType}"/>
         <serviceId th:text="${service.serviceId}"/>
-        <!--/* <controlURL th:text="${service.controlURL}"/> */-->
-        <!--/* <eventSubURL th:text="${service.eventSubURL}"/> */-->
-        <!--/* <SCPDURL th:text="${service.SCPDURL}"/> */-->
+        <SCPDURL th:text="${service.SCPDURL}"/>
+        <controlURL th:text="${service.controlURL}"/>
+        <eventSubURL th:text="${service.eventSubURL}"/>
       </service>
     </serviceList>
     <deviceList th:if="${! device.deviceList.isEmpty()}">
