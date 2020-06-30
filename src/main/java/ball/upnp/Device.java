@@ -33,43 +33,43 @@ import java.util.UUID;
 public interface Device extends Templated {
 
     /**
-     * Method to get the URN ({@link URI}) describing this {@link Device}'s
-     * device type.
+     * Method to get the URN ({@link URI}) describing {@link.this}
+     * {@link Device}'s device type.
      *
      * @return  The service type.
      */
     public URI getDeviceType();
 
     /**
-     * Method to get this {@link Device}'s {@link UUID}.
+     * Method to get {@link.this} {@link Device}'s {@link UUID}.
      *
      * @return  The {@link UUID}.
      */
     public UUID getUUID();
 
     /**
-     * Method to get this {@link Device}'s {@link Service}s.
+     * Method to get {@link.this} {@link Device}'s {@link Service}s.
      *
      * @return  The {@link List} of {@link Service}s.
      */
     public List<Service> getServiceList();
 
     /**
-     * Method to get this {@link Device}'s {@link Device}s.
+     * Method to get {@link.this} {@link Device}'s {@link Device}s.
      *
      * @return  The {@link List} of {@link Device}s.
      */
     public List<Device> getDeviceList();
 
     /**
-     * Method to get this {@link Device}'s {@link Icon}s.
+     * Method to get {@link.this} {@link Device}'s {@link Icon}s.
      *
      * @return  The {@link List} of {@link Icon}s.
      */
     public List<Icon> getIconList();
 
     /**
-     * Method to get {@link.this} {@link Service}s UDN.
+     * Method to get {@link.this} {@link Device}'s UDN.
      *
      * @return  The UDN {@link URI}.
      */

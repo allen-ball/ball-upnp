@@ -32,37 +32,38 @@ import java.util.List;
 public interface Service extends Templated {
 
     /**
-     * Method to get the URN ({@link URI}) describing this {@link Service}'s
-     * service type.
+     * Method to get the URN ({@link URI}) describing {@link.this}
+     * {@link Service}'s service type.
      *
      * @return  The service type.
      */
     public URI getServiceType();
 
     /**
-     * Method to get the URN ({@link URI}) describing this {@link Service}'s
-     * service ID.
+     * Method to get the URN ({@link URI}) describing {@link.this}
+     * {@link Service}'s service ID.
      *
      * @return  The service type.
      */
     public URI getServiceId();
 
     /**
-     * Method to get the {@link Device} hosting this {@link Service}.
+     * Method to get the {@link Device} hosting {@link.this}
+     * {@link Service}.
      *
      * @return  The {@link Device}.
      */
     public Device getDevice();
 
     /**
-     * Method to get this {@link Service}'s {@link Action}s.
+     * Method to get {@link.this} {@link Service}'s {@link Action}s.
      *
      * @return  The {@link List} of {@link Action}s.
      */
     public List<Action> getActionList();
 
     /**
-     * Method to get this {@link Service}'s {@link StateVariable}s.
+     * Method to get {@link.this} {@link Service}'s {@link StateVariable}s.
      *
      * @return  The {@link List} of {@link StateVariable}s.
      */
