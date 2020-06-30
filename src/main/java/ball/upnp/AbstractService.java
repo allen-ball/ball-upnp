@@ -20,17 +20,31 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import lombok.Data;
+import ball.upnp.annotation.Template;
+import java.util.LinkedList;
+import java.util.List;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PROTECTED;
+
 /**
- * {@link Action}.
+ * Abstract base class for {@link.uri http://www.upnp.org/ UPnP}
+ * {@link Service}s.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Data
-public class Action {
+@Template("urn:schemas-upnp-org:service-1-0")
+@NoArgsConstructor(access = PROTECTED)
+public abstract class AbstractService implements AnnotatedService {
+    @Getter
+    private final List<Action> actionList = new LinkedList<>();
+    @Getter
+    private final List<StateVariable> serviceStateTable = new LinkedList<>();
+
+    @Override
+    public String toString() { return getServiceType().toString(); }
 }

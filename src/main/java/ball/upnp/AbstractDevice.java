@@ -20,17 +20,29 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import lombok.Data;
+import ball.upnp.annotation.Template;
+import java.util.LinkedList;
+import java.util.List;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PROTECTED;
+
 /**
- * {@link Action}.
+ * Abstract base class for {@link.uri http://www.upnp.org/ UPnP}
+ * {@link Device}s.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Data
-public class Action {
+@Template("urn:schemas-upnp-org:device-1-0")
+@NoArgsConstructor(access = PROTECTED)
+public abstract class AbstractDevice implements AnnotatedDevice {
+    @Getter
+    private final List<Icon> iconList = new LinkedList<>();
+
+    @Override
+    public String toString() { return getDeviceType().toString(); }
 }

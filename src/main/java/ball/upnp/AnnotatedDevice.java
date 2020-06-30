@@ -30,14 +30,8 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface AnnotatedDevice extends Templated {
-
-    /**
-     * Method to get the URN ({@link URI}) describing this
-     * {@link AnnotatedDevice}'s device type.
-     *
-     * @return  The service type.
-     */
+public interface AnnotatedDevice extends Device {
+    @Override
     default URI getDeviceType() {
         DeviceType annotation =
             AnnotationUtils.findAnnotation(getClass(), DeviceType.class);

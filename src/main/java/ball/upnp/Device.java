@@ -20,45 +20,60 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.upnp.annotation.Template;
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} devices.
- *
- * {@bean.info}
+ * {@link.uri http://www.upnp.org/ UPnP} device interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Template("urn:schemas-upnp-org:device-1-0")
-@NoArgsConstructor(access = PROTECTED)
-public abstract class Device implements AnnotatedDevice {
-    @Getter
-    private final UUID UUID = java.util.UUID.randomUUID();
-    @Getter
-    private final List<Icon> iconList = new LinkedList<>();
-    @Getter
-    private final List<Service> serviceList = new LinkedList<>();
-    @Getter
-    private final List<Device> deviceList = new LinkedList<>();
+public interface Device extends Templated {
+
+    /**
+     * Method to get the URN ({@link URI}) describing this {@link Device}'s
+     * device type.
+     *
+     * @return  The service type.
+     */
+    public URI getDeviceType();
+
+    /**
+     * Method to get this {@link Device}'s {@link UUID}.
+     *
+     * @return  The {@link UUID}.
+     */
+    public UUID getUUID();
+
+    /**
+     * Method to get this {@link Device}'s {@link Service}s.
+     *
+     * @return  The {@link List} of {@link Service}s.
+     */
+    public List<Service> getServiceList();
+
+    /**
+     * Method to get this {@link Device}'s {@link Device}s.
+     *
+     * @return  The {@link List} of {@link Device}s.
+     */
+    public List<Device> getDeviceList();
+
+    /**
+     * Method to get this {@link Device}'s {@link Icon}s.
+     *
+     * @return  The {@link List} of {@link Icon}s.
+     */
+    public List<Icon> getIconList();
 
     /**
      * Method to get {@link.this} {@link Service}s UDN.
      *
      * @return  The UDN {@link URI}.
      */
-    public URI getUDN() {
+    default URI getUDN() {
         return URI.create("uuid:" + getUUID().toString().toUpperCase());
     }
-
-    @Override
-    public String toString() { return getDeviceType().toString(); }
 }

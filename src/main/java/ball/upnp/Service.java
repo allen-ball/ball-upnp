@@ -20,33 +20,53 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.upnp.annotation.Template;
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
-import static lombok.AccessLevel.PROTECTED;
 
 /**
- * Abstract base class for {@link.uri http://www.upnp.org/ UPnP} services.
- *
- * {@bean.info}
+ * {@link.uri http://www.upnp.org/ UPnP} service interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Template("urn:schemas-upnp-org:service-1-0")
-@RequiredArgsConstructor(access = PROTECTED)
-public abstract class Service implements AnnotatedService {
-    @NonNull @Getter
-    private final Device device;
-    @Getter
-    private final List<Action> actionList = new LinkedList<>();
-    @Getter
-    private final List<StateVariable> serviceStateTable = new LinkedList<>();
+public interface Service extends Templated {
+
+    /**
+     * Method to get the URN ({@link URI}) describing this {@link Service}'s
+     * service type.
+     *
+     * @return  The service type.
+     */
+    public URI getServiceType();
+
+    /**
+     * Method to get the URN {{@link URI}) describing this {@link Service}'s
+     * service ID.
+     *
+     * @return  The service type.
+     */
+    public URI getServiceId();
+
+    /**
+     * Method to get the {@link Device} hosting this {@link Service}.
+     *
+     * @return  The {@link Device}.
+     */
+    public Device getDevice();
+
+    /**
+     * Method to get this {@link Service}'s {@link Action}s.
+     *
+     * @return  The {@link List} of {@link Action}s.
+     */
+    public List<Action> getActionList();
+
+    /**
+     * Method to get this {@link Service}'s {@link StateVariable}s.
+     *
+     * @return  The {@link List} of {@link StateVariable}s.
+     */
+    public List<StateVariable> getServiceStateTable();
 
     /**
      * Method to get the USN {@link URI}.  The {@link URI} is calculated by
@@ -54,10 +74,7 @@ public abstract class Service implements AnnotatedService {
      *
      * @return  The USN {@link URI}.
      */
-    public URI getUSN() {
+    default URI getUSN() {
         return URI.create(getDevice().getUDN() + "::" + getServiceId());
     }
-
-    @Override
-    public String toString() { return getServiceType().toString(); }
 }

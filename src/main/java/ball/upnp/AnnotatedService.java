@@ -31,14 +31,8 @@ import org.springframework.core.annotation.AnnotationUtils;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface AnnotatedService extends Templated {
-
-    /**
-     * Method to get the URN ({@link URI}) describing this
-     * {@link AnnotatedService}'s service type.
-     *
-     * @return  The service type.
-     */
+public interface AnnotatedService extends Service {
+    @Override
     default URI getServiceType() {
         ServiceType annotation =
             AnnotationUtils.findAnnotation(getClass(), ServiceType.class);
@@ -46,12 +40,7 @@ public interface AnnotatedService extends Templated {
         return (annotation != null) ? URI.create(annotation.value()) : null;
     }
 
-    /**
-     * Method to get the URN {{@link URI}) describing this
-     * {@link AnnotatedService}'s service ID.
-     *
-     * @return  The service type.
-     */
+    @Override
     default URI getServiceId() {
         ServiceId annotation =
             AnnotationUtils.findAnnotation(getClass(), ServiceId.class);

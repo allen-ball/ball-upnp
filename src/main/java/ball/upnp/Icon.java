@@ -20,10 +20,8 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * {@link Icon}.
@@ -33,7 +31,7 @@ import lombok.ToString;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Getter @Setter @ToString
+@NoArgsConstructor @Data
 public class Icon {
     private String mimetype = null;
     private Integer width = null;
