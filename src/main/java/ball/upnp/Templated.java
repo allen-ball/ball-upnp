@@ -20,10 +20,18 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.annotation.CompileTimeCheck;
 import ball.upnp.annotation.Template;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.xml.bind.annotation.XmlTransient;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import static java.util.Objects.requireNonNull;
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * {@link Templated} support for {@link Template} annotation.
@@ -39,10 +47,20 @@ public interface Templated {
     public static final String TEMPLATE = "/templates/%s.xml";
 
     /**
+     * {@link Pattern} to parse {@link #getTemplate()} to generate a
+     * {@link SpecVersion}.  Provides "{@code major}" and  "{@code minor}"
+     * matching groups.
+     */
+    @CompileTimeCheck
+    public static final Pattern SPEC_VERSION_PATTERN =
+        Pattern.compile("(?i)^.+-(?<major>[0-9]+)-(?<minor>[0-9]+)$");
+
+    /**
      * Method to get the {@link Template}'s name.
      *
      * @return  The name.
      */
+    @XmlTransient @JsonIgnore
     default String getTemplate() {
         Template annotation =
             AnnotationUtils.findAnnotation(getClass(), Template.class);
@@ -59,7 +77,37 @@ public interface Templated {
      *                          If {@link #getTemplate()} returns
      *                          {@code null}.
      */
+    @XmlTransient @JsonIgnore
     default String getTemplatePath() {
         return String.format(TEMPLATE, requireNonNull(getTemplate()));
+    }
+
+    /**
+     * Method to generate {@link SpecVersion} from {@link Template}.
+     *
+     * @return  The {@link SpecVersion}.
+     */
+    default SpecVersion getSpecVersion() {
+        SpecVersion version = null;
+        Matcher matcher = SPEC_VERSION_PATTERN.matcher(getTemplate());
+
+        if (matcher.matches()) {
+            version =
+                new SpecVersion(matcher.group("major"),
+                                matcher.group("minor"));
+        }
+
+        return version;
+    }
+
+    /**
+     * See {@link #getSpecVersion()}.
+     *
+     * {@bean.info}
+     */
+    @AllArgsConstructor(access = PRIVATE) @Data
+    public class SpecVersion {
+        private String major = null;
+        private String minor = null;
     }
 }

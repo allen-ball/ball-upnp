@@ -20,8 +20,13 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URI;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} service interface.
@@ -29,6 +34,8 @@ import java.util.List;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
+@XmlRootElement(name = "scpd", namespace = "urn:schemas-upnp-org:service-1-0")
+@JacksonXmlRootElement(localName = "scpd")
 public interface Service extends Templated {
 
     /**
@@ -37,6 +44,7 @@ public interface Service extends Templated {
      *
      * @return  The {@link Device}.
      */
+    @XmlTransient @JsonIgnore
     public Device getDevice();
 
     /**
@@ -55,8 +63,11 @@ public interface Service extends Templated {
      */
     public URI getServiceId();
 
+    @XmlElement(name = "SCPDURL")
     public URI getSCPDURL();
+
     public URI getControlURL();
+
     public URI getEventSubURL();
 
     /**
