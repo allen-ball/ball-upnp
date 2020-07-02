@@ -36,5 +36,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @Data
 public class Action {
     private String name = null;
-    private List<Argument> argumentList = new LinkedList<>();
+    private List<? extends Argument> argumentList = new LinkedList<>();
 }

@@ -56,21 +56,21 @@ public interface Device extends Templated {
      *
      * @return  The {@link List} of {@link Service}s.
      */
-    public List<Service> getServiceList();
+    public List<? extends Service> getServiceList();
 
     /**
      * Method to get {@link.this} {@link Device}'s {@link Device}s.
      *
      * @return  The {@link List} of {@link Device}s.
      */
-    public List<Device> getDeviceList();
+    public List<? extends Device> getDeviceList();
 
     /**
      * Method to get {@link.this} {@link Device}'s {@link Icon}s.
      *
      * @return  The {@link List} of {@link Icon}s.
      */
-    public List<Icon> getIconList();
+    public List<? extends Icon> getIconList();
 
     /**
      * Method to get {@link.this} {@link Device}'s UDN.

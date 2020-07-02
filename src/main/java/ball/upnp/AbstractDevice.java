@@ -41,7 +41,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
     @Getter
-    private final List<Icon> iconList = new LinkedList<>();
+    private final List<? extends Icon> iconList = new LinkedList<>();
 
     @Override
     public String toString() { return getDeviceType().toString(); }

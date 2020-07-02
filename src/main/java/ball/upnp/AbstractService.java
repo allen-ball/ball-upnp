@@ -41,9 +41,10 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractService implements AnnotatedService {
     @Getter
-    private final List<Action> actionList = new LinkedList<>();
+    private final List<? extends Action> actionList = new LinkedList<>();
     @Getter
-    private final List<StateVariable> serviceStateTable = new LinkedList<>();
+    private final List<? extends StateVariable> serviceStateTable =
+        new LinkedList<>();
 
     @Override
     public String toString() { return getServiceType().toString(); }

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.net.URI;
 import java.util.List;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -63,7 +62,6 @@ public interface Service extends Templated {
      */
     public URI getServiceId();
 
-    @XmlElement(name = "SCPDURL")
     public URI getSCPDURL();
 
     public URI getControlURL();
@@ -75,14 +73,14 @@ public interface Service extends Templated {
      *
      * @return  The {@link List} of {@link Action}s.
      */
-    public List<Action> getActionList();
+    public List<? extends Action> getActionList();
 
     /**
      * Method to get {@link.this} {@link Service}'s {@link StateVariable}s.
      *
      * @return  The {@link List} of {@link StateVariable}s.
      */
-    public List<StateVariable> getServiceStateTable();
+    public List<? extends StateVariable> getServiceStateTable();
 
     /**
      * Method to get the USN {@link URI}.  The {@link URI} is calculated by
