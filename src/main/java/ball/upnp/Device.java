@@ -20,11 +20,10 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import ball.upnp.annotation.XmlNs;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} device interface.
@@ -32,9 +31,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@XmlRootElement(name = "root", namespace = "urn:schemas-upnp-org:device-1-0")
-@JacksonXmlRootElement(localName = "root")
-public interface Device extends Templated {
+@XmlNs("urn:schemas-upnp-org:device-1-0")
+public interface Device extends Description {
 
     /**
      * Method to get the URN ({@link URI}) describing {@link.this}

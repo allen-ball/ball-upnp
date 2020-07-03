@@ -10,13 +10,6 @@
 	AbstractDevice and Service, AnnotatedService, and AbstractService,
 	respectively.
 
-2020-06-28  Allen D. Ball  <ball@hcf.dev>
-
-	* src/main/java/ball/upnp/Templated.java,
-	src/main/java/ball/upnp/annotation/Template.java,
-	src/main/java/ball/upnp/annotation/processing/TemplateProcessor.java:
-	Initial writing.
-
 	* pom.xml: Started development of 2.0-SNAPSHOT.
 
 2020-06-12  Allen D. Ball  <ball@hcf.dev>

@@ -20,7 +20,6 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import ball.upnp.annotation.Template;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
@@ -37,7 +36,6 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Template("urn:schemas-upnp-org:device-1-0")
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
     @Getter

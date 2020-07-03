@@ -21,11 +21,9 @@ package ball.upnp;
  * ##########################################################################
  */
 import ball.annotation.CompileTimeCheck;
-import ball.upnp.annotation.Template;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import ball.upnp.annotation.XmlNs;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.bind.annotation.XmlTransient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -34,20 +32,15 @@ import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
- * {@link Templated} support for {@link Template} annotation.
+ * {@link Description} support for {@link XmlNs} annotation.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface Templated {
+public interface Description {
 
     /**
-     * {@link #TEMPLATE} = {@value #TEMPLATE}
-     */
-    public static final String TEMPLATE = "/templates/%s.xml";
-
-    /**
-     * {@link Pattern} to parse {@link #getTemplate()} to generate a
+     * {@link Pattern} to parse {@link #getXmlns()} to generate a
      * {@link SpecVersion}.  Provides "{@code major}" and  "{@code minor}"
      * matching groups.
      */
@@ -56,40 +49,25 @@ public interface Templated {
         Pattern.compile("(?i)^.+-(?<major>[0-9]+)-(?<minor>[0-9]+)$");
 
     /**
-     * Method to get the {@link Template}'s name.
+     * Method to get the {@link XmlNs}'s name.
      *
      * @return  The name.
      */
-    @XmlTransient @JsonIgnore
-    default String getTemplate() {
-        Template annotation =
-            AnnotationUtils.findAnnotation(getClass(), Template.class);
+    default String getXmlns() {
+        XmlNs annotation =
+            AnnotationUtils.findAnnotation(getClass(), XmlNs.class);
 
         return (annotation != null) ? annotation.value() : null;
     }
 
     /**
-     * Method to get the {@link Template}'s resource path.
-     *
-     * @return  The resource path.
-     *
-     * @throws  NullPointerException
-     *                          If {@link #getTemplate()} returns
-     *                          {@code null}.
-     */
-    @XmlTransient @JsonIgnore
-    default String getTemplatePath() {
-        return String.format(TEMPLATE, requireNonNull(getTemplate()));
-    }
-
-    /**
-     * Method to generate {@link SpecVersion} from {@link Template}.
+     * Method to generate {@link SpecVersion} from {@link XmlNs}.
      *
      * @return  The {@link SpecVersion}.
      */
     default SpecVersion getSpecVersion() {
         SpecVersion version = null;
-        Matcher matcher = SPEC_VERSION_PATTERN.matcher(getTemplate());
+        Matcher matcher = SPEC_VERSION_PATTERN.matcher(getXmlns());
 
         if (matcher.matches()) {
             version =
@@ -106,7 +84,7 @@ public interface Templated {
      * {@bean.info}
      */
     @AllArgsConstructor(access = PRIVATE) @Data
-    public class SpecVersion {
+    public static class SpecVersion {
         private String major = null;
         private String minor = null;
     }

@@ -23,41 +23,19 @@ package ball.upnp.annotation.processing;
 import ball.annotation.ServiceProviderFor;
 import ball.annotation.processing.AnnotatedProcessor;
 import ball.annotation.processing.For;
-import ball.upnp.annotation.Template;
+import ball.upnp.annotation.XmlNs;
 import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import static ball.upnp.Templated.TEMPLATE;
-import static javax.tools.Diagnostic.Kind.WARNING;
-
 /**
- * {@link Template} annotation {@link Processor}.
+ * {@link XmlNs} annotation {@link Processor}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
 @ServiceProviderFor({ Processor.class })
-@For({ Template.class })
+@For({ XmlNs.class })
 @NoArgsConstructor @ToString
-public class TemplateProcessor extends AnnotatedProcessor {
-    @Override
-    protected void process(RoundEnvironment roundEnv,
-                           TypeElement annotation, Element element) {
-        super.process(roundEnv, annotation, element);
-
-        AnnotationMirror mirror = getAnnotationMirror(element, annotation);
-        AnnotationValue value = getAnnotationValue(mirror, "value");
-        String resource = String.format(TEMPLATE, value.getValue());
-
-        if (Template.class.getResource(resource) == null) {
-            print(WARNING, element, mirror,
-                  "Cannot locate template %s", resource);
-        }
-    }
+public class XmlNsProcessor extends AnnotatedProcessor {
 }

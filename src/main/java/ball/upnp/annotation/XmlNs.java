@@ -22,8 +22,7 @@ package ball.upnp.annotation;
  */
 import ball.annotation.processing.AnnotationValueMustConvertTo;
 import ball.annotation.processing.TargetMustExtend;
-import ball.upnp.AnnotatedDevice;
-import ball.upnp.Templated;
+import ball.upnp.Description;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -33,7 +32,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * {@link ball.upnp.Templated} {@link java.lang.annotation.Annotation}.
+ * {@link Description} xmlns {@link java.lang.annotation.Annotation}.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
@@ -41,8 +40,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE })
-@TargetMustExtend(Templated.class)
+@TargetMustExtend(Description.class)
 @AnnotationValueMustConvertTo(URI.class)
-public @interface Template {
+public @interface XmlNs {
     String value();
 }
