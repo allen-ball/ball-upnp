@@ -20,9 +20,6 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import java.util.LinkedList;
-import java.util.List;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -38,9 +35,6 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
-    @Getter
-    private final List<? extends Icon> iconList = new LinkedList<>();
-
     @Override
     public String toString() { return getDeviceType().toString(); }
 }

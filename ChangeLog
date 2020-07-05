@@ -1,3 +1,8 @@
+2020-07-05  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/Device.java:
+	Removed iconList and added presentationURL properties.
+
 2020-07-02  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/resources/schema/device-1-0.xsd,

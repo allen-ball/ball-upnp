@@ -64,11 +64,12 @@ public interface Device extends Description {
     public List<? extends Device> getDeviceList();
 
     /**
-     * Method to get {@link.this} {@link Device}'s {@link Icon}s.
+     * Method to get {@link.this} {@link Device}'s presentation
+     * {@code URL} (as an {@link URI}).
      *
-     * @return  The {@link List} of {@link Icon}s.
+     * @return  The presentation {@link URI}.
      */
-    public List<? extends Icon> getIconList();
+    public URI getPresentationURL();
 
     /**
      * Method to get {@link.this} {@link Device}'s UDN.
