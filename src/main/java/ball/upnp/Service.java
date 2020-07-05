@@ -57,10 +57,28 @@ public interface Service extends Description {
      */
     public URI getServiceId();
 
+    /**
+     * Method to get {@link.this} {@link Service}'s description (SCPD)
+     * {@code URL} (as an {@link URI}).
+     *
+     * @return  The presentation {@link URI}.
+     */
     public URI getSCPDURL();
 
+    /**
+     * Method to get {@link.this} {@link Service}'s control {@code URL} (as
+     * an {@link URI}).
+     *
+     * @return  The presentation {@link URI}.
+     */
     public URI getControlURL();
 
+    /**
+     * Method to get {@link.this} {@link Service}'s event subscription
+     * {@code URL} (as an {@link URI}).
+     *
+     * @return  The presentation {@link URI}.
+     */
     public URI getEventSubURL();
 
     /**
