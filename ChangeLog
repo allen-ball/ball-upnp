@@ -3,12 +3,6 @@
 	* src/main/java/ball/upnp/Device.java:
 	Removed iconList and added presentationURL properties.
 
-2020-07-02  Allen D. Ball  <ball@hcf.dev>
-
-	* src/main/resources/schema/device-1-0.xsd,
-	src/main/resources/schema/service-1-0.xsd:
-	Downloaded from http://www.upnp.org/schemas/.
-
 2020-06-29  Allen D. Ball  <ball@hcf.dev>
 
 	* Re-factored Device and Service to Device, AnnotatedDevice, and
