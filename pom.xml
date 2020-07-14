@@ -45,7 +45,7 @@
     </license>
   </licenses>
   <properties>
-    <jre.version>1.8</jre.version>
+    <jse.release>1.8</jse.release>
   </properties>
   <dependencies verbose="true">
     <dependency>
