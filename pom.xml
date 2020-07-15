@@ -45,7 +45,7 @@
     </license>
   </licenses>
   <properties>
-    <jse.release>8</jse.release>
+    <jse.target>8</jse.target>
   </properties>
   <dependencies verbose="true">
     <dependency>
