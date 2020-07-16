@@ -1,3 +1,7 @@
+2020-07-15  Allen D. Ball  <ball@hcf.dev>
+
+	* pom.xml: Released version 2.0.0.
+
 2020-07-05  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/Device.java:
@@ -8,8 +12,6 @@
 	* Re-factored Device and Service to Device, AnnotatedDevice, and
 	AbstractDevice and Service, AnnotatedService, and AbstractService,
 	respectively.
-
-	* pom.xml: Started development of 2.0-SNAPSHOT.
 
 2020-06-12  Allen D. Ball  <ball@hcf.dev>
 
