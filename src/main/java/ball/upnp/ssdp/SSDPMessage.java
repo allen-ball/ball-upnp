@@ -132,6 +132,27 @@ public interface SSDPMessage extends HttpMessage {
      * Method to encode {@link.this} {@link SSDPMessage} to a
      * {@link DatagramPacket}.
      *
+     * @param   address         The {@link InetSocketAddress} to send the
+     *                          packet.
+     *
+     * @return  The {@link DatagramPacket}.
+     *
+     * @throws  SocketException
+     *                          If this {@link SSDPMessage} cannot be
+     *                          converted to a {@link DatagramPacket}.
+     *
+     * @see #ADDRESS
+     */
+    public default DatagramPacket toDatagramPacket(InetSocketAddress address) throws SocketException {
+        byte[] bytes = toString().getBytes(CHARSET);
+
+        return new DatagramPacket(bytes, 0, bytes.length, address);
+    }
+
+    /**
+     * Method to encode {@link.this} {@link SSDPMessage} to a
+     * {@link DatagramPacket}.
+     *
      * @return  The {@link DatagramPacket}.
      *
      * @throws  SocketException
@@ -141,8 +162,6 @@ public interface SSDPMessage extends HttpMessage {
      * @see #ADDRESS
      */
     public default DatagramPacket toDatagramPacket() throws SocketException {
-        byte[] bytes = toString().getBytes(CHARSET);
-
-        return new DatagramPacket(bytes, 0, bytes.length, ADDRESS);
+        return toDatagramPacket(ADDRESS);
     }
 }
