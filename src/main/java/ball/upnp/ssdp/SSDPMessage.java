@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpMessage;
+import org.apache.http.protocol.HttpDateGenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -40,18 +41,23 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public interface SSDPMessage extends HttpMessage {
 
     /**
-     * SSDP {@link Charset}
+     * SSDP {@link Charset}.
      */
     public static final Charset CHARSET = UTF_8;
 
     /**
-     * SSDP IPv4 broadcast address
+     * SSDP IPv4 broadcast address.
      */
     public static final InetSocketAddress ADDRESS =
         new InetSocketAddress("239.255.255.250", 1900);
 
     /**
-     * SSDP message header name
+     * {@link HttpDateGenerator} instance.
+     */
+    public static final HttpDateGenerator GENERATOR = new HttpDateGenerator();
+
+    /**
+     * SSDP message header name.
      */
     public static final String
         AL = "AL",
@@ -64,14 +70,14 @@ public interface SSDPMessage extends HttpMessage {
         USN = "USN";
 
     /**
-     * SSDP {@link #NTS} value
+     * SSDP {@link #NTS} value.
      */
     public static final String
         SSDP_ALIVE = "ssdp:alive",
         SSDP_BYEBYE = "ssdp:byebye";
 
     /**
-     * HTTP cache control key
+     * HTTP cache control key.
      */
     public static final String
         MAX_AGE = "max-age";

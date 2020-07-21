@@ -97,11 +97,11 @@ public interface Service extends Description {
 
     /**
      * Method to get the USN {@link URI}.  The {@link URI} is calculated by
-     * combining the {@link Device#getUDN()} and {@link #getServiceId()}.
+     * combining the {@link Device#getUDN()} and {@link #getServiceType()}.
      *
      * @return  The USN {@link URI}.
      */
     default URI getUSN() {
-        return URI.create(getDevice().getUDN() + "::" + getServiceId());
+        return URI.create(getDevice().getUDN() + "::" + getServiceType());
     }
 }

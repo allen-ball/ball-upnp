@@ -44,7 +44,6 @@ public class SSDPDiscoveryThread extends Thread {
         new CopyOnWriteArrayList<>();
     private final ConcurrentLinkedQueue<SSDPMessage> queue =
         new ConcurrentLinkedQueue<>();
-    private final SSDPDiscoveryRequest request = new SSDPDiscoveryRequest();
 
     /**
      * Sole constructor.
@@ -104,7 +103,7 @@ public class SSDPDiscoveryThread extends Thread {
      * {@link SSDPDiscoveryRequest} available to be intercepted (overridden)
      * by subclass implementations.
      */
-    protected void ping() { queue(request); }
+    protected void ping() { queue(new SSDPDiscoveryRequest()); }
 
     @Override
     public void start() {
