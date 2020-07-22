@@ -23,12 +23,13 @@ package ball.upnp.ant.taskdefs;
 import ball.swing.table.ArrayListTableModel;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryRequest;
-import ball.upnp.ssdp.SSDPDiscoveryThread;
+import ball.upnp.ssdp.SSDPDiscoveryService;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,11 +56,9 @@ public abstract class SSDPTask extends Task
                                implements AnnotatedAntTask,
                                           ClasspathDelegateAntTask,
                                           ConfigurableAntTask,
-                                          SSDPDiscoveryThread.Listener {
+                                          SSDPDiscoveryService.Listener {
     @Getter @Setter @Accessors(chain = true, fluent = true)
     private ClasspathUtils.Delegate delegate = null;
-    @Getter @Setter
-    private int timeout = 60;
 
     @Override
     public void init() throws BuildException {
@@ -75,12 +74,12 @@ public abstract class SSDPTask extends Task
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService thread, SSDPMessage message) {
         log(String.valueOf(message));
     }
 
     @Override
-    public void receiveEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService thread, SSDPMessage message) {
         log(String.valueOf(message));
     }
 
@@ -93,6 +92,9 @@ public abstract class SSDPTask extends Task
     @AntTask("ssdp-discover")
     @NoArgsConstructor @ToString
     public static class Discover extends SSDPTask {
+        @Getter @Setter
+        private int timeout = 60;
+
         @Override
         public void execute() throws BuildException {
             super.execute();
@@ -104,14 +106,13 @@ public abstract class SSDPTask extends Task
                 Thread.currentThread().setContextClassLoader(getClassLoader());
 
                 SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
-                SSDPDiscoveryThread thread =
-                    new SSDPDiscoveryThread(getTimeout());
+                SSDPDiscoveryService service =
+                    new SSDPDiscoveryService()
+                    .addListener(this)
+                    .addListener(cache)
+                    .discover(getTimeout());
 
-                thread.addListener(this);
-                thread.addListener(cache);
-                thread.start();
-
-                Thread.sleep(getTimeout() * 1000);
+                service.awaitTermination(getTimeout(), TimeUnit.SECONDS);
 
                 log(new TableModelImpl(cache));
             } catch (BuildException exception) {
@@ -180,13 +181,11 @@ public abstract class SSDPTask extends Task
             try {
                 Thread.currentThread().setContextClassLoader(getClassLoader());
 
-                SSDPDiscoveryThread thread =
-                    new SSDPDiscoveryThread(getTimeout());
+                SSDPDiscoveryService service =
+                    new SSDPDiscoveryService()
+                    .addListener(this);
 
-                thread.setDaemon(false);
-                thread.addListener(this);
-                thread.start();
-                thread.join();
+                service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
             } catch (BuildException exception) {
                 throw exception;
             } catch (Throwable throwable) {

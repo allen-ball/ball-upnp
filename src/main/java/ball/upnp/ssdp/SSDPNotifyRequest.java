@@ -20,7 +20,6 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import org.apache.http.HttpHeaders;
 
 /**
  * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
@@ -43,6 +42,6 @@ public class SSDPNotifyRequest extends SSDPRequest {
     public SSDPNotifyRequest() {
         super(METHOD);
 
-        addHeader(HttpHeaders.HOST.toUpperCase(), toString(ADDRESS));
+        addHeader(HOST, toString(MULTICAST_SOCKET_ADDRESS));
     }
 }

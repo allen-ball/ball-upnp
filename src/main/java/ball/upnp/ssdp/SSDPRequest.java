@@ -26,7 +26,11 @@ import java.util.regex.Pattern;
 import org.apache.http.Header;
 import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.message.BasicLineParser;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.http.message.BasicLineParser.INSTANCE;
+import static org.apache.http.message.BasicLineParser.parseHeader;
+import static org.apache.http.message.BasicLineParser.parseRequestLine;
 
 /**
  * SSDP {@link org.apache.http.HttpRequest} implementation.
@@ -37,7 +41,6 @@ import org.apache.http.message.BasicLineParser;
  * @version $Revision$
  */
 public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
-    private static final BasicLineParser PARSER = BasicLineParser.INSTANCE;
 
     /**
      * Sole public constructor.
@@ -50,15 +53,15 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     private SSDPRequest(byte[] data, int offset, int length) {
-        this(new String(data, offset, length, CHARSET)
+        this(new String(data, offset, length, UTF_8)
              .split(Pattern.quote(CRLF)));
     }
 
     private SSDPRequest(String[] lines) {
-        super(BasicLineParser.parseRequestLine(lines[0], PARSER));
+        super(parseRequestLine(lines[0], INSTANCE));
 
         for (int i = 1; i < lines.length; i += 1) {
-            addHeader(BasicLineParser.parseHeader(lines[i], PARSER));
+            addHeader(parseHeader(lines[i], INSTANCE));
         }
     }
 

@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
 import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
 
 import static ball.upnp.ssdp.SSDPMessage.MAX_AGE;
@@ -41,7 +40,7 @@ import static java.util.Objects.requireNonNull;
  */
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
-             implements SSDPDiscoveryThread.Listener {
+             implements SSDPDiscoveryService.Listener {
     private static final long serialVersionUID = -383765398333867476L;
 
     /**
@@ -68,16 +67,16 @@ public class SSDPDiscoveryCache
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
-        receiveEvent(thread, message);
+    public void sendEvent(SSDPDiscoveryService service, SSDPMessage message) {
+        receiveEvent(service, message);
     }
 
     @Override
-    public void receiveEvent(SSDPDiscoveryThread thread, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service, SSDPMessage message) {
         try {
             long time = now();
             long expiration = 0;
-            Header header = message.getFirstHeader(HttpHeaders.CACHE_CONTROL);
+            Header header = message.getFirstHeader(SSDPMessage.CACHE_CONTROL);
 
             if (header != null) {
                 CacheControlDirectiveMap map =
@@ -86,7 +85,7 @@ public class SSDPDiscoveryCache
 
                 if (value != null) {
                     try {
-                        header = message.getFirstHeader(HttpHeaders.DATE);
+                        header = message.getFirstHeader(SSDPMessage.DATE);
 
                         if (header != null) {
                             time =
@@ -99,7 +98,7 @@ public class SSDPDiscoveryCache
                     expiration = time + (Long.decode(value) * 1000);
                 }
             } else {
-                header = message.getFirstHeader(HttpHeaders.EXPIRES);
+                header = message.getFirstHeader(SSDPMessage.EXPIRES);
 
                 if (header != null) {
                     String value = header.getValue();

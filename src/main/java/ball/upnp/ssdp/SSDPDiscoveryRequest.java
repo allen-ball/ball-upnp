@@ -20,7 +20,6 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import org.apache.http.HttpHeaders;
 
 /**
  * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
@@ -43,7 +42,7 @@ public class SSDPDiscoveryRequest extends SSDPRequest {
     public SSDPDiscoveryRequest() {
         super(METHOD);
 
-        addHeader(HttpHeaders.HOST.toUpperCase(), toString(ADDRESS));
+        addHeader(HOST, toString(MULTICAST_SOCKET_ADDRESS));
         addHeader(MAN, "\"ssdp:discover\"");
         addHeader(MX, String.valueOf(120));
         addHeader(ST, "ssdp:all");

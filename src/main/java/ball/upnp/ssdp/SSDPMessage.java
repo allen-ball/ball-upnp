@@ -41,14 +41,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public interface SSDPMessage extends HttpMessage {
 
     /**
-     * SSDP {@link Charset}.
+     * SSDP IPv4 multicast socket address.
      */
-    public static final Charset CHARSET = UTF_8;
-
-    /**
-     * SSDP IPv4 broadcast address.
-     */
-    public static final InetSocketAddress ADDRESS =
+    public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
         new InetSocketAddress("239.255.255.250", 1900);
 
     /**
@@ -61,11 +56,17 @@ public interface SSDPMessage extends HttpMessage {
      */
     public static final String
         AL = "AL",
+        CACHE_CONTROL = HttpHeaders.CACHE_CONTROL.toUpperCase(),
+        DATE = HttpHeaders.DATE,
+        EXPIRES = HttpHeaders.EXPIRES.toUpperCase(),
         EXT = "EXT",
+        HOST = HttpHeaders.HOST.toUpperCase(),
+        LOCATION = HttpHeaders.LOCATION.toUpperCase(),
         MAN = "MAN",
         MX = "MX",
         NT = "NT",
         NTS = "NTS",
+        SERVER = HttpHeaders.SERVER.toUpperCase(),
         ST = "ST",
         USN = "USN";
 
@@ -93,7 +94,7 @@ public interface SSDPMessage extends HttpMessage {
      * @return  The service location {@link URI}.
      */
     public default URI getLocation() {
-        Header header = getFirstHeader(HttpHeaders.LOCATION);
+        Header header = getFirstHeader(LOCATION);
 
         if (header == null) {
             header = getFirstHeader(AL);
@@ -140,11 +141,9 @@ public interface SSDPMessage extends HttpMessage {
      * @throws  SocketException
      *                          If this {@link SSDPMessage} cannot be
      *                          converted to a {@link DatagramPacket}.
-     *
-     * @see #ADDRESS
      */
     public default DatagramPacket toDatagramPacket(InetSocketAddress address) throws SocketException {
-        byte[] bytes = toString().getBytes(CHARSET);
+        byte[] bytes = toString().getBytes(UTF_8);
 
         return new DatagramPacket(bytes, 0, bytes.length, address);
     }
@@ -159,9 +158,9 @@ public interface SSDPMessage extends HttpMessage {
      *                          If this {@link SSDPMessage} cannot be
      *                          converted to a {@link DatagramPacket}.
      *
-     * @see #ADDRESS
+     * @see #MULTICAST_SOCKET_ADDRESS
      */
     public default DatagramPacket toDatagramPacket() throws SocketException {
-        return toDatagramPacket(ADDRESS);
+        return toDatagramPacket(MULTICAST_SOCKET_ADDRESS);
     }
 }

@@ -26,7 +26,11 @@ import java.util.regex.Pattern;
 import org.apache.http.Header;
 import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicLineParser;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.http.message.BasicLineParser.INSTANCE;
+import static org.apache.http.message.BasicLineParser.parseHeader;
+import static org.apache.http.message.BasicLineParser.parseStatusLine;
 
 /**
  * SSDP {@link org.apache.http.HttpResponse} implementation.
@@ -37,8 +41,6 @@ import org.apache.http.message.BasicLineParser;
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
-    private static final BasicLineParser PARSER = BasicLineParser.INSTANCE;
-
     private final InetAddress from;
 
     /**
@@ -52,10 +54,10 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     }
 
     private SSDPResponse(DatagramPacket packet, String[] lines) {
-        super(BasicLineParser.parseStatusLine(lines[0], PARSER));
+        super(parseStatusLine(lines[0], INSTANCE));
 
         for (int i = 1; i < lines.length; i += 1) {
-            addHeader(BasicLineParser.parseHeader(lines[i], PARSER));
+            addHeader(parseHeader(lines[i], INSTANCE));
         }
 
         from = packet.getAddress();
@@ -63,7 +65,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
 
     private static String toString(DatagramPacket packet) {
         return new String(packet.getData(),
-                          packet.getOffset(), packet.getLength(), CHARSET);
+                          packet.getOffset(), packet.getLength(), UTF_8);
     }
 
     /**

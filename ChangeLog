@@ -1,3 +1,8 @@
+2020-07-22  Allen D. Ball  <ball@hcf.dev>
+
+	* Converted SSDPDiscoveryThread to SSDPDiscoveryService and use
+	Java 7 MulticastSocket.
+
 2020-07-21  Allen D. Ball  <ball@hcf.dev>
 
 	* Refactored SSDPDiscoverTask to SSDPTask and added <ssdp-listen/>
