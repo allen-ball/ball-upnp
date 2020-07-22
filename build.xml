@@ -32,7 +32,7 @@
 
   <resolver:resolve>
     <dependencies>
-      <dependency coords="ball:parent:20200715.0:xml:compile"/>
+      <dependency coords="ball:parent:20200721-SNAPSHOT:xml:compile"/>
     </dependencies>
     <properties/>
   </resolver:resolve>
@@ -44,6 +44,14 @@
     <taskdef classpathref="build.classpath"
              resource="ball/upnp/ant/antlib.xml"/>
     <ssdp-discover/>
+  </target>
+
+  <target name="ssdp-listen"
+          description="--> Invokes &lt;ssdp-listen/&gt; task."
+          depends="jar-classes">
+    <taskdef classpathref="build.classpath"
+             resource="ball/upnp/ant/antlib.xml"/>
+    <ssdp-listen/>
   </target>
 
 </project>
