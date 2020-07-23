@@ -20,17 +20,21 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.DatagramSocket;
 import java.net.URI;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import lombok.NoArgsConstructor;
 import org.apache.http.Header;
-import org.apache.http.client.utils.DateUtils;
 
 import static ball.upnp.ssdp.SSDPMessage.MAX_AGE;
 import static ball.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
 import static java.util.Objects.requireNonNull;
+import static org.apache.http.client.utils.DateUtils.parseDate;
 
 /**
  * SSDP discovery cache implementation.
@@ -38,41 +42,31 @@ import static java.util.Objects.requireNonNull;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
+@NoArgsConstructor
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
-    private static final long serialVersionUID = -383765398333867476L;
+    private static final long serialVersionUID = -8435687218821120293L;
 
-    /**
-     * Sole constructor.
-     */
-    public SSDPDiscoveryCache() {
-        super();
+    private ScheduledFuture<?> expirer = null;
 
-        new Thread() {
-            { setDaemon(true); }
-
-            @Override
-            public void run() {
-                for (;;) {
-                    try {
-                        sleep(60 * 1000);
-                    } catch (InterruptedException exception) {
-                    }
-
-                    values().removeIf(t -> now() > t.getExpiration());
-                }
-            }
-        }.start();
+    @Override
+    public void sendEvent(SSDPDiscoveryService service,
+                          DatagramSocket socket,
+                          SSDPMessage message) {
+        receiveEvent(service, socket, message);
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryService service, SSDPMessage message) {
-        receiveEvent(service, message);
-    }
+    public void receiveEvent(SSDPDiscoveryService service,
+                             DatagramSocket socket,
+                             SSDPMessage message) {
+        if (expirer == null) {
+            expirer =
+                service.scheduleAtFixedRate(() -> expire(),
+                                            0, 60, TimeUnit.SECONDS);
+        }
 
-    @Override
-    public void receiveEvent(SSDPDiscoveryService service, SSDPMessage message) {
         try {
             long time = now();
             long expiration = 0;
@@ -88,9 +82,7 @@ public class SSDPDiscoveryCache
                         header = message.getFirstHeader(SSDPMessage.DATE);
 
                         if (header != null) {
-                            time =
-                                DateUtils.parseDate(header.getValue())
-                                .getTime();
+                            time = parseDate(header.getValue()).getTime();
                         }
                     } catch (Exception exception) {
                     }
@@ -102,7 +94,7 @@ public class SSDPDiscoveryCache
 
                 if (header != null) {
                     String value = header.getValue();
-                    Date date = DateUtils.parseDate(value);
+                    Date date = parseDate(value);
 
                     if (date != null) {
                         expiration = date.getTime();
@@ -131,6 +123,10 @@ public class SSDPDiscoveryCache
     }
 
     private long now() { return System.currentTimeMillis(); }
+
+    private void expire() {
+        values().removeIf(t -> now() > t.getExpiration());
+    }
 
     /**
      * {@link SSDPDiscoveryCache} {@link java.util.Map} {@link Value}
