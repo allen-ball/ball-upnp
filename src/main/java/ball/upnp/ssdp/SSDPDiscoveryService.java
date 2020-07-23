@@ -115,7 +115,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      */
     public SSDPDiscoveryService discover(int interval) {
         if (interval > 0) {
-            scheduleAtFixedRate(() -> multicast(new SSDPDiscoveryRequest()),
+            scheduleAtFixedRate(() -> multicast(new SSDPDiscoveryRequest(MULTICAST_SOCKET_ADDRESS)),
                                 0, interval, TimeUnit.SECONDS);
         }
 

@@ -20,6 +20,7 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.SocketAddress;
 
 /**
  * SSDP discovery ({@value #METHOD}) {@link SSDPRequest}.
@@ -38,11 +39,13 @@ public class SSDPDiscoveryRequest extends SSDPRequest {
 
     /**
      * Sole constructor.
+     *
+     * @param   host            The host {@link SocketAddress}.
      */
-    public SSDPDiscoveryRequest() {
+    public SSDPDiscoveryRequest(SocketAddress host) {
         super(METHOD);
 
-        addHeader(HOST, toString(MULTICAST_SOCKET_ADDRESS));
+        addHeader(HOST, host);
         addHeader(MAN, "\"ssdp:discover\"");
         addHeader(MX, String.valueOf(120));
         addHeader(ST, "ssdp:all");

@@ -21,13 +21,17 @@ package ball.upnp.ssdp;
  * ##########################################################################
  */
 import java.net.DatagramPacket;
-import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.apache.http.Header;
 import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpRequest;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.http.message.BasicLineParser.INSTANCE;
 import static org.apache.http.message.BasicLineParser.parseHeader;
 import static org.apache.http.message.BasicLineParser.parseRequestLine;
@@ -41,6 +45,7 @@ import static org.apache.http.message.BasicLineParser.parseRequestLine;
  * @version $Revision$
  */
 public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
+    private SocketAddress address = null;
 
     /**
      * Sole public constructor.
@@ -49,20 +54,15 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      *                          {@link SSDPRequest}.
      */
     public SSDPRequest(DatagramPacket packet) {
-        this(packet.getData(), packet.getOffset(), packet.getLength());
+        this(packet, SSDPMessage.parse(packet));
     }
 
-    private SSDPRequest(byte[] data, int offset, int length) {
-        this(new String(data, offset, length, UTF_8)
-             .split(Pattern.quote(CRLF)));
-    }
+    private SSDPRequest(DatagramPacket packet, List<String> list) {
+        super(parseRequestLine(list.remove(0), INSTANCE));
 
-    private SSDPRequest(String[] lines) {
-        super(parseRequestLine(lines[0], INSTANCE));
+        list.stream().forEach(t -> addHeader(parseHeader(t, INSTANCE)));
 
-        for (int i = 1; i < lines.length; i += 1) {
-            addHeader(parseHeader(lines[i], INSTANCE));
-        }
+        address = packet.getSocketAddress();
     }
 
     /**
@@ -75,29 +75,23 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     /**
-     * Convenience method to format a {@link InetSocketAddress} to its
-     * {@link String} representation.
+     * Method to get the {@link SocketAddress} from the
+     * {@link DatagramPacket} if {@link.this} {@link SSDPRequest} was
+     * parsed rom a packet.
      *
-     * @param   address         The {@link InetSocketAddress}.
-     *
-     * @return  The {@link String} representation.
+     * @return  The {@link SocketAddress}.
      */
-    protected String toString(InetSocketAddress address) {
-        return address.getAddress().getHostAddress() + ":" + address.getPort();
-    }
+    public SocketAddress getSocketAddress() { return address; }
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        String string =
+            Stream.concat(Stream.of(getRequestLine()),
+                          Stream.of(getAllHeaders()))
+            .filter(Objects::nonNull)
+            .map(Objects::toString)
+            .collect(joining(CRLF, EMPTY, CRLF + CRLF));
 
-        buffer.append(getRequestLine()).append(CRLF);
-
-        for (Header header : getAllHeaders()) {
-            buffer.append(header.toString()).append(CRLF);
-        }
-
-        buffer.append(CRLF);
-
-        return buffer.toString();
+        return string;
     }
 }

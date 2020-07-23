@@ -21,13 +21,18 @@ package ball.upnp.ssdp;
  * ##########################################################################
  */
 import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.apache.http.Header;
 import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpResponse;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.http.message.BasicLineParser.INSTANCE;
 import static org.apache.http.message.BasicLineParser.parseHeader;
 import static org.apache.http.message.BasicLineParser.parseStatusLine;
@@ -41,7 +46,7 @@ import static org.apache.http.message.BasicLineParser.parseStatusLine;
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
-    private final InetAddress from;
+    private SocketAddress address = null;
 
     /**
      * Sole public constructor.
@@ -50,22 +55,15 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      *                          {@link SSDPResponse}.
      */
     public SSDPResponse(DatagramPacket packet) {
-        this(packet, toString(packet).split(Pattern.quote(CRLF)));
+        this(packet, SSDPMessage.parse(packet));
     }
 
-    private SSDPResponse(DatagramPacket packet, String[] lines) {
-        super(parseStatusLine(lines[0], INSTANCE));
+    private SSDPResponse(DatagramPacket packet, List<String> list) {
+        super(parseStatusLine(list.remove(0), INSTANCE));
 
-        for (int i = 1; i < lines.length; i += 1) {
-            addHeader(parseHeader(lines[i], INSTANCE));
-        }
+        list.stream().forEach(t -> addHeader(parseHeader(t, INSTANCE)));
 
-        from = packet.getAddress();
-    }
-
-    private static String toString(DatagramPacket packet) {
-        return new String(packet.getData(),
-                          packet.getOffset(), packet.getLength(), UTF_8);
+        address = packet.getSocketAddress();
     }
 
     /**
@@ -76,29 +74,26 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      */
     protected SSDPResponse(int code, String reason) {
         super(HttpVersion.HTTP_1_1, code, reason);
-
-        from = null;
     }
 
     /**
-     * Method to get the sender {@link InetAddress}.
+     * Method to get the {@link SocketAddress} from the
+     * {@link DatagramPacket} if {@link.this} {@link SSDPResponse} was
+     * parsed rom a packet.
      *
-     * @return  The sender {@link InetAddress} (may be {@code null}).
+     * @return  The {@link SocketAddress}.
      */
-    public InetAddress getInetAddress() { return from; }
+    public SocketAddress getSocketAddress() { return address; }
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        String string =
+            Stream.concat(Stream.of(getStatusLine()),
+                          Stream.of(getAllHeaders()))
+            .filter(Objects::nonNull)
+            .map(Objects::toString)
+            .collect(joining(CRLF, EMPTY, CRLF + CRLF));
 
-        buffer.append(getStatusLine()).append(CRLF);
-
-        for (Header header : getAllHeaders()) {
-            buffer.append(header.toString()).append(CRLF);
-        }
-
-        buffer.append(CRLF);
-
-        return buffer.toString();
+        return string;
     }
 }

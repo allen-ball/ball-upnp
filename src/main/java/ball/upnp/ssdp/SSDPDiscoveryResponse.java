@@ -43,10 +43,10 @@ public class SSDPDiscoveryResponse extends SSDPResponse {
         super(200, "OK");
 
         addHeader(SERVER, "UPnP/1.0");
-        addHeader(ST, st.toASCIIString());
-        addHeader(LOCATION, location.toASCIIString());
+        addHeader(ST, st);
+        addHeader(LOCATION, location);
         addHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
-        addHeader(USN, usn.toASCIIString());
-        addHeader(EXT, null);
+        addHeader(USN, usn);
+        addHeader(EXT, (String) null);
     }
 }

@@ -20,6 +20,7 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.InetSocketAddress;
 import java.net.URI;
 
 /**
@@ -35,14 +36,15 @@ public class SSDPNotifyByeByeRequest extends SSDPNotifyRequest {
     /**
      * Sole constructor.
      *
+     * @param   host            The host {@link InetSocketAddress}.
      * @param   nt              The {@code NT} header value.
      * @param   usn             The {@code USN} header value.
      */
-    public SSDPNotifyByeByeRequest(URI nt, URI usn) {
-        super();
+    public SSDPNotifyByeByeRequest(InetSocketAddress host, URI nt, URI usn) {
+        super(host);
 
-        addHeader(NT, nt.toASCIIString());
+        addHeader(NT, nt);
         addHeader(NTS, SSDP_BYEBYE);
-        addHeader(USN, usn.toASCIIString());
+        addHeader(USN, usn);
     }
 }

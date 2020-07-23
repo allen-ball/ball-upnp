@@ -20,6 +20,7 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.InetSocketAddress;
 import java.net.URI;
 
 /**
@@ -35,17 +36,19 @@ public class SSDPNotifyAliveRequest extends SSDPNotifyRequest {
     /**
      * Sole constructor.
      *
+     * @param   host            The host {@link InetSocketAddress}.
      * @param   nt              The {@code NT} header value.
      * @param   usn             The {@code USN} header value.
      * @param   location        The {@code LOCATION} header value.
      */
-    public SSDPNotifyAliveRequest(URI nt, URI usn, URI location) {
-        super();
+    public SSDPNotifyAliveRequest(InetSocketAddress host,
+                                  URI nt, URI usn, URI location) {
+        super(host);
 
-        addHeader(NT, nt.toASCIIString());
+        addHeader(NT, nt);
         addHeader(NTS, SSDP_ALIVE);
-        addHeader(USN, usn.toASCIIString());
-        addHeader(LOCATION, location.toASCIIString());
+        addHeader(USN, usn);
+        addHeader(LOCATION, location);
         addHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
     }
 }

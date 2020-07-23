@@ -22,15 +22,18 @@ package ball.upnp.ssdp;
  */
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
 import java.net.SocketException;
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpMessage;
 import org.apache.http.protocol.HttpDateGenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 
 /**
  * SSDP {@link HttpMessage} interface definition.
@@ -39,12 +42,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version $Revision$
  */
 public interface SSDPMessage extends HttpMessage {
-
-    /**
-     * SSDP IPv4 multicast socket address.
-     */
-    public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
-        new InetSocketAddress("239.255.255.250", 1900);
 
     /**
      * {@link HttpDateGenerator} instance.
@@ -89,11 +86,59 @@ public interface SSDPMessage extends HttpMessage {
     public static final String CRLF = "\r\n";
 
     /**
+     * See {@link #addHeader(String,String)}.
+     *
+     * @param   name            The header name.
+     * @param   name            The header value.
+     */
+    default void addHeader(String name, SocketAddress value) {
+        InetSocketAddress address = (InetSocketAddress) value;
+
+        addHeader(name, String.format("%s:%d",
+                                      address.getAddress().getHostAddress(),
+                                      address.getPort()));
+    }
+
+    /**
+     * See {@link #setHeader(String,String)}.
+     *
+     * @param   name            The header name.
+     * @param   name            The header value.
+     */
+    default void setHeader(String name, SocketAddress value) {
+        InetSocketAddress address = (InetSocketAddress) value;
+
+        addHeader(name, String.format("%s:%d",
+                                      address.getAddress().getHostAddress(),
+                                      address.getPort()));
+    }
+
+    /**
+     * See {@link #addHeader(String,String)}.
+     *
+     * @param   name            The header name.
+     * @param   name            The header value.
+     */
+    default void addHeader(String name, URI value) {
+        addHeader(name, (value != null) ? value.toASCIIString() : null);
+    }
+
+    /**
+     * See {@link #setHeader(String,String)}.
+     *
+     * @param   name            The header name.
+     * @param   name            The header value.
+     */
+    default void setHeader(String name, URI value) {
+        setHeader(name, (value != null) ? value.toASCIIString() : null);
+    }
+
+    /**
      * Method to get the service location.
      *
      * @return  The service location {@link URI}.
      */
-    public default URI getLocation() {
+    default URI getLocation() {
         Header header = getFirstHeader(LOCATION);
 
         if (header == null) {
@@ -110,7 +155,7 @@ public interface SSDPMessage extends HttpMessage {
      *
      * @return  The service type {@link URI}.
      */
-    public default URI getST() {
+    default URI getST() {
         Header header = getFirstHeader(ST);
         String value = (header != null) ? header.getValue() : null;
 
@@ -122,7 +167,7 @@ public interface SSDPMessage extends HttpMessage {
      *
      * @return  The {@value #USN} {@link URI}.
      */
-    public default URI getUSN() {
+    default URI getUSN() {
         Header header = getFirstHeader(USN);
         String value = (header != null) ? header.getValue() : null;
 
@@ -142,25 +187,16 @@ public interface SSDPMessage extends HttpMessage {
      *                          If this {@link SSDPMessage} cannot be
      *                          converted to a {@link DatagramPacket}.
      */
-    public default DatagramPacket toDatagramPacket(InetSocketAddress address) throws SocketException {
+    default DatagramPacket toDatagramPacket(InetSocketAddress address) throws SocketException {
         byte[] bytes = toString().getBytes(UTF_8);
 
         return new DatagramPacket(bytes, 0, bytes.length, address);
     }
 
-    /**
-     * Method to encode {@link.this} {@link SSDPMessage} to a
-     * {@link DatagramPacket}.
-     *
-     * @return  The {@link DatagramPacket}.
-     *
-     * @throws  SocketException
-     *                          If this {@link SSDPMessage} cannot be
-     *                          converted to a {@link DatagramPacket}.
-     *
-     * @see #MULTICAST_SOCKET_ADDRESS
-     */
-    public default DatagramPacket toDatagramPacket() throws SocketException {
-        return toDatagramPacket(MULTICAST_SOCKET_ADDRESS);
+    public static List<String> parse(DatagramPacket packet) {
+        String string =
+            new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
+
+        return Pattern.compile(CRLF).splitAsStream(string).collect(toList());
     }
 }
