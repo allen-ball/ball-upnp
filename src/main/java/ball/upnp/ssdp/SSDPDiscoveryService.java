@@ -22,6 +22,8 @@ package ball.upnp.ssdp;
  */
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -31,7 +33,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.http.ParseException;
 
-import static ball.upnp.ssdp.SSDPMessage.MULTICAST_SOCKET_ADDRESS;
 /**
  * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.
  *
@@ -43,8 +44,14 @@ import static ball.upnp.ssdp.SSDPMessage.MULTICAST_SOCKET_ADDRESS;
 public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     private static final int SIZE = 4;
 
-    private final MulticastSocket socket;
-    private final CopyOnWriteArrayList<Listener> list =
+    /**
+     * SSDP IPv4 multicast socket address.
+     */
+    public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
+        new InetSocketAddress("239.255.255.250", 1900);
+
+    private final MulticastSocket multicast;
+    private final CopyOnWriteArrayList<Listener> listeners =
         new CopyOnWriteArrayList<>();
 
     /**
@@ -56,12 +63,12 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public SSDPDiscoveryService() throws IOException {
         super(SIZE);
 
-        socket = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
-        socket.setLoopbackMode(false);
-        socket.setTimeToLive(255);
-        socket.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
+        multicast = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
+        multicast.setLoopbackMode(false);
+        multicast.setTimeToLive(255);
+        multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
 
-        submit(() -> receive());
+        submit(() -> receive(multicast));
     }
 
     /**
@@ -72,7 +79,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @return  {@link.this}
      */
     public SSDPDiscoveryService addListener(Listener listener) {
-        list.add(listener);
+        listeners.add(listener);
 
         return this;
     }
@@ -85,9 +92,17 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @return  {@link.this}
      */
     public SSDPDiscoveryService removeListener(Listener listener) {
-        list.remove(listener);
+        listeners.remove(listener);
 
         return this;
+    }
+
+    private void fireSendEvent(DatagramSocket socket, SSDPMessage message) {
+        listeners.stream().forEach(t -> t.sendEvent(this, socket, message));
+    }
+
+    private void fireReceiveEvent(DatagramSocket socket, SSDPMessage message) {
+        listeners.stream().forEach(t -> t.receiveEvent(this, socket, message));
     }
 
     /**
@@ -100,7 +115,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      */
     public SSDPDiscoveryService discover(int interval) {
         if (interval > 0) {
-            scheduleAtFixedRate(() -> send(new SSDPDiscoveryRequest()),
+            scheduleAtFixedRate(() -> multicast(new SSDPDiscoveryRequest()),
                                 0, interval, TimeUnit.SECONDS);
         }
 
@@ -108,21 +123,37 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Method to send an {@link SSDPMessage} on the
-     * {@link SSDPMessage#MULTICAST_SOCKET_ADDRESS}.
+     * Method queue an {@link SSDPMessage} for multicast.
      *
      * @param   message         The {@link SSDPMessage} to send.
      */
-    public void send(SSDPMessage message) {
+    public void multicast(SSDPMessage message) {
+        send(multicast, MULTICAST_SOCKET_ADDRESS, message);
+    }
+
+    /**
+     * Method to queue an {@link SSDPMessage} for sending on a
+     * {@link DatagramSocket}.
+     *
+     * @param   socket          The {@link DatagramSocket}.
+     * @param   address         The destination {@link InetSocketAddress}.
+     * @param   message         The {@link SSDPMessage} to send.
+     */
+    public void send(DatagramSocket socket,
+                     InetSocketAddress address, SSDPMessage message) {
+        submit(() -> task(socket, address, message));
+    }
+
+    private void task(DatagramSocket socket,
+                      InetSocketAddress address, SSDPMessage message) {
         try {
-            list.stream()
-                .forEach(t -> t.sendEvent(this, message));
-            socket.send(message.toDatagramPacket());
+            fireSendEvent(socket, message);
+            socket.send(message.toDatagramPacket(address));
         } catch (IOException exception) {
         }
     }
 
-    private void receive() {
+    private void receive(DatagramSocket socket) {
         try {
             for (;;) {
                 byte[] bytes = new byte[8 * 1024];
@@ -135,17 +166,12 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
                     SSDPMessage message = parse(packet);
 
                     if (message != null) {
-                        list.stream()
-                            .forEach(t -> t.receiveEvent(this, message));
+                        fireReceiveEvent(socket, message);
                     }
                 } catch (SocketTimeoutException exception) {
                 }
             }
         } catch (IOException exception) {
-        } finally {
-            if (socket != null) {
-                socket.close();
-            }
         }
     }
 
@@ -178,18 +204,22 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
          * Callback made just before sending a {@link SSDPMessage}.
          *
          * @param       service         The {@link SSDPDiscoveryService}.
+         * @param       socket          The {@link DatagramSocket}.
          * @param       message         The {@link SSDPMessage}.
          */
         public void sendEvent(SSDPDiscoveryService service,
+                              DatagramSocket socket,
                               SSDPMessage message);
 
         /**
          * Callback made after receiving a {@link SSDPMessage}.
          *
          * @param       service         The {@link SSDPDiscoveryService}.
+         * @param       socket          The {@link DatagramSocket}.
          * @param       message         The {@link SSDPMessage}.
          */
         public void receiveEvent(SSDPDiscoveryService service,
+                                 DatagramSocket socket,
                                  SSDPMessage message);
     }
 }

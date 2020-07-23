@@ -29,6 +29,7 @@ import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
+import java.net.DatagramSocket;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -74,12 +75,16 @@ public abstract class SSDPTask extends Task
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryService thread, SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService thread,
+                          DatagramSocket socket,
+                          SSDPMessage message) {
         log(String.valueOf(message));
     }
 
     @Override
-    public void receiveEvent(SSDPDiscoveryService thread, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService thread,
+                             DatagramSocket socket,
+                             SSDPMessage message) {
         log(String.valueOf(message));
     }
 
