@@ -29,11 +29,11 @@ import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
-import java.net.DatagramSocket;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Synchronized;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.apache.http.HttpHeaders;
@@ -74,17 +74,15 @@ public abstract class SSDPTask extends Task
         AnnotatedAntTask.super.execute();
     }
 
+    @Synchronized
     @Override
-    public void sendEvent(SSDPDiscoveryService thread,
-                          DatagramSocket socket,
-                          SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService service, SSDPMessage message) {
         log(String.valueOf(message));
     }
 
+    @Synchronized
     @Override
-    public void receiveEvent(SSDPDiscoveryService thread,
-                             DatagramSocket socket,
-                             SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service, SSDPMessage message) {
         log(String.valueOf(message));
     }
 

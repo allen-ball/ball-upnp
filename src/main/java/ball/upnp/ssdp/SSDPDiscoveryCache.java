@@ -20,7 +20,6 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
-import java.net.DatagramSocket;
 import java.net.URI;
 import java.util.Date;
 import java.util.TreeMap;
@@ -47,21 +46,17 @@ import static org.apache.http.client.utils.DateUtils.parseDate;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
-    private static final long serialVersionUID = -7074831120669331454L;
+    private static final long serialVersionUID = -8127055123917686458L;
 
     private ScheduledFuture<?> expirer = null;
 
     @Override
-    public void sendEvent(SSDPDiscoveryService service,
-                          DatagramSocket socket,
-                          SSDPMessage message) {
-        receiveEvent(service, socket, message);
+    public void sendEvent(SSDPDiscoveryService service, SSDPMessage message) {
+        receiveEvent(service, message);
     }
 
     @Override
-    public void receiveEvent(SSDPDiscoveryService service,
-                             DatagramSocket socket,
-                             SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service, SSDPMessage message) {
         if (expirer == null) {
             schedule(service);
         }

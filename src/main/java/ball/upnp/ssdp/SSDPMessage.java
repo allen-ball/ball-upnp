@@ -174,25 +174,6 @@ public interface SSDPMessage extends HttpMessage {
         return (value != null) ? URI.create(value) : null;
     }
 
-    /**
-     * Method to encode {@link.this} {@link SSDPMessage} to a
-     * {@link DatagramPacket}.
-     *
-     * @param   address         The {@link InetSocketAddress} to send the
-     *                          packet.
-     *
-     * @return  The {@link DatagramPacket}.
-     *
-     * @throws  SocketException
-     *                          If this {@link SSDPMessage} cannot be
-     *                          converted to a {@link DatagramPacket}.
-     */
-    default DatagramPacket toDatagramPacket(InetSocketAddress address) throws SocketException {
-        byte[] bytes = toString().getBytes(UTF_8);
-
-        return new DatagramPacket(bytes, 0, bytes.length, address);
-    }
-
     public static List<String> parse(DatagramPacket packet) {
         String string =
             new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
