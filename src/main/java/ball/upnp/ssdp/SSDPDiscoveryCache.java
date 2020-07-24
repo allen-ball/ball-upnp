@@ -29,6 +29,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 import org.apache.http.Header;
 
 import static ball.upnp.ssdp.SSDPMessage.MAX_AGE;
@@ -46,7 +47,7 @@ import static org.apache.http.client.utils.DateUtils.parseDate;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
-    private static final long serialVersionUID = -8435687218821120293L;
+    private static final long serialVersionUID = -7074831120669331454L;
 
     private ScheduledFuture<?> expirer = null;
 
@@ -62,9 +63,7 @@ public class SSDPDiscoveryCache
                              DatagramSocket socket,
                              SSDPMessage message) {
         if (expirer == null) {
-            expirer =
-                service.scheduleAtFixedRate(() -> expire(),
-                                            0, 60, TimeUnit.SECONDS);
+            schedule(service);
         }
 
         try {
@@ -122,11 +121,20 @@ public class SSDPDiscoveryCache
         }
     }
 
-    private long now() { return System.currentTimeMillis(); }
+    @Synchronized
+    private void schedule(SSDPDiscoveryService service) {
+        if (expirer == null) {
+            expirer =
+                service.scheduleAtFixedRate(() -> expire(),
+                                            0, 60, TimeUnit.SECONDS);
+        }
+    }
 
     private void expire() {
         values().removeIf(t -> now() > t.getExpiration());
     }
+
+    private long now() { return System.currentTimeMillis(); }
 
     /**
      * {@link SSDPDiscoveryCache} {@link java.util.Map} {@link Value}
