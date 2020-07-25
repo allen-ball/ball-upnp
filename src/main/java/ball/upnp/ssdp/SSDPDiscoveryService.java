@@ -74,6 +74,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
 
         sender = new DatagramSocket();
+        sender.setTimeToLive(4);
 
         submit(() -> receive(multicast));
     }
