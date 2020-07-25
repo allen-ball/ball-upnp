@@ -31,10 +31,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.apache.http.ParseException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.
@@ -45,13 +46,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version $Revision$
  */
 public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
-    private static final int SIZE = 4;
+    private static final String MULTICAST_ADDRESS = "239.255.255.250";
+    private static final int MULTICAST_PORT = 1900;
 
     /**
-     * SSDP IPv4 multicast socket address.
+     * SSDP IPv4 multicast {@link SocketAddress}.
      */
     public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
-        new InetSocketAddress("239.255.255.250", 1900);
+        new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
     private final MulticastSocket multicast;
     private final DatagramSocket sender;
@@ -65,16 +67,15 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      *                          cannot be conditioned.
      */
     public SSDPDiscoveryService() throws IOException {
-        super(SIZE);
+        super(8);
 
         multicast = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
         multicast.setReuseAddress(true);
         multicast.setLoopbackMode(false);
-        multicast.setSoTimeout(15 * 1000);
+        multicast.setTimeToLive(4);
         multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
 
         sender = new DatagramSocket();
-        sender.setTimeToLive(4);
 
         submit(() -> receive(multicast));
     }
@@ -123,8 +124,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      */
     public SSDPDiscoveryService discover(int interval) {
         if (interval > 0) {
-            scheduleAtFixedRate(() -> discover(),
-                                0, interval, TimeUnit.SECONDS);
+            scheduleAtFixedRate(() -> discover(), 0, interval, SECONDS);
         }
 
         return this;
@@ -167,12 +167,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
     private void receive(DatagramSocket socket) {
         try {
-            for (;;) {
-                byte[] bytes = new byte[8 * 1024];
-                DatagramPacket packet =
-                    new DatagramPacket(bytes, bytes.length);
+            socket.setSoTimeout((int) MILLISECONDS.convert(15, SECONDS));
 
+            for (;;) {
                 try {
+                    byte[] bytes = new byte[8 * 1024];
+                    DatagramPacket packet =
+                        new DatagramPacket(bytes, bytes.length);
+
                     socket.receive(packet);
 
                     SSDPMessage message = parse(packet);
