@@ -42,11 +42,11 @@ public class SSDPDiscoveryResponse extends SSDPResponse {
     public SSDPDiscoveryResponse(URI st, URI usn, URI location) {
         super(200, "OK");
 
-        addHeader(SERVER, "UPnP/1.0");
-        addHeader(ST, st);
-        addHeader(LOCATION, location);
-        addHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
-        addHeader(USN, usn);
-        addHeader(EXT, (String) null);
+        setHeader(SERVER, "UPnP/1.0");
+        setHeader(ST, st);
+        setHeader(LOCATION, location);
+        setHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
+        setHeader(USN, usn);
+        setHeader(EXT, (String) null);
     }
 }

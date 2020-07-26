@@ -23,10 +23,13 @@ package ball.upnp.ssdp;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.List;
 import java.net.SocketException;
 import java.net.URI;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpMessage;
@@ -83,21 +86,12 @@ public interface SSDPMessage extends HttpMessage {
     /**
      * {@link SSDPMessage} end-of-line sequence.
      */
-    public static final String CRLF = "\r\n";
+    public static final String EOL = "\r\n";
 
     /**
-     * See {@link #addHeader(String,String)}.
-     *
-     * @param   name            The header name.
-     * @param   name            The header value.
+     * {@link SSDPMessage} end-of-message sequence.
      */
-    default void addHeader(String name, SocketAddress value) {
-        InetSocketAddress address = (InetSocketAddress) value;
-
-        addHeader(name, String.format("%s:%d",
-                                      address.getAddress().getHostAddress(),
-                                      address.getPort()));
-    }
+    public static final String EOM = EOL + EOL;
 
     /**
      * See {@link #setHeader(String,String)}.
@@ -114,16 +108,6 @@ public interface SSDPMessage extends HttpMessage {
     }
 
     /**
-     * See {@link #addHeader(String,String)}.
-     *
-     * @param   name            The header name.
-     * @param   name            The header value.
-     */
-    default void addHeader(String name, URI value) {
-        addHeader(name, (value != null) ? value.toASCIIString() : null);
-    }
-
-    /**
      * See {@link #setHeader(String,String)}.
      *
      * @param   name            The header name.
@@ -134,50 +118,58 @@ public interface SSDPMessage extends HttpMessage {
     }
 
     /**
-     * Method to get the service location.
+     * Method to find the first {@link Header} matching {@code names} and
+     * return that value.
      *
-     * @return  The service location {@link URI}.
+     * @param   names           The candidate {@link Header} names.
+     *
+     * @return  The value or {@code null} if no header found.
      */
-    default URI getLocation() {
-        Header header = getFirstHeader(LOCATION);
+    default String get(String... names) {
+        String value =
+            Stream.of(names)
+            .map(this::getFirstHeader)
+            .filter(Objects::nonNull)
+            .map(Header::getValue)
+            .findFirst().orElse(null);
 
-        if (header == null) {
-            header = getFirstHeader(AL);
-        }
-
-        String value = (header != null) ? header.getValue() : null;
-
-        return (value != null) ? URI.create(value) : null;
+        return value;
     }
 
     /**
-     * Method to get the service type ({@value #ST}).
+     * Method to find the first {@link Header} matching {@code names} and
+     * return the value converted with {@code function}.
      *
-     * @return  The service type {@link URI}.
+     * @param   function        The conversion {@code Function}.
+     * @param   names           The candidate {@link Header} names.
+     * @param   <T>             The target type.
+     *
+     * @return  The converted value or {@code null} if no header found.
      */
-    default URI getST() {
-        Header header = getFirstHeader(ST);
-        String value = (header != null) ? header.getValue() : null;
+    default <T> T get(Function<String,T> function, String... names) {
+        String value = get(names);
 
-        return (value != null) ? URI.create(value) : null;
+        return (value != null) ? function.apply(value) : null;
     }
+
+    /**
+     * Method to get the location {@link URI}.
+     *
+     * @return  The service location {@link URI}.
+     */
+    default URI getLocation() { return get(URI::create, LOCATION, AL); }
 
     /**
      * Method to get the {@value #USN} {@link URI}.
      *
-     * @return  The {@value #USN} {@link URI}.
+     * @return  The service location {@link URI}.
      */
-    default URI getUSN() {
-        Header header = getFirstHeader(USN);
-        String value = (header != null) ? header.getValue() : null;
-
-        return (value != null) ? URI.create(value) : null;
-    }
+    default URI getUSN() { return get(URI::create, USN); }
 
     public static List<String> parse(DatagramPacket packet) {
         String string =
             new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
 
-        return Pattern.compile(CRLF).splitAsStream(string).collect(toList());
+        return Pattern.compile(EOL).splitAsStream(string).collect(toList());
     }
 }

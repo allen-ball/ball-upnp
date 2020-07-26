@@ -43,8 +43,8 @@ public class SSDPNotifyByeByeRequest extends SSDPNotifyRequest {
     public SSDPNotifyByeByeRequest(InetSocketAddress host, URI nt, URI usn) {
         super(host);
 
-        addHeader(NT, nt);
-        addHeader(NTS, SSDP_BYEBYE);
-        addHeader(USN, usn);
+        setHeader(NT, nt);
+        setHeader(NTS, SSDP_BYEBYE);
+        setHeader(USN, usn);
     }
 }

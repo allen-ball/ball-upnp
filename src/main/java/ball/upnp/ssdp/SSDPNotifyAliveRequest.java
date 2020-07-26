@@ -45,10 +45,10 @@ public class SSDPNotifyAliveRequest extends SSDPNotifyRequest {
                                   URI nt, URI usn, URI location) {
         super(host);
 
-        addHeader(NT, nt);
-        addHeader(NTS, SSDP_ALIVE);
-        addHeader(USN, usn);
-        addHeader(LOCATION, location);
-        addHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
+        setHeader(NT, nt);
+        setHeader(NTS, SSDP_ALIVE);
+        setHeader(USN, usn);
+        setHeader(LOCATION, location);
+        setHeader(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800));
     }
 }

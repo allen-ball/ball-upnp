@@ -75,6 +75,13 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     /**
+     * Method to get the {@link org.apache.http.RequestLine} method.
+     *
+     * @return  The method specified on the request line.
+     */
+    public String getMethod() { return getRequestLine().getMethod(); }
+
+    /**
      * Method to get the {@link SocketAddress} from the
      * {@link DatagramPacket} if {@link.this} {@link SSDPRequest} was
      * parsed rom a packet.
@@ -90,7 +97,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
                           Stream.of(getAllHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
-            .collect(joining(CRLF, EMPTY, CRLF + CRLF));
+            .collect(joining(EOL, EMPTY, EOM));
 
         return string;
     }

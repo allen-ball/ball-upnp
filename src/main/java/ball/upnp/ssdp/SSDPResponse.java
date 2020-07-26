@@ -92,7 +92,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
                           Stream.of(getAllHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
-            .collect(joining(CRLF, EMPTY, CRLF + CRLF));
+            .collect(joining(EOL, EMPTY, EOM));
 
         return string;
     }

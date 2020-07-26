@@ -45,6 +45,6 @@ public class SSDPNotifyRequest extends SSDPRequest {
     public SSDPNotifyRequest(SocketAddress host) {
         super(METHOD);
 
-        addHeader(HOST, host);
+        setHeader(HOST, host);
     }
 }

@@ -45,9 +45,9 @@ public class SSDPDiscoveryRequest extends SSDPRequest {
     public SSDPDiscoveryRequest(SocketAddress host) {
         super(METHOD);
 
-        addHeader(HOST, host);
-        addHeader(MAN, "\"ssdp:discover\"");
-        addHeader(MX, String.valueOf(120));
-        addHeader(ST, "ssdp:all");
+        setHeader(HOST, host);
+        setHeader(MAN, "\"ssdp:discover\"");
+        setHeader(ST, "ssdp:all");
+        setHeader(MX, String.valueOf(30));
     }
 }
