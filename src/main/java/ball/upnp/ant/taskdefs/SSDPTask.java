@@ -29,6 +29,7 @@ import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
+import java.net.DatagramSocket;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -76,13 +77,15 @@ public abstract class SSDPTask extends Task
 
     @Synchronized
     @Override
-    public void sendEvent(SSDPDiscoveryService service, SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService service,
+                          DatagramSocket socket, SSDPMessage message) {
         log(String.valueOf(message));
     }
 
     @Synchronized
     @Override
-    public void receiveEvent(SSDPDiscoveryService service, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service,
+                             DatagramSocket socket, SSDPMessage message) {
         log(String.valueOf(message));
     }
 
@@ -96,7 +99,9 @@ public abstract class SSDPTask extends Task
     @NoArgsConstructor @ToString
     public static class Discover extends SSDPTask {
         @Getter @Setter
-        private int timeout = 60;
+        private int interval = 120;
+        @Getter @Setter
+        private int timeout = 180;
 
         @Override
         public void execute() throws BuildException {
@@ -113,7 +118,7 @@ public abstract class SSDPTask extends Task
                     new SSDPDiscoveryService()
                     .addListener(this)
                     .addListener(cache)
-                    .discover(getTimeout());
+                    .discover(getInterval());
 
                 service.awaitTermination(getTimeout(), TimeUnit.SECONDS);
 
@@ -148,7 +153,7 @@ public abstract class SSDPTask extends Task
                     break;
 
                 case 1:
-                    object = row.getSSDPMessage().getST();
+                    object = row.getSSDPMessage().get(SSDPMessage.ST);
                     break;
 
                 case 2:
