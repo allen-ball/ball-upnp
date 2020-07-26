@@ -1,3 +1,9 @@
+2020-07-25  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
+	Added DatagramSocket parameter to Listener methods.
+	Added delay parameter to multicast and send methods.
+
 2020-07-24  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
