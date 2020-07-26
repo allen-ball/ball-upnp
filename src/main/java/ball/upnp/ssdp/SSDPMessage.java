@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpMessage;
+import org.apache.http.HttpStatus;
 import org.apache.http.protocol.HttpDateGenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -44,7 +45,7 @@ import static java.util.stream.Collectors.toList;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-public interface SSDPMessage extends HttpMessage {
+public interface SSDPMessage extends HttpMessage, HttpStatus {
 
     /**
      * {@link HttpDateGenerator} instance.
@@ -94,27 +95,20 @@ public interface SSDPMessage extends HttpMessage {
     public static final String EOM = EOL + EOL;
 
     /**
-     * See {@link #setHeader(String,String)}.
+     * Static method to parse a {@link DatagramPacket} to a {@link List} of
+     * lines ({@link String}s).
      *
-     * @param   name            The header name.
-     * @param   name            The header value.
-     */
-    default void setHeader(String name, SocketAddress value) {
-        InetSocketAddress address = (InetSocketAddress) value;
-
-        addHeader(name, String.format("%s:%d",
-                                      address.getAddress().getHostAddress(),
-                                      address.getPort()));
-    }
-
-    /**
-     * See {@link #setHeader(String,String)}.
+     * @param   packet          The {@link DatagramPacket}.
      *
-     * @param   name            The header name.
-     * @param   name            The header value.
+     * @return  The {@link List} of parsed lines.
      */
-    default void setHeader(String name, URI value) {
-        setHeader(name, (value != null) ? value.toASCIIString() : null);
+    public static List<String> parse(DatagramPacket packet) {
+        String string =
+            new String(packet.getData(),
+                       packet.getOffset(), packet.getLength(),
+                       UTF_8);
+
+        return Pattern.compile(EOL).splitAsStream(string).collect(toList());
     }
 
     /**
@@ -126,30 +120,30 @@ public interface SSDPMessage extends HttpMessage {
      * @return  The value or {@code null} if no header found.
      */
     default String get(String... names) {
-        String value =
+        String string =
             Stream.of(names)
             .map(this::getFirstHeader)
             .filter(Objects::nonNull)
             .map(Header::getValue)
             .findFirst().orElse(null);
 
-        return value;
+        return string;
     }
 
     /**
      * Method to find the first {@link Header} matching {@code names} and
      * return the value converted with {@code function}.
      *
+     * @param   <T>             The target type.
      * @param   function        The conversion {@code Function}.
      * @param   names           The candidate {@link Header} names.
-     * @param   <T>             The target type.
      *
      * @return  The converted value or {@code null} if no header found.
      */
     default <T> T get(Function<String,T> function, String... names) {
-        String value = get(names);
+        String string = get(names);
 
-        return (value != null) ? function.apply(value) : null;
+        return (string != null) ? function.apply(string) : null;
     }
 
     /**
@@ -165,11 +159,4 @@ public interface SSDPMessage extends HttpMessage {
      * @return  The service location {@link URI}.
      */
     default URI getUSN() { return get(URI::create, USN); }
-
-    public static List<String> parse(DatagramPacket packet) {
-        String string =
-            new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
-
-        return Pattern.compile(EOL).splitAsStream(string).collect(toList());
-    }
 }

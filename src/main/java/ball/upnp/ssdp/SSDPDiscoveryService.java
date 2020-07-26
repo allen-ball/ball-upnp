@@ -116,7 +116,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Send {@link SSDPDiscoveryRequest}s every {@code interval} seconds.
+     * Send {@code M-SEARCH} requests every {@code interval} seconds.
      *
      * @param   interval        The minimum interval (in seconds) between
      *                          broadcast messages.
@@ -132,13 +132,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private void discover() {
-        multicast(0, new SSDPDiscoveryRequest(MULTICAST_SOCKET_ADDRESS));
+        multicast(0, SSDPRequest.discovery(MULTICAST_SOCKET_ADDRESS));
     }
 
     /**
      * Method to queue an {@link SSDPMessage} multicast.
      *
-     * @param   delay           Time to delay (in seconds) before sending.
+     * @param   delay           Time to delay (in milliseconds) before
+     *                          sending.
      * @param   message         The {@link SSDPMessage} to send.
      */
     public void multicast(long delay, SSDPMessage message) {
@@ -148,7 +149,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     /**
      * Method to queue an {@link SSDPMessage} for sending.
      *
-     * @param   delay           Time to delay (in seconds) before sending.
+     * @param   delay           Time to delay (in milliseconds) before
+     *                          sending.
      * @param   address         The destination {@link SocketAddress}.
      * @param   message         The {@link SSDPMessage} to send.
      */
@@ -157,7 +159,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         DatagramPacket packet =
             new DatagramPacket(bytes, 0, bytes.length, address);
 
-        schedule(() -> task(message, packet), delay, SECONDS);
+        schedule(() -> task(message, packet), delay, MILLISECONDS);
     }
 
     private void task(SSDPMessage message, DatagramPacket packet) {
@@ -197,14 +199,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
         if (message == null) {
             try {
-                message = new SSDPResponse(packet);
+                message = SSDPResponse.from(packet);
             } catch (ParseException exception) {
             }
         }
 
         if (message == null) {
             try {
-                message = new SSDPRequest(packet);
+                message = SSDPRequest.from(packet);
             } catch (ParseException exception) {
             }
         }

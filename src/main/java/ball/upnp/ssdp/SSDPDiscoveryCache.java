@@ -49,7 +49,7 @@ public class SSDPDiscoveryCache
              implements SSDPDiscoveryService.Listener {
     private static final long serialVersionUID = -7074831120669331454L;
 
-    private ScheduledFuture<?> expirer = null;
+    /** @serial */ private ScheduledFuture<?> expirer = null;
 
     @Override
     public void sendEvent(SSDPDiscoveryService service,
@@ -111,7 +111,7 @@ public class SSDPDiscoveryCache
             SSDPRequest request = (SSDPRequest) message;
             String method = request.getRequestLine().getMethod();
 
-            if (SSDPNotifyRequest.METHOD.equals(method)) {
+            if (SSDPRequest.Method.NOTIFY.is(method)) {
                 Header header = message.getFirstHeader(SSDPMessage.NTS);
 
                 if (header != null && SSDP_BYEBYE.equals(header.getValue())) {
