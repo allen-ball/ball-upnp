@@ -59,7 +59,6 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
         AL = "AL",
         CACHE_CONTROL = HttpHeaders.CACHE_CONTROL.toUpperCase(),
         DATE = HttpHeaders.DATE,
-        EXPIRES = HttpHeaders.EXPIRES.toUpperCase(),
         EXT = "EXT",
         HOST = HttpHeaders.HOST.toUpperCase(),
         LOCATION = HttpHeaders.LOCATION.toUpperCase(),
@@ -119,7 +118,7 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      *
      * @return  The value or {@code null} if no header found.
      */
-    default String get(String... names) {
+    default String getHeaderValue(String... names) {
         String string =
             Stream.of(names)
             .map(this::getFirstHeader)
@@ -140,8 +139,52 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      *
      * @return  The converted value or {@code null} if no header found.
      */
-    default <T> T get(Function<String,T> function, String... names) {
-        String string = get(names);
+    default <T> T getHeaderValue(Function<String,T> function,
+                                 String... names) {
+        String string = getHeaderValue(names);
+
+        return (string != null) ? function.apply(string) : null;
+    }
+
+    /**
+     * Method to find the first {@link Header} matching {@code name} with a
+     * parameter matching {@code parameter} and return that parameter value.
+     *
+     * @param   name            The target {@link Header} name.
+     * @param   parameter       The target parameter name.
+     *
+     * @return  The value or {@code null} if no header/parameter combination
+     *          is found.
+     */
+    default String getHeaderParameterValue(String name, String parameter) {
+        String value =
+            Stream.of(getHeaders(name))
+            .map(t -> t.getElements())
+            .filter(Objects::nonNull)
+            .flatMap(t -> Stream.of(t))
+            .filter(t -> parameter.equals(t.getName()))
+            .map(t -> t.getValue())
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+
+        return value;
+    }
+
+    /**
+     * Method to find the first {@link Header} matching {@code name} with a
+     * parameter matching {@code parameter} and return that parameter value
+     * converted with {@code function}.
+     *
+     * @param   <T>             The target type.
+     * @param   name            The target {@link Header} name.
+     * @param   parameter       The target parameter name.
+     *
+     * @return  The value or {@code null} if no header/parameter combination
+     *          is found.
+     */
+    default <T> T getHeaderParameterValue(Function<String,T> function,
+                                          String name, String parameter) {
+        String string = getHeaderParameterValue(name, parameter);
 
         return (string != null) ? function.apply(string) : null;
     }
@@ -151,12 +194,14 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      *
      * @return  The service location {@link URI}.
      */
-    default URI getLocation() { return get(URI::create, LOCATION, AL); }
+    default URI getLocation() {
+        return getHeaderValue(URI::create, LOCATION, AL);
+    }
 
     /**
      * Method to get the {@value #USN} {@link URI}.
      *
      * @return  The service location {@link URI}.
      */
-    default URI getUSN() { return get(URI::create, USN); }
+    default URI getUSN() { return getHeaderValue(URI::create, USN); }
 }
