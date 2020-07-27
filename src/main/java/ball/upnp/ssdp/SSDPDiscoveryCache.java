@@ -51,7 +51,7 @@ public class SSDPDiscoveryCache
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
-    private final List<SSDPDiscoveryService.Listener> listeners =
+    /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners =
         List.of(new NOTIFYRequestHandler(), new MSEARCHResponseHandler());
 
     @Override
