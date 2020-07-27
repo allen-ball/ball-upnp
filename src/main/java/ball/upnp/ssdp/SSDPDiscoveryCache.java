@@ -23,19 +23,19 @@ package ball.upnp.ssdp;
 import java.net.DatagramSocket;
 import java.net.URI;
 import java.util.Date;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import lombok.NoArgsConstructor;
-import lombok.Synchronized;
+import lombok.ToString;
 import org.apache.http.Header;
+import org.apache.http.client.utils.DateUtils;
 
-import static ball.upnp.ssdp.SSDPMessage.MAX_AGE;
-import static ball.upnp.ssdp.SSDPMessage.SSDP_BYEBYE;
-import static java.util.Objects.requireNonNull;
-import static org.apache.http.client.utils.DateUtils.parseDate;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * SSDP discovery cache implementation.
@@ -47,94 +47,91 @@ import static org.apache.http.client.utils.DateUtils.parseDate;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
-    private static final long serialVersionUID = -7074831120669331454L;
+    private static final long serialVersionUID = 7371468643024489160L;
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
+    /** @serial */ private ScheduledFuture<?> msearch = null;
+    private final List<SSDPDiscoveryService.Listener> listeners =
+        List.of(new NOTIFYRequestHandler(), new MSEARCHResponseHandler());
 
     @Override
-    public void sendEvent(SSDPDiscoveryService service,
-                          DatagramSocket socket,
-                          SSDPMessage message) {
-        receiveEvent(service, socket, message);
-    }
-
-    @Override
-    public void receiveEvent(SSDPDiscoveryService service,
-                             DatagramSocket socket,
-                             SSDPMessage message) {
-        if (expirer == null) {
-            schedule(service);
-        }
-
-        try {
-            long time = now();
-            long expiration = 0;
-            Header header = message.getFirstHeader(SSDPMessage.CACHE_CONTROL);
-
-            if (header != null) {
-                CacheControlDirectiveMap map =
-                    new CacheControlDirectiveMap(header.getValue());
-                String value = map.get(MAX_AGE);
-
-                if (value != null) {
-                    try {
-                        header = message.getFirstHeader(SSDPMessage.DATE);
-
-                        if (header != null) {
-                            time = parseDate(header.getValue()).getTime();
-                        }
-                    } catch (Exception exception) {
-                    }
-
-                    expiration = time + (Long.decode(value) * 1000);
-                }
-            } else {
-                header = message.getFirstHeader(SSDPMessage.EXPIRES);
-
-                if (header != null) {
-                    String value = header.getValue();
-                    Date date = parseDate(value);
-
-                    if (date != null) {
-                        expiration = date.getTime();
-                    }
-                }
-            }
-
-            if (expiration > time) {
-                put(message.getUSN(), new Value(message, expiration));
-            }
-        } catch (Exception exception) {
-        }
-
-        if (message instanceof SSDPRequest) {
-            SSDPRequest request = (SSDPRequest) message;
-            String method = request.getRequestLine().getMethod();
-
-            if (SSDPRequest.Method.NOTIFY.is(method)) {
-                Header header = message.getFirstHeader(SSDPMessage.NTS);
-
-                if (header != null && SSDP_BYEBYE.equals(header.getValue())) {
-                    remove(request.getUSN());
-                }
-            }
-        }
-    }
-
-    @Synchronized
-    private void schedule(SSDPDiscoveryService service) {
+    public void register(SSDPDiscoveryService service) {
         if (expirer == null) {
             expirer =
                 service.scheduleAtFixedRate(() -> expire(),
                                             0, 60, TimeUnit.SECONDS);
         }
+
+        if (msearch == null) {
+            msearch =
+                service.scheduleAtFixedRate(() -> msearch(service),
+                                            0, 300, TimeUnit.SECONDS);
+        }
+
+        listeners.stream().forEach(t -> service.addListener(t));
+    }
+
+    @Override
+    public void unregister(SSDPDiscoveryService service) {
+        ScheduledFuture<?> expirer = this.expirer;
+
+        if (expirer != null) {
+            expirer.cancel(true);
+        }
+
+        ScheduledFuture<?> msearch = this.msearch;
+
+        if (msearch != null) {
+            msearch.cancel(true);
+        }
+    }
+
+    @Override
+    public void sendEvent(SSDPDiscoveryService service,
+                          DatagramSocket socket, SSDPMessage message) {
+    }
+
+    @Override
+    public void receiveEvent(SSDPDiscoveryService service,
+                             DatagramSocket socket, SSDPMessage message) {
     }
 
     private void expire() {
         values().removeIf(t -> now() > t.getExpiration());
     }
 
+    private void msearch(SSDPDiscoveryService service) {
+        service.multicast(0, SSDPRequest.msearch());
+    }
+
     private long now() { return System.currentTimeMillis(); }
+
+    private void update(SSDPMessage message, URI usn) {
+        if (usn != null) {
+            long time = now();
+            long expiration = 0;
+            Long maxAge =
+                message.getHeaderParameterValue(Long::decode,
+                                                SSDPMessage.CACHE_CONTROL,
+                                                SSDPMessage.MAX_AGE);
+
+            if (maxAge != null) {
+                Date date =
+                    message.getHeaderValue(DateUtils::parseDate,
+                                           SSDPMessage.DATE);
+
+                if (date != null) {
+                    time = date.getTime();
+                }
+
+                expiration = time + MILLISECONDS.convert(maxAge, SECONDS);
+            }
+
+            if (expiration > time) {
+                put(usn, new Value(message, expiration));
+            }
+        }
+    }
 
     /**
      * {@link SSDPDiscoveryCache} {@link java.util.Map} {@link Value}
@@ -147,7 +144,7 @@ public class SSDPDiscoveryCache
         private long expiration = 0;
 
         private Value(SSDPMessage message, long expiration) {
-            this.message = requireNonNull(message, "message");
+            this.message = Objects.requireNonNull(message, "message");
 
             setExpiration(expiration);
         }
@@ -167,17 +164,31 @@ public class SSDPDiscoveryCache
         public String toString() { return message.toString(); }
     }
 
-    private class CacheControlDirectiveMap extends TreeMap<String,String> {
-        private static final long serialVersionUID = -7901522510091761313L;
+    @ToString
+    private class NOTIFYRequestHandler extends SSDPDiscoveryService.RequestHandler {
+        public NOTIFYRequestHandler() { super(SSDPRequest.Method.NOTIFY); }
 
-        public CacheControlDirectiveMap(String string) {
-            super(String.CASE_INSENSITIVE_ORDER);
+        @Override
+        public void run(SSDPDiscoveryService service,
+                        DatagramSocket socket, SSDPRequest request) {
+            String nts = request.getHeaderValue(SSDPMessage.NTS);
 
-            for (String directive : string.trim().split(Pattern.quote(";"))) {
-                String[] pair = directive.split(Pattern.quote("="), 2);
-
-                put(pair[0].trim(), (pair.length > 1) ? pair[1].trim() : null);
+            if (Objects.equals(SSDPMessage.SSDP_ALIVE, nts)) {
+                update(request, request.getUSN());
+            } else if (Objects.equals(SSDPMessage.SSDP_BYEBYE, nts)) {
+                remove(request.getUSN());
             }
+        }
+    }
+
+    @ToString
+    private class MSEARCHResponseHandler extends SSDPDiscoveryService.ResponseHandler {
+        public MSEARCHResponseHandler() { super(); }
+
+        @Override
+        public void run(SSDPDiscoveryService service,
+                        DatagramSocket socket, SSDPResponse response) {
+            update(response, response.getUSN());
         }
     }
 }
