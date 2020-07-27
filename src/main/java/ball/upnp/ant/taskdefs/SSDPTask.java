@@ -22,7 +22,6 @@ package ball.upnp.ant.taskdefs;
  */
 import ball.swing.table.ArrayListTableModel;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
-import ball.upnp.ssdp.SSDPDiscoveryRequest;
 import ball.upnp.ssdp.SSDPDiscoveryService;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.util.ant.taskdefs.AnnotatedAntTask;
@@ -30,6 +29,8 @@ import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -75,10 +76,17 @@ public abstract class SSDPTask extends Task
         AnnotatedAntTask.super.execute();
     }
 
+    @Override
+    public void register(SSDPDiscoveryService service) { }
+
+    @Override
+    public void unregister(SSDPDiscoveryService service) { }
+
     @Synchronized
     @Override
     public void sendEvent(SSDPDiscoveryService service,
                           DatagramSocket socket, SSDPMessage message) {
+        // log(toString(socket) + " --> " /* + message.getSocketAddress() */);
         log(String.valueOf(message));
     }
 
@@ -86,7 +94,22 @@ public abstract class SSDPTask extends Task
     @Override
     public void receiveEvent(SSDPDiscoveryService service,
                              DatagramSocket socket, SSDPMessage message) {
+        // log(toString(socket) + " <-- " /* + message.getSocketAddress() */);
         log(String.valueOf(message));
+    }
+
+    private String toString(DatagramSocket socket) {
+        return toString(socket.getLocalSocketAddress());
+    }
+
+    private String toString(SocketAddress address) {
+        return toString((InetSocketAddress) address);
+    }
+
+    private String toString(InetSocketAddress address) {
+        return String.format("%s:%d",
+                             address.getAddress().getHostAddress(),
+                             address.getPort());
     }
 
     /**
@@ -98,8 +121,6 @@ public abstract class SSDPTask extends Task
     @AntTask("ssdp-discover")
     @NoArgsConstructor @ToString
     public static class Discover extends SSDPTask {
-        @Getter @Setter
-        private int interval = 120;
         @Getter @Setter
         private int timeout = 180;
 
@@ -117,8 +138,7 @@ public abstract class SSDPTask extends Task
                 SSDPDiscoveryService service =
                     new SSDPDiscoveryService()
                     .addListener(this)
-                    .addListener(cache)
-                    .discover(getInterval());
+                    .addListener(cache);
 
                 service.awaitTermination(getTimeout(), TimeUnit.SECONDS);
 
@@ -138,7 +158,7 @@ public abstract class SSDPTask extends Task
 
             public TableModelImpl(SSDPDiscoveryCache cache) {
                 super(cache.values(),
-                      SSDPMessage.USN, SSDPMessage.ST,
+                      SSDPMessage.USN,
                       HttpHeaders.EXPIRES, HttpHeaders.LOCATION);
             }
 
@@ -153,14 +173,10 @@ public abstract class SSDPTask extends Task
                     break;
 
                 case 1:
-                    object = row.getSSDPMessage().get(SSDPMessage.ST);
-                    break;
-
-                case 2:
                     object = row.getExpiration();
                     break;
 
-                case 3:
+                case 2:
                     object = row.getSSDPMessage().getLocation();
                     break;
                 }

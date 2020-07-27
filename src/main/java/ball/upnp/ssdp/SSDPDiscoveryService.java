@@ -27,9 +27,8 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.apache.http.ParseException;
 
@@ -89,7 +88,9 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @return  {@link.this}
      */
     public SSDPDiscoveryService addListener(Listener listener) {
-        listeners.add(listener);
+        if ((! listeners.contains(listener)) && listeners.add(listener)) {
+            listener.register(this);
+        }
 
         return this;
     }
@@ -102,7 +103,9 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @return  {@link.this}
      */
     public SSDPDiscoveryService removeListener(Listener listener) {
-        listeners.remove(listener);
+        if (listeners.remove(listener)) {
+            listener.register(this);
+        }
 
         return this;
     }
@@ -113,26 +116,6 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
     private void fireReceiveEvent(DatagramSocket socket, SSDPMessage message) {
         listeners.stream().forEach(t -> t.receiveEvent(this, socket, message));
-    }
-
-    /**
-     * Send {@code M-SEARCH} requests every {@code interval} seconds.
-     *
-     * @param   interval        The minimum interval (in seconds) between
-     *                          broadcast messages.
-     *
-     * @return  {@link.this}
-     */
-    public SSDPDiscoveryService discover(int interval) {
-        if (interval > 0) {
-            scheduleAtFixedRate(() -> discover(), 0, interval, SECONDS);
-        }
-
-        return this;
-    }
-
-    private void discover() {
-        multicast(0, SSDPRequest.discovery(MULTICAST_SOCKET_ADDRESS));
     }
 
     /**
@@ -220,6 +203,22 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public interface Listener {
 
         /**
+         * Callback when a {@link Listener} is added to a
+         * {@link SSDPDiscoveryService}.
+         *
+         * @param       service         The {@link SSDPDiscoveryService}.
+         */
+        public void register(SSDPDiscoveryService service);
+
+        /**
+         * Callback when a {@link Listener} is removed from a
+         * {@link SSDPDiscoveryService}.
+         *
+         * @param       service         The {@link SSDPDiscoveryService}.
+         */
+        public void unregister(SSDPDiscoveryService service);
+
+        /**
          * Callback made just before sending a {@link SSDPMessage}.
          *
          * @param       service         The {@link SSDPDiscoveryService}.
@@ -240,5 +239,81 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public void receiveEvent(SSDPDiscoveryService service,
                                  DatagramSocket socket,
                                  SSDPMessage message);
+    }
+
+    /**
+     * {@link SSDPDiscoveryService} {@link SSDPRequest} handler.
+     */
+    public static abstract class RequestHandler implements Listener {
+        private final SSDPRequest.Method method;
+
+        /**
+         * Sole constructor.
+         *
+         * @param       method          The {@link SSDPRequest.Method} to
+         *                              handle.
+         */
+        protected RequestHandler(SSDPRequest.Method method) {
+            this.method = Objects.requireNonNull(method);
+        }
+
+        public abstract void run(SSDPDiscoveryService service,
+                                 DatagramSocket socket, SSDPRequest request);
+
+        @Override
+        public void register(SSDPDiscoveryService service) { }
+
+        @Override
+        public void unregister(SSDPDiscoveryService service) { }
+
+        @Override
+        public void receiveEvent(SSDPDiscoveryService service,
+                                 DatagramSocket socket, SSDPMessage message) {
+            if (message instanceof SSDPRequest) {
+                SSDPRequest request = (SSDPRequest) message;
+
+                if (method.is(request.getMethod())) {
+                    service.submit(() -> run(service, socket, request));
+                }
+            }
+        }
+
+        @Override
+        public void sendEvent(SSDPDiscoveryService service,
+                              DatagramSocket socket, SSDPMessage message) {
+        }
+    }
+
+    /**
+     * {@link SSDPDiscoveryService} {@link SSDPResponse} handler.
+     */
+    public static abstract class ResponseHandler implements Listener {
+
+        /**
+         * Sole constructor.
+         */
+        protected ResponseHandler() { }
+
+        public abstract void run(SSDPDiscoveryService service,
+                                 DatagramSocket socket, SSDPResponse request);
+
+        @Override
+        public void register(SSDPDiscoveryService service) { }
+
+        @Override
+        public void unregister(SSDPDiscoveryService service) { }
+
+        @Override
+        public void receiveEvent(SSDPDiscoveryService service,
+                                 DatagramSocket socket, SSDPMessage message) {
+            if (message instanceof SSDPResponse) {
+                service.submit(() -> run(service, socket, (SSDPResponse) message));
+            }
+        }
+
+        @Override
+        public void sendEvent(SSDPDiscoveryService service,
+                              DatagramSocket socket, SSDPMessage message) {
+        }
     }
 }
