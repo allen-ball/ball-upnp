@@ -63,16 +63,18 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     }
 
     /**
-     * Discovery {@link SSDPResponse}.
+     * {@code M-SEARCH} {@link SSDPResponse}.
      *
+     * @param   maxAge          The {@code MAX-AGE} header parameter value.
+     * @param   location        The {@code LOCATION} header value.
      * @param   st              The {@code ST} header value.
      * @param   usn             The {@code USN} header value.
-     * @param   location        The {@code LOCATION} header value.
      */
-    public static SSDPResponse discovery(URI st, URI usn, URI location) {
+    public static SSDPResponse msearch(int maxAge,
+                                       URI location, URI st, URI usn) {
         SSDPResponse response =
             new SSDPResponse(SC_OK, "OK")
-            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800))
+            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(maxAge))
             .header(DATE, GENERATOR.getCurrentDate())
             .header(EXT, (String) null)
             .header(LOCATION, location)
