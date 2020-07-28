@@ -20,10 +20,14 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -43,6 +47,30 @@ public abstract class AbstractService implements AnnotatedService {
     @Getter
     private final List<? extends StateVariable> serviceStateTable =
         new LinkedList<>();
+    private Map<URI,URI> notifications = null;
+
+    /**
+     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
+     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
+     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
+     * responses for {@link.this} {@link Device}.
+     *
+     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
+     */
+    @Synchronized
+    public Map<URI,URI> notifications() {
+        if (notifications == null) {
+            notifications = new LinkedHashMap<>();
+            notifications.put(getServiceType(),
+                              usn(getDevice().getUDN(), getServiceType()));
+        }
+
+        return notifications;
+    }
+
+    private URI usn(URI left, URI right) {
+        return URI.create(left.toASCIIString() + "::" + right.toASCIIString());
+    }
 
     @Override
     public String toString() { return getServiceType().toString(); }

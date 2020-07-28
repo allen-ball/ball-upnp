@@ -20,7 +20,11 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.NoArgsConstructor;
+import lombok.Synchronized;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -35,6 +39,36 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
+    private Map<URI,URI> notifications = null;
+
+    /**
+     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
+     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
+     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
+     * responses for {@link.this} {@link Device}.
+     *
+     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
+     */
+    @Synchronized
+    public Map<URI,URI> notifications() {
+        if (notifications == null) {
+            notifications = new LinkedHashMap<>();
+
+            if (this instanceof RootDevice) {
+                notifications.put(RootDevice.NT, usn(getUDN(), RootDevice.NT));
+            }
+
+            notifications.put(getUDN(), getUDN());
+            notifications.put(getDeviceType(), usn(getUDN(), getDeviceType()));
+        }
+
+        return notifications;
+    }
+
+    private URI usn(URI left, URI right) {
+        return URI.create(left.toASCIIString() + "::" + right.toASCIIString());
+    }
+
     @Override
     public String toString() { return getDeviceType().toString(); }
 }

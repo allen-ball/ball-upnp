@@ -1,5 +1,9 @@
 2020-07-27  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/AbstractDevice.java,
+	src/main/java/ball/upnp/AbstractService.java:
+	Added notifications() method.
+
 	* src/main/java/ball/upnp/RootDevice.java: Initial writing.
 
 2020-07-26  Allen D. Ball  <ball@hcf.dev>
