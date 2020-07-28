@@ -78,6 +78,12 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
         SSDP_BYEBYE = "ssdp:byebye";
 
     /**
+     * SSDP {@link #ST} value.
+     */
+    public static final String
+        SSDP_ALL = "ssdp:all";
+
+    /**
      * HTTP cache control key.
      */
     public static final String
