@@ -1,5 +1,9 @@
 2020-07-28  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
+	Added send(int,SocketAddress,List<? extends SSDPMessage>) to honor
+	requestor's MX parameter.
+
 	* src/main/java/ball/upnp/Device.java,
 	src/main/java/ball/upnp/AbstractDevice.java:
 	Added getUSNs() method.

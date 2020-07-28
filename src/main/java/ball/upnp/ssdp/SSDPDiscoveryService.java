@@ -27,7 +27,10 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.apache.http.ParseException;
@@ -35,6 +38,7 @@ import org.apache.http.ParseException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
 
 /**
  * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.
@@ -58,6 +62,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     private final DatagramSocket socket;
     private final CopyOnWriteArrayList<Listener> listeners =
         new CopyOnWriteArrayList<>();
+    private final Random random = new Random();
 
     /**
      * Sole constructor.
@@ -75,6 +80,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
 
         socket = new DatagramSocket();
+
+        random.setSeed(System.currentTimeMillis());
 
         submit(() -> receive(multicast));
         submit(() -> receive(socket));
@@ -151,6 +158,30 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             socket.send(packet);
         } catch (IOException exception) {
         }
+    }
+
+    /**
+     * Method to queue a {@link List} of {@link SSDPMessage}s for sending
+     * with a {@code MX} parameter.  Messages are sent in list order with
+     * random delays none greater that {@code MX} seconds.
+     *
+     * @param   mx              Maximum delay (in seconds) before sending.
+     * @param   address         The destination {@link SocketAddress}.
+     * @param   messages        The {@link List} of {@link SSDPMessage}s to
+     *                          send.
+     */
+    public void send(int mx,
+                     SocketAddress address,
+                     List<? extends SSDPMessage> messages) {
+        List<Long> delays =
+            messages.stream()
+            .map(t -> random.nextInt((int) SECONDS.toMillis(mx)))
+            .map(t -> SECONDS.toMillis(1) + t)
+            .collect(toList());
+
+        delays.sort(Comparator.naturalOrder());
+
+        messages.stream().forEach(t -> send(delays.remove(0), address, t));
     }
 
     private void receive(DatagramSocket socket) {
