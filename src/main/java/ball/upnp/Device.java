@@ -23,6 +23,7 @@ package ball.upnp;
 import ball.upnp.annotation.XmlNs;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -79,4 +80,15 @@ public interface Device extends Description {
     default URI getUDN() {
         return URI.create("uuid:" + getUUID().toString().toUpperCase());
     }
+
+    /**
+     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
+     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
+     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
+     * responses for {@link.this} {@link Device} and embedded
+     * {@link Service}s and {@link Device}s.
+     *
+     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
+     */
+    public Map<URI,URI> getUSNs();
 }

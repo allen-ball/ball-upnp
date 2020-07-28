@@ -39,30 +39,31 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
-    private Map<URI,URI> notifications = null;
+    private Map<URI,URI> map = null;
 
-    /**
-     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
-     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
-     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
-     * responses for {@link.this} {@link Device}.
-     *
-     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
-     */
     @Synchronized
-    public Map<URI,URI> notifications() {
-        if (notifications == null) {
-            notifications = new LinkedHashMap<>();
+    @Override
+    public Map<URI,URI> getUSNs() {
+        if (map == null) {
+            map = new LinkedHashMap<>();
 
             if (this instanceof RootDevice) {
-                notifications.put(RootDevice.NT, usn(getUDN(), RootDevice.NT));
+                map.put(RootDevice.NT, usn(getUDN(), RootDevice.NT));
             }
 
-            notifications.put(getUDN(), getUDN());
-            notifications.put(getDeviceType(), usn(getUDN(), getDeviceType()));
+            map.put(getUDN(), getUDN());
+            map.put(getDeviceType(), usn(getUDN(), getDeviceType()));
+
+            if (this instanceof RootDevice) {
+                getServiceList().stream()
+                    .forEach(t -> map.put(t.getServiceType(),
+                                          usn(getUDN(), t.getServiceType())));
+                getDeviceList().stream()
+                    .forEach(t -> map.putAll(t.getUSNs()));
+            }
         }
 
-        return notifications;
+        return map;
     }
 
     private URI usn(URI left, URI right) {
