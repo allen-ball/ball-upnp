@@ -48,6 +48,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
+    private static final long serialVersionUID = -6249849064415060790L;
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
