@@ -35,6 +35,7 @@ import org.apache.http.Header;
 import org.apache.http.client.utils.DateUtils;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -47,7 +48,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class SSDPDiscoveryCache
              extends ConcurrentSkipListMap<URI,SSDPDiscoveryCache.Value>
              implements SSDPDiscoveryService.Listener {
-    private static final long serialVersionUID = 7371468643024489160L;
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
@@ -58,14 +58,14 @@ public class SSDPDiscoveryCache
     public void register(SSDPDiscoveryService service) {
         if (expirer == null) {
             expirer =
-                service.scheduleAtFixedRate(() -> expire(),
-                                            0, 60, TimeUnit.SECONDS);
+                service.scheduleAtFixedRate(() -> expirer(service),
+                                            0, 60, SECONDS);
         }
 
         if (msearch == null) {
             msearch =
                 service.scheduleAtFixedRate(() -> msearch(service),
-                                            0, 300, TimeUnit.SECONDS);
+                                            0, 300, SECONDS);
         }
 
         listeners.stream().forEach(t -> service.addListener(t));
@@ -78,7 +78,6 @@ public class SSDPDiscoveryCache
         if (expirer != null) {
             expirer.cancel(true);
         }
-
         ScheduledFuture<?> msearch = this.msearch;
 
         if (msearch != null) {
@@ -96,12 +95,21 @@ public class SSDPDiscoveryCache
                              DatagramSocket socket, SSDPMessage message) {
     }
 
-    private void expire() {
-        values().removeIf(t -> now() > t.getExpiration());
+    private void expirer(SSDPDiscoveryService service) {
+        long now = now();
+        boolean pending =
+            values().stream()
+            .mapToLong(t -> MINUTES.convert(t.getExpiration() - now, MILLISECONDS))
+            .anyMatch(t -> t <= expirer.getDelay(MINUTES));
+        boolean expired = values().removeIf(t -> t.getExpiration() < now);
+
+        if (expired || pending) {
+            service.submit(() -> msearch(service));
+        }
     }
 
     private void msearch(SSDPDiscoveryService service) {
-        service.multicast(0, SSDPRequest.msearch());
+        service.multicast(0, SSDPRequest.msearch("ssdp:all"));
     }
 
     private long now() { return System.currentTimeMillis(); }

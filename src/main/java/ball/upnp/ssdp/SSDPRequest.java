@@ -90,14 +90,14 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * Notify "alive" {@link SSDPRequest}.
      *
      * @param   host            The host {@link SocketAddress}.
+     * @param   location        The {@code LOCATION} header value.
      * @param   nt              The {@code NT} header value.
      * @param   usn             The {@code USN} header value.
-     * @param   location        The {@code LOCATION} header value.
      *
      * @return  The {@link SSDPRequest}.
      */
     public static SSDPRequest alive(SocketAddress host,
-                                    URI nt, URI usn, URI location) {
+                                    URI location, URI nt, URI usn) {
         SSDPRequest request =
             new SSDPRequest(Method.NOTIFY)
             .header(HOST, host)
@@ -133,15 +133,17 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     /**
      * Discovery {@link SSDPRequest}.
      *
+     * @param   st              The {@code ST} header value.
+     *
      * @return  The {@link SSDPRequest}.
      */
-    public static SSDPRequest msearch() {
+    public static SSDPRequest msearch(String st) {
         SSDPRequest request =
             new SSDPRequest(Method.MSEARCH)
             .header(HOST, SSDPDiscoveryService.MULTICAST_SOCKET_ADDRESS)
             .header(MAN, "\"ssdp:discover\"")
             .header(MX, String.valueOf(30))
-            .header(ST, "ssdp:all");
+            .header(ST, st);
 
         return request;
     }
