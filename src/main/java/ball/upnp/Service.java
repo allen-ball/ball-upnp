@@ -94,14 +94,4 @@ public interface Service extends Description {
      * @return  The {@link List} of {@link StateVariable}s.
      */
     public List<? extends StateVariable> getServiceStateTable();
-
-    /**
-     * Method to get the USN {@link URI}.  The {@link URI} is calculated by
-     * combining the {@link Device#getUDN()} and {@link #getServiceType()}.
-     *
-     * @return  The USN {@link URI}.
-     */
-    default URI getUSN() {
-        return URI.create(getDevice().getUDN() + "::" + getServiceType());
-    }
 }
