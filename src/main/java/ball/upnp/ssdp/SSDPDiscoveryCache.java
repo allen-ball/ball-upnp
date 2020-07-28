@@ -53,7 +53,7 @@ public class SSDPDiscoveryCache
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
     /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners =
-        List.of(new NOTIFYRequestHandler(), new MSEARCHResponseHandler());
+        List.of(new NOTIFY(), new MSEARCH());
 
     @Override
     public void register(SSDPDiscoveryService service) {
@@ -110,7 +110,7 @@ public class SSDPDiscoveryCache
     }
 
     private void msearch(SSDPDiscoveryService service) {
-        service.multicast(0, SSDPRequest.msearch("ssdp:all"));
+        service.multicast(0, SSDPRequest.msearch(SSDPMessage.SSDP_ALL));
     }
 
     private long now() { return System.currentTimeMillis(); }
@@ -174,8 +174,8 @@ public class SSDPDiscoveryCache
     }
 
     @ToString
-    private class NOTIFYRequestHandler extends SSDPDiscoveryService.RequestHandler {
-        public NOTIFYRequestHandler() { super(SSDPRequest.Method.NOTIFY); }
+    private class NOTIFY extends SSDPDiscoveryService.RequestHandler {
+        public NOTIFY() { super(SSDPRequest.Method.NOTIFY); }
 
         @Override
         public void run(SSDPDiscoveryService service,
@@ -190,10 +190,8 @@ public class SSDPDiscoveryCache
         }
     }
 
-    @ToString
-    private class MSEARCHResponseHandler extends SSDPDiscoveryService.ResponseHandler {
-        public MSEARCHResponseHandler() { super(); }
-
+    @NoArgsConstructor @ToString
+    private class MSEARCH extends SSDPDiscoveryService.ResponseHandler {
         @Override
         public void run(SSDPDiscoveryService service,
                         DatagramSocket socket, SSDPResponse response) {
