@@ -33,8 +33,11 @@ import org.apache.http.Header;
 import org.apache.http.HttpVersion;
 import org.apache.http.message.BasicHttpRequest;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.math.NumberUtils.toInt;
 import static org.apache.http.message.BasicLineParser.INSTANCE;
 import static org.apache.http.message.BasicLineParser.parseHeader;
 import static org.apache.http.message.BasicLineParser.parseRequestLine;
@@ -90,18 +93,19 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * Notify "alive" {@link SSDPRequest}.
      *
      * @param   host            The host {@link SocketAddress}.
+     * @param   maxAge          The {@code MAX-AGE} header parameter value.
      * @param   location        The {@code LOCATION} header value.
      * @param   nt              The {@code NT} header value.
      * @param   usn             The {@code USN} header value.
      *
      * @return  The {@link SSDPRequest}.
      */
-    public static SSDPRequest alive(SocketAddress host,
+    public static SSDPRequest alive(SocketAddress host, int maxAge,
                                     URI location, URI nt, URI usn) {
         SSDPRequest request =
             new SSDPRequest(Method.NOTIFY)
             .header(HOST, host)
-            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(1800))
+            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(maxAge))
             .header(LOCATION, location)
             .header(NT, nt)
             .header(NTS, SSDP_ALIVE)
@@ -181,6 +185,17 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * @return  The {@link SocketAddress}.
      */
     public SocketAddress getSocketAddress() { return address; }
+
+    /**
+     * Method to get the {@value #MX} header value as an {@code int}.
+     * Returns {@code 120} if the header is not specified or the if the
+     * value is not in the range of {@code 1 <= mx <= 120}.
+     *
+     * @return  The {@value #MX} value.
+     */
+    public int getMX() {
+        return getHeaderValue(t -> min(max(toInt(t, 120), 1), 120), MX);
+    }
 
     /**
      * {@link String} fluent header setter.
