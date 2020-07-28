@@ -31,6 +31,7 @@ import ball.util.ant.taskdefs.ConfigurableAntTask;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -87,6 +88,7 @@ public abstract class SSDPTask extends Task
     public void sendEvent(SSDPDiscoveryService service,
                           DatagramSocket socket, SSDPMessage message) {
         // log(toString(socket) + " --> " /* + message.getSocketAddress() */);
+        log("--- Outgoing ---");
         log(String.valueOf(message));
     }
 
@@ -95,6 +97,7 @@ public abstract class SSDPTask extends Task
     public void receiveEvent(SSDPDiscoveryService service,
                              DatagramSocket socket, SSDPMessage message) {
         // log(toString(socket) + " <-- " /* + message.getSocketAddress() */);
+        log("--- Incoming ---");
         log(String.valueOf(message));
     }
 
@@ -173,7 +176,10 @@ public abstract class SSDPTask extends Task
                     break;
 
                 case 1:
-                    object = row.getExpiration();
+                    object =
+                        Duration.ofMillis(row.getExpiration()
+                                          - System.currentTimeMillis())
+                        .toString();
                     break;
 
                 case 2:
