@@ -110,7 +110,7 @@ public class SSDPDiscoveryCache
     }
 
     private void msearch(SSDPDiscoveryService service) {
-        service.multicast(0, SSDPRequest.msearch(SSDPMessage.SSDP_ALL));
+        service.multicast(0, SSDPRequest.msearch(15, SSDPMessage.SSDP_ALL));
     }
 
     private long now() { return System.currentTimeMillis(); }

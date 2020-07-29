@@ -137,16 +137,17 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     /**
      * Discovery {@link SSDPRequest}.
      *
+     * @param   mx              The {@code MX} header value.
      * @param   st              The {@code ST} header value.
      *
      * @return  The {@link SSDPRequest}.
      */
-    public static SSDPRequest msearch(String st) {
+    public static SSDPRequest msearch(int mx, URI st) {
         SSDPRequest request =
             new SSDPRequest(Method.MSEARCH)
             .header(HOST, SSDPDiscoveryService.MULTICAST_SOCKET_ADDRESS)
             .header(MAN, "\"ssdp:discover\"")
-            .header(MX, String.valueOf(30))
+            .header(MX, String.valueOf(mx))
             .header(ST, st);
 
         return request;
