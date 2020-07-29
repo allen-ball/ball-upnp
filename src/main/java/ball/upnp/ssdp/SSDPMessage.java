@@ -80,8 +80,7 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
     /**
      * SSDP {@link #ST} value.
      */
-    public static final String
-        SSDP_ALL = "ssdp:all";
+    public static final URI SSDP_ALL = URI.create("ssdp:all");
 
     /**
      * HTTP cache control key.
