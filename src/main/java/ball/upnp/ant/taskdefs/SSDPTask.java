@@ -21,10 +21,13 @@ package ball.upnp.ant.taskdefs;
  * ##########################################################################
  */
 import ball.swing.table.ArrayListTableModel;
+import ball.swing.table.MapTableModel;
+import ball.upnp.SSDP;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryService;
 import ball.upnp.ssdp.SSDPMessage;
 import ball.upnp.ssdp.SSDPRequest;
+import ball.upnp.ssdp.SSDPResponse;
 import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
@@ -34,7 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentSkipListMap;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,6 +49,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.util.ClasspathUtils;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
@@ -145,7 +149,7 @@ public abstract class SSDPTask extends Task
                     .addListener(this)
                     .addListener(cache);
 
-                service.awaitTermination(getTimeout(), TimeUnit.SECONDS);
+                service.awaitTermination(getTimeout(), SECONDS);
 
                 log(new TableModelImpl(cache));
             } catch (BuildException exception) {
@@ -164,7 +168,7 @@ public abstract class SSDPTask extends Task
             public TableModelImpl(SSDPDiscoveryCache cache) {
                 super(cache.values(),
                       SSDPMessage.USN,
-                      HttpHeaders.EXPIRES, HttpHeaders.LOCATION);
+                      HttpHeaders.EXPIRES, SSDPMessage.LOCATION);
             }
 
             @Override
@@ -217,7 +221,7 @@ public abstract class SSDPTask extends Task
                     new SSDPDiscoveryService()
                     .addListener(this);
 
-                service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                service.awaitTermination(Long.MAX_VALUE, SECONDS);
             } catch (BuildException exception) {
                 throw exception;
             } catch (Throwable throwable) {
@@ -238,6 +242,8 @@ public abstract class SSDPTask extends Task
     @AntTask("ssdp-m-search")
     @NoArgsConstructor @ToString
     public static class MSearch extends SSDPTask {
+        private static final ConcurrentSkipListMap<URI,URI> map =
+            new ConcurrentSkipListMap<>();
         @Getter @Setter
         private int mx = 5;
         @Getter @Setter
@@ -255,10 +261,14 @@ public abstract class SSDPTask extends Task
 
                 SSDPDiscoveryService service =
                     new SSDPDiscoveryService()
-                    .addListener(this);
+                    .addListener(this)
+                    .addListener(new MSEARCH());
 
                 service.multicast(0, SSDPRequest.msearch(getMx(), getSt()));
-                service.awaitTermination(getMx(), TimeUnit.SECONDS);
+                service.awaitTermination(getMx(), SECONDS);
+
+                log(new MapTableModel(map,
+                                      SSDPMessage.USN, SSDPMessage.LOCATION));
             } catch (BuildException exception) {
                 throw exception;
             } catch (Throwable throwable) {
@@ -266,6 +276,22 @@ public abstract class SSDPTask extends Task
                 throw new BuildException(throwable);
             } finally {
                 Thread.currentThread().setContextClassLoader(loader);
+            }
+        }
+
+        @NoArgsConstructor @ToString
+        private class MSEARCH extends SSDPDiscoveryService.ResponseHandler {
+            @Override
+            public void run(SSDPDiscoveryService service,
+                            DatagramSocket socket, SSDPResponse response) {
+                if (matches(getSt(), response.getST())) {
+                    map.put(response.getUSN(), response.getLocation());
+                }
+            }
+
+            private boolean matches(URI st, URI nt) {
+                return (SSDPMessage.SSDP_ALL.equals(st)
+                        || st.toString().equalsIgnoreCase(nt.toString()));
             }
         }
     }
