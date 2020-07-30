@@ -1,3 +1,7 @@
+2020-07-29  Allen D. Ball  <ball@hcf.dev>
+
+	* Added <ssdp-m-search/> Ant Task and build target.
+
 2020-07-28  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:

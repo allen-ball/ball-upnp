@@ -24,6 +24,7 @@ import ball.swing.table.ArrayListTableModel;
 import ball.upnp.ssdp.SSDPDiscoveryCache;
 import ball.upnp.ssdp.SSDPDiscoveryService;
 import ball.upnp.ssdp.SSDPMessage;
+import ball.upnp.ssdp.SSDPRequest;
 import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
@@ -31,6 +32,7 @@ import ball.util.ant.taskdefs.ConfigurableAntTask;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
@@ -216,6 +218,47 @@ public abstract class SSDPTask extends Task
                     .addListener(this);
 
                 service.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+            } catch (BuildException exception) {
+                throw exception;
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                throw new BuildException(throwable);
+            } finally {
+                Thread.currentThread().setContextClassLoader(loader);
+            }
+        }
+    }
+
+    /**
+     * {@link.uri http://ant.apache.org/ Ant} {@link Task} to send an
+     * {@code M-SEARCH} command and then listen on the SSDP UDP port.
+     *
+     * {@ant.task}
+     */
+    @AntTask("ssdp-m-search")
+    @NoArgsConstructor @ToString
+    public static class MSearch extends SSDPTask {
+        @Getter @Setter
+        private int mx = 5;
+        @Getter @Setter
+        private URI st = SSDPMessage.SSDP_ALL;
+
+        @Override
+        public void execute() throws BuildException {
+            super.execute();
+
+            ClassLoader loader =
+                Thread.currentThread().getContextClassLoader();
+
+            try {
+                Thread.currentThread().setContextClassLoader(getClassLoader());
+
+                SSDPDiscoveryService service =
+                    new SSDPDiscoveryService()
+                    .addListener(this);
+
+                service.multicast(0, SSDPRequest.msearch(getMx(), getSt()));
+                service.awaitTermination(getMx(), TimeUnit.SECONDS);
             } catch (BuildException exception) {
                 throw exception;
             } catch (Throwable throwable) {

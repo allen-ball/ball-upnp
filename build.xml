@@ -54,4 +54,12 @@
     <ssdp-listen/>
   </target>
 
+  <target name="ssdp-m-search"
+          description="--> Invokes &lt;ssdp-m-search/&gt; task."
+          depends="jar-classes">
+    <taskdef classpathref="build.classpath"
+             resource="ball/upnp/ant/antlib.xml"/>
+    <ssdp-m-search/>
+  </target>
+
 </project>

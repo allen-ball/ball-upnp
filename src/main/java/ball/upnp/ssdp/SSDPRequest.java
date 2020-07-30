@@ -188,11 +188,11 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     public SocketAddress getSocketAddress() { return address; }
 
     /**
-     * Method to get the {@value #MX} header value as an {@code int}.
-     * Returns {@code 120} if the header is not specified or the if the
-     * value is not in the range of {@code 1 <= mx <= 120}.
+     * Method to get the {@code MX} header value as an {@code int}.  Returns
+     * {@code 120} if the header is not specified or the if the value is not
+     * in the range of {@code 1 <= mx <= 120}.
      *
-     * @return  The {@value #MX} value.
+     * @return  The {@code MX} value.
      */
     public int getMX() {
         return getHeaderValue(t -> min(max(toInt(t, 120), 1), 120), MX);
