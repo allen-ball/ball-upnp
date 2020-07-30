@@ -35,10 +35,11 @@ import static ball.upnp.ssdp.SSDPMessage.SSDP_ALL;
 public interface SSDP {
 
     /**
-     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
+     * Method to provide the {@link Map} of {@code NT} ({@code ST}) to
      * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
-     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
-     * responses for {@link.this} {@link Device} or {@link Service}.
+     * and {@code NOTIFY("ssdp:byebye")} requests and
+     * {@code M-SEARCH("ssdp:all")} responses for {@link.this}
+     * {@link Device} or {@link Service}.
      *
      * @return  {@link Map} of {@code NT}/{@code USN} permutations.
      */
