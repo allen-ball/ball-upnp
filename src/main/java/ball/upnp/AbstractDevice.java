@@ -21,7 +21,6 @@ package ball.upnp;
  * ##########################################################################
  */
 import java.net.URI;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -43,31 +42,12 @@ public abstract class AbstractDevice implements AnnotatedDevice {
 
     @Synchronized
     @Override
-    public Map<URI,URI> getUSNs() {
+    public Map<URI,URI> getNTMap() {
         if (map == null) {
-            map = new LinkedHashMap<>();
-
-            if (this instanceof RootDevice) {
-                map.put(RootDevice.NT, usn(getUDN(), RootDevice.NT));
-            }
-
-            map.put(getUDN(), getUDN());
-            map.put(getDeviceType(), usn(getUDN(), getDeviceType()));
-
-            if (this instanceof RootDevice) {
-                getServiceList().stream()
-                    .forEach(t -> map.put(t.getServiceType(),
-                                          usn(getUDN(), t.getServiceType())));
-                getDeviceList().stream()
-                    .forEach(t -> map.putAll(t.getUSNs()));
-            }
+            map = AnnotatedDevice.super.getNTMap();
         }
 
         return map;
-    }
-
-    private URI usn(URI left, URI right) {
-        return URI.create(left.toASCIIString() + "::" + right.toASCIIString());
     }
 
     @Override

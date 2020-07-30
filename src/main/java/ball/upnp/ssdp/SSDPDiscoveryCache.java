@@ -153,7 +153,7 @@ public class SSDPDiscoveryCache
         private long expiration = 0;
 
         private Value(SSDPMessage message, long expiration) {
-            this.message = Objects.requireNonNull(message, "message");
+            this.message = Objects.requireNonNull(message);
 
             setExpiration(expiration);
         }

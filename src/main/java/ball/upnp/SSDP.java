@@ -21,43 +21,26 @@ package ball.upnp;
  * ##########################################################################
  */
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Synchronized;
 
-import static lombok.AccessLevel.PROTECTED;
+import static ball.upnp.ssdp.SSDPMessage.SSDP_ALL;
 
 /**
- * Abstract base class for {@link.uri http://www.upnp.org/ UPnP}
- * {@link Service}s.
- *
- * {@bean.info}
+ * SSDP "discoverable" marker interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor(access = PROTECTED)
-public abstract class AbstractService implements AnnotatedService {
-    @Getter
-    private final List<? extends Action> actionList = new LinkedList<>();
-    @Getter
-    private final List<? extends StateVariable> serviceStateTable =
-        new LinkedList<>();
-    private Map<URI,URI> map = null;
+public interface SSDP {
 
-    @Synchronized
-    @Override
-    public Map<URI,URI> getNTMap() {
-        if (map == null) {
-            map = AnnotatedService.super.getNTMap();
-        }
-
-        return map;
-    }
-
-    @Override
-    public String toString() { return getServiceType().toString(); }
+    /**
+     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
+     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
+     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
+     * responses for {@link.this} {@link Device} or {@link Service}.
+     *
+     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
+     */
+    public Map<URI,URI> getNTMap();
 }

@@ -195,6 +195,27 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
     }
 
     /**
+     * Method to get the {@value #NT} {@link URI}.
+     *
+     * @return  The {@value #NT} {@link URI}.
+     */
+    default URI getNT() { return getHeaderValue(URI::create, NT); }
+
+    /**
+     * Method to get the {@value #ST} {@link URI}.
+     *
+     * @return  The {@value #ST} {@link URI}.
+     */
+    default URI getST() { return getHeaderValue(URI::create, ST); }
+
+    /**
+     * Method to get the {@value #USN} {@link URI}.
+     *
+     * @return  The {@value #USN} {@link URI}.
+     */
+    default URI getUSN() { return getHeaderValue(URI::create, USN); }
+
+    /**
      * Method to get the location {@link URI}.
      *
      * @return  The service location {@link URI}.
@@ -202,11 +223,4 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
     default URI getLocation() {
         return getHeaderValue(URI::create, LOCATION, AL);
     }
-
-    /**
-     * Method to get the {@value #USN} {@link URI}.
-     *
-     * @return  The service location {@link URI}.
-     */
-    default URI getUSN() { return getHeaderValue(URI::create, USN); }
 }

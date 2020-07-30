@@ -22,6 +22,7 @@ package ball.upnp;
  */
 import ball.upnp.annotation.XmlNs;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,7 @@ import java.util.UUID;
  * @version $Revision$
  */
 @XmlNs("urn:schemas-upnp-org:device-1-0")
-public interface Device extends Description {
+public interface Device extends Description, SSDP {
 
     /**
      * Method to get the URN ({@link URI}) describing {@link.this}
@@ -81,14 +82,14 @@ public interface Device extends Description {
         return URI.create("uuid:" + getUUID().toString().toUpperCase());
     }
 
-    /**
-     * Method to provide {@link Map} of {@code NT} ({@code ST}) to
-     * {@code USN} permutations required for {@code NOTIFY("ssdp:alive")}
-     * and {@code NOTIFY("ssdp:byebye")} and {@code M-SEARCH("ssdp:all")}
-     * responses for {@link.this} {@link Device} and embedded
-     * {@link Service}s and {@link Device}s.
-     *
-     * @return  {@link Map} of {@code NT}/{@code USN} permutations.
-     */
-    public Map<URI,URI> getUSNs();
+    @Override
+    default Map<URI,URI> getNTMap() {
+        LinkedHashMap<URI,URI> map = new LinkedHashMap<>();
+
+        map.put(getUDN(), getUDN());
+        map.put(getDeviceType(),
+                URI.create(getUDN() + "::" + getDeviceType()));
+
+        return map;
+    }
 }

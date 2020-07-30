@@ -22,7 +22,9 @@ package ball.upnp;
  */
 import ball.upnp.annotation.XmlNs;
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} service interface.
@@ -31,7 +33,7 @@ import java.util.List;
  * @version $Revision$
  */
 @XmlNs("urn:schemas-upnp-org:service-1-0")
-public interface Service extends Description {
+public interface Service extends Description, SSDP {
 
     /**
      * Method to get the {@link Device} hosting {@link.this}
@@ -94,4 +96,14 @@ public interface Service extends Description {
      * @return  The {@link List} of {@link StateVariable}s.
      */
     public List<? extends StateVariable> getServiceStateTable();
+
+    @Override
+    default Map<URI,URI> getNTMap() {
+        LinkedHashMap<URI,URI> map = new LinkedHashMap<>();
+
+        map.put(getDevice().getDeviceType(),
+                URI.create(getDevice().getUDN() + "::" + getServiceType()));
+
+        return map;
+    }
 }

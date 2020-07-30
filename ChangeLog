@@ -1,3 +1,9 @@
+2020-07-30  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/SSDP.java:
+	Initial writing.  Common interface in Device and Service hierarchy
+	to support UPnP Discovery.  Implemented methods in subclasses.
+
 2020-07-29  Allen D. Ball  <ball@hcf.dev>
 
 	* Added <ssdp-m-search/> Ant Task and build target.

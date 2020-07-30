@@ -41,7 +41,7 @@ public interface Description {
 
     /**
      * {@link Pattern} to parse {@link #getXmlns()} to generate a
-     * {@link SpecVersion}.  Provides "{@code major}" and  "{@code minor}"
+     * {@link SpecVersion}.  Provides "{@code major}" and "{@code minor}"
      * matching groups.
      */
     @CompileTimeCheck

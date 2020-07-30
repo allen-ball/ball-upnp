@@ -21,6 +21,9 @@ package ball.upnp;
  * ##########################################################################
  */
 import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link RootDevice} interface.
@@ -34,4 +37,19 @@ public interface RootDevice extends Device {
      * {@code upnp:rootdevice}
      */
     public static final URI NT = URI.create("upnp:rootdevice");
+
+    @Override
+    default Map<URI,URI> getNTMap() {
+        LinkedHashMap<URI,URI> map = new LinkedHashMap<>();
+
+        map.put(NT, URI.create(getUDN() + "::" + NT));
+        map.putAll(Device.super.getNTMap());
+
+        Stream.concat(getServiceList().stream(), getDeviceList().stream())
+            .map(SSDP::getNTMap)
+            .flatMap(t -> t.entrySet().stream())
+            .forEach(t -> map.putIfAbsent(t.getKey(), t.getValue()));
+
+        return map;
+    }
 }
