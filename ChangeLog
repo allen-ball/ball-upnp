@@ -1,3 +1,10 @@
+2020-07-31  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/SSDP.java:
+	Added getUSNMap() and getUSN(URI) interface methods and static
+	matches(URI,URI) and matches(URI) methods to compare NT to STs.
+	Added the corresponding implementations in the class hierarchy.
+
 2020-07-30  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/SSDP.java:

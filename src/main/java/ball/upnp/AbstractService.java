@@ -21,9 +21,13 @@ package ball.upnp;
  * ##########################################################################
  */
 import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -46,13 +50,13 @@ public abstract class AbstractService implements AnnotatedService {
     @Getter
     private final List<? extends StateVariable> serviceStateTable =
         new LinkedList<>();
-    private Map<URI,URI> map = null;
+    private Map<URI,Set<URI>> map = null;
 
     @Synchronized
     @Override
-    public Map<URI,URI> getNTMap() {
+    public Map<URI,Set<URI>> getUSNMap() {
         if (map == null) {
-            map = AnnotatedService.super.getNTMap();
+            map = AnnotatedService.super.getUSNMap();
         }
 
         return map;

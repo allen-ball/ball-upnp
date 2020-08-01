@@ -22,6 +22,7 @@ package ball.upnp;
  */
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 
@@ -38,13 +39,13 @@ import static lombok.AccessLevel.PROTECTED;
  */
 @NoArgsConstructor(access = PROTECTED)
 public abstract class AbstractDevice implements AnnotatedDevice {
-    private Map<URI,URI> map = null;
+    private Map<URI,Set<URI>> map = null;
 
     @Synchronized
     @Override
-    public Map<URI,URI> getNTMap() {
+    public Map<URI,Set<URI>> getUSNMap() {
         if (map == null) {
-            map = AnnotatedDevice.super.getNTMap();
+            map = AnnotatedDevice.super.getUSNMap();
         }
 
         return map;

@@ -23,8 +23,12 @@ package ball.upnp;
 import ball.upnp.annotation.XmlNs;
 import java.net.URI;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} service interface.
@@ -98,12 +102,18 @@ public interface Service extends Description, SSDP {
     public List<? extends StateVariable> getServiceStateTable();
 
     @Override
-    default Map<URI,URI> getNTMap() {
-        LinkedHashMap<URI,URI> map = new LinkedHashMap<>();
+    default Map<URI,Set<URI>> getUSNMap() {
+        LinkedHashMap<URI,Set<URI>> map = new LinkedHashMap<>();
+        Function<URI,Set<URI>> mapper = k -> new LinkedHashSet<>();
 
-        map.put(getDevice().getDeviceType(),
-                URI.create(getDevice().getUDN() + "::" + getServiceType()));
+        map.computeIfAbsent(getUSN(getServiceType()), mapper)
+            .add(getServiceType());
 
         return map;
+    }
+
+    @Override
+    default URI getUSN(URI urn) {
+        return getDevice().getUSN(Objects.requireNonNull(urn));
     }
 }

@@ -23,9 +23,13 @@ package ball.upnp;
 import ball.upnp.annotation.XmlNs;
 import java.net.URI;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} device interface.
@@ -83,13 +87,39 @@ public interface Device extends Description, SSDP {
     }
 
     @Override
-    default Map<URI,URI> getNTMap() {
-        LinkedHashMap<URI,URI> map = new LinkedHashMap<>();
+    default Map<URI,Set<URI>> getUSNMap() {
+        LinkedHashMap<URI,Set<URI>> map = new LinkedHashMap<>();
+        Function<URI,Set<URI>> mapper = k -> new LinkedHashSet<>();
 
-        map.put(getUDN(), getUDN());
-        map.put(getDeviceType(),
-                URI.create(getUDN() + "::" + getDeviceType()));
+        if (this instanceof RootDevice) {
+            map.computeIfAbsent(getUSN(RootDevice.NT), mapper)
+                .add(RootDevice.NT);
+        }
+
+        map.computeIfAbsent(getUSN(null), mapper)
+            .add(getUDN());
+        map.computeIfAbsent(getUSN(getDeviceType()), mapper)
+            .add(getDeviceType());
+
+        if (this instanceof RootDevice) {
+            Stream.concat(getServiceList().stream(), getDeviceList().stream())
+                .map(SSDP::getUSNMap)
+                .forEach(t -> t.forEach((k, v) -> map.computeIfAbsent(k, mapper).addAll(v)));
+        }
 
         return map;
+    }
+
+    @Override
+    default URI getUSN(URI urn) {
+        URI usn = null;
+
+        if (urn != null) {
+            usn = URI.create(getUDN() + "::" + urn);
+        } else {
+            usn = getUDN();
+        }
+
+        return usn;
     }
 }
