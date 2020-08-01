@@ -26,6 +26,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Comparator;
 import java.util.List;
@@ -58,11 +59,11 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
         new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
+    private final Random random = new Random();
     private final MulticastSocket multicast;
-    private final DatagramSocket socket;
+    private final DatagramSocket unicast;
     private final CopyOnWriteArrayList<Listener> listeners =
         new CopyOnWriteArrayList<>();
-    private final Random random = new Random();
 
     /**
      * Sole constructor.
@@ -73,18 +74,37 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public SSDPDiscoveryService() throws IOException {
         super(8);
 
+        random.setSeed(System.currentTimeMillis());
+
         multicast = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
         multicast.setReuseAddress(true);
         multicast.setLoopbackMode(false);
         multicast.setTimeToLive(4);
         multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
+        /*
+         * Bind to an {@link.rfc 4340} ephemeral port.
+         */
+        DatagramSocket socket = null;
+        List<Integer> ports =
+            random.ints(49152, 65536).limit(256).boxed().collect(toList());
 
-        socket = new DatagramSocket();
+        for (;;) {
+            try {
+                socket = new DatagramSocket(ports.remove(0));
+                break;
+            } catch (SocketException exception) {
+                if (ports.isEmpty()) {
+                    throw exception;
+                } else {
+                    continue;
+                }
+            }
+        }
 
-        random.setSeed(System.currentTimeMillis());
+        unicast = socket;
 
         submit(() -> receive(multicast));
-        submit(() -> receive(socket));
+        submit(() -> receive(unicast));
     }
 
     /**
@@ -154,8 +174,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
     private void task(SSDPMessage message, DatagramPacket packet) {
         try {
-            fireSendEvent(socket, message);
-            socket.send(packet);
+            fireSendEvent(unicast, message);
+            unicast.send(packet);
         } catch (IOException exception) {
         }
     }
