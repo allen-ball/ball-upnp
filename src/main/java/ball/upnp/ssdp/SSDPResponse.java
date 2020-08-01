@@ -36,6 +36,7 @@ import org.apache.http.message.BasicHttpResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.apache.http.message.BasicLineParser.INSTANCE;
 import static org.apache.http.message.BasicLineParser.parseHeader;
 import static org.apache.http.message.BasicLineParser.parseStatusLine;
@@ -49,6 +50,11 @@ import static org.apache.http.message.BasicLineParser.parseStatusLine;
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
+    private static final String UPNP = "UPnP/1.0";
+    private static final String OS =
+        Stream.of("os.name", "os.version")
+        .map(System::getProperty)
+        .collect(joining("/"));
 
     /**
      * Method to parse a {@link SSDPResponse} from a
@@ -78,7 +84,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
             .header(DATE, GENERATOR.getCurrentDate())
             .header(EXT, (String) null)
             .header(LOCATION, location)
-            .header(SERVER, "UPnP/1.0")
+            .header(SERVER, String.join(SPACE, OS, UPNP))
             .header(ST, st)
             .header(USN, usn);
 
