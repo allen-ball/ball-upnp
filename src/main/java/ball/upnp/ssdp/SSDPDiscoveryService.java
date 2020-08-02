@@ -59,6 +59,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
         new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
+    private final int bootID =
+        (int) MILLISECONDS.convert(System.currentTimeMillis(), SECONDS);
     private final Random random = new Random();
     private final MulticastSocket multicast;
     private final DatagramSocket unicast;
@@ -106,6 +108,20 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         submit(() -> receive(multicast));
         submit(() -> receive(unicast));
     }
+
+    /**
+     * {@code BOOTID.UPNP.ORG}
+     *
+     * @return  {@code bootID}
+     */
+    public int getBootID() { return bootID; }
+
+    /**
+     * {@code SEARCHPORT.UPNP.ORG}
+     *
+     * @return  Search port.
+     */
+    public int getSearchPort() { return unicast.getLocalPort(); }
 
     /**
      * Method to add a {@link Listener}.
