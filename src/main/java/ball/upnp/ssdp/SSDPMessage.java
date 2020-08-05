@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -34,9 +35,12 @@ import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpMessage;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.http.protocol.HttpDateGenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -114,6 +118,14 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
 
         return Pattern.compile(EOL).splitAsStream(string).collect(toList());
     }
+
+    /**
+     * Method to get the expiration time for {@link.this}
+     * {@link SSDPMessage}.
+     *
+     * @return  The expiration time (milliseconds since the UNIX epoch).
+     */
+    public long getExpiration();
 
     /**
      * Method to find the first {@link Header} matching {@code names} and
@@ -222,5 +234,31 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      */
     default URI getLocation() {
         return getHeaderValue(URI::create, LOCATION, AL);
+    }
+
+    /**
+     * Implementation method for {@link #getExpiration()}.
+     *
+     * @param   message         The {@link SSDPMessage}.
+     * @param   timestamp       The message's timestamp.
+     *
+     * @return  The expiration time (milliseconds since the UNIX epoch).
+     */
+    public static long getExpiration(SSDPMessage message, long timestamp) {
+        long expiration = timestamp;
+        Date date = message.getHeaderValue(DateUtils::parseDate, DATE);
+
+        if (date != null) {
+            expiration = date.getTime();
+        }
+
+        Long maxAge =
+            message.getHeaderParameterValue(Long::decode,
+                                            CACHE_CONTROL, MAX_AGE);
+
+        expiration +=
+            MILLISECONDS.convert((maxAge != null) ? maxAge : 0, SECONDS);
+
+        return expiration;
     }
 }

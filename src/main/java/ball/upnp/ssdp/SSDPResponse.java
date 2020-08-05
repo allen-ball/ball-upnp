@@ -36,7 +36,6 @@ import org.apache.http.message.BasicHttpResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.apache.http.message.BasicLineParser.INSTANCE;
 import static org.apache.http.message.BasicLineParser.parseHeader;
 import static org.apache.http.message.BasicLineParser.parseStatusLine;
@@ -50,11 +49,6 @@ import static org.apache.http.message.BasicLineParser.parseStatusLine;
  * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
-    private static final String UPNP = "UPnP/1.0";
-    private static final String OS =
-        Stream.of("os.name", "os.version")
-        .map(System::getProperty)
-        .collect(joining("/"));
 
     /**
      * Method to parse a {@link SSDPResponse} from a
@@ -68,32 +62,17 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
         return new SSDPResponse(packet);
     }
 
-    /**
-     * {@code M-SEARCH} {@link SSDPResponse}.
-     *
-     * @param   maxAge          The {@code MAX-AGE} header parameter value.
-     * @param   location        The {@code LOCATION} header value.
-     * @param   st              The {@code ST} header value.
-     * @param   usn             The {@code USN} header value.
-     */
-    public static SSDPResponse msearch(int maxAge,
-                                       URI location, URI st, URI usn) {
-        SSDPResponse response =
-            new SSDPResponse(SC_OK, "OK")
-            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(maxAge))
-            .header(DATE, GENERATOR.getCurrentDate())
-            .header(EXT, (String) null)
-            .header(LOCATION, location)
-            .header(SERVER, String.join(SPACE, OS, UPNP))
-            .header(ST, st)
-            .header(USN, usn);
-
-        return response;
-    }
-
     private SocketAddress address = null;
+    private long timestamp = System.currentTimeMillis();
+    private Long expiration = null;
 
-    private SSDPResponse(int code, String reason) {
+    /**
+     * Sole non-private constructor.
+     *
+     * @param   code            The {@link SSDPRequest} {@code code}.
+     * @param   reason          The {@link SSDPRequest} reason.
+     */
+    protected SSDPResponse(int code, String reason) {
         super(HttpVersion.HTTP_1_1, code, reason);
     }
 
@@ -186,6 +165,15 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
         setHeader(name, (value != null) ? function.apply(value) : null);
 
         return this;
+    }
+
+    @Override
+    public long getExpiration() {
+        if (expiration == null) {
+            expiration = SSDPMessage.getExpiration(this, timestamp);
+        }
+
+        return expiration;
     }
 
     @Override

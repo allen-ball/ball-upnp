@@ -78,8 +78,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     /**
-     * Method to parse a {@link SSDPRequest} from a
-     * {@link DatagramPacket}.
+     * Method to parse a {@link SSDPRequest} from a {@link DatagramPacket}.
      *
      * @param   packet          The {@link DatagramPacket}.
      *
@@ -89,73 +88,16 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
         return new SSDPRequest(packet);
     }
 
-    /**
-     * Notify "alive" {@link SSDPRequest}.
-     *
-     * @param   host            The host {@link SocketAddress}.
-     * @param   maxAge          The {@code MAX-AGE} header parameter value.
-     * @param   location        The {@code LOCATION} header value.
-     * @param   nt              The {@code NT} header value.
-     * @param   usn             The {@code USN} header value.
-     *
-     * @return  The {@link SSDPRequest}.
-     */
-    public static SSDPRequest alive(SocketAddress host, int maxAge,
-                                    URI location, URI nt, URI usn) {
-        SSDPRequest request =
-            new SSDPRequest(Method.NOTIFY)
-            .header(HOST, host)
-            .header(CACHE_CONTROL, MAX_AGE + "=" + String.valueOf(maxAge))
-            .header(LOCATION, location)
-            .header(NT, nt)
-            .header(NTS, SSDP_ALIVE)
-            .header(USN, usn);
-
-        return request;
-    }
-
-    /**
-     * Notify "byebye" {@link SSDPRequest}.
-     *
-     * @param   host            The host {@link SocketAddress}.
-     * @param   nt              The {@code NT} header value.
-     * @param   usn             The {@code USN} header value.
-     *
-     * @return  The {@link SSDPRequest}.
-     */
-    public static SSDPRequest byebye(SocketAddress host, URI nt, URI usn) {
-        SSDPRequest request =
-            new SSDPRequest(Method.NOTIFY)
-            .header(HOST, host)
-            .header(NT, nt)
-            .header(NTS, SSDP_BYEBYE)
-            .header(USN, usn);
-
-        return request;
-    }
-
-    /**
-     * Discovery {@link SSDPRequest}.
-     *
-     * @param   mx              The {@code MX} header value.
-     * @param   st              The {@code ST} header value.
-     *
-     * @return  The {@link SSDPRequest}.
-     */
-    public static SSDPRequest msearch(int mx, URI st) {
-        SSDPRequest request =
-            new SSDPRequest(Method.MSEARCH)
-            .header(HOST, SSDPDiscoveryService.MULTICAST_SOCKET_ADDRESS)
-            .header(MAN, "\"ssdp:discover\"")
-            .header(MX, String.valueOf(mx))
-            .header(ST, st);
-
-        return request;
-    }
-
     private SocketAddress address = null;
+    private long timestamp = System.currentTimeMillis();
+    private Long expiration = null;
 
-    private SSDPRequest(Method method) {
+    /**
+     * Sole non-private constructor.
+     *
+     * @param   method          The {@link SSDPRequest} {@link Method}.
+     */
+    protected SSDPRequest(Method method) {
         super(method.toString(), "*", HttpVersion.HTTP_1_1);
     }
 
@@ -266,6 +208,15 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
         setHeader(name, (value != null) ? function.apply(value) : null);
 
         return this;
+    }
+
+    @Override
+    public long getExpiration() {
+        if (expiration == null) {
+            expiration = SSDPMessage.getExpiration(this, timestamp);
+        }
+
+        return expiration;
     }
 
     @Override

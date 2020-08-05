@@ -1,5 +1,9 @@
 2020-08-05  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/ssdp/SSDPMessage.java:
+	Added getExpiration() method to interface and provided
+	implementations in concrete subclasses.
+
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
 	Added product parameter to sole constructor.  Added getService()
 	and msearch(int,URI) methods.
