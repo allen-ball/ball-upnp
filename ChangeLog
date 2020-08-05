@@ -1,5 +1,8 @@
 2020-08-05  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryCache.java:
+	Changed Map entry value type to SSDPMessage.
+
 	* src/main/java/ball/upnp/ssdp/SSDPMessage.java:
 	Added getExpiration() method to interface and provided
 	implementations in concrete subclasses.
