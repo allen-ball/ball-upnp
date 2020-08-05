@@ -126,7 +126,6 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         }
 
         unicast = socket;
-        unicast.setTimeToLive(2);
 
         submit(() -> receive(multicast));
         submit(() -> receive(unicast));
