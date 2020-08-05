@@ -72,13 +72,19 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
         NTS = "NTS",
         SERVER = HttpHeaders.SERVER.toUpperCase(),
         ST = "ST",
-        USN = "USN";
+        USN = "USN",
+        BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG",
+        NEXTBOOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG",
+        CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG",
+        SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG",
+        USER_AGENT = "USER-AGENT";
 
     /**
      * SSDP {@link #NTS} value.
      */
     public static final String
         SSDP_ALIVE = "ssdp:alive",
+        SSDP_UPDATE = "ssdp:update",
         SSDP_BYEBYE = "ssdp:byebye";
 
     /**

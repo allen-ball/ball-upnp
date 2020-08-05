@@ -1,5 +1,7 @@
 2020-08-05  Allen D. Ball  <ball@hcf.dev>
 
+	* Support UPnP 1.1 Discovery.
+
 	* src/main/java/ball/upnp/ant/taskdefs/SSDPTask.java:
 	Added support for "product" attribute (with default value).
 

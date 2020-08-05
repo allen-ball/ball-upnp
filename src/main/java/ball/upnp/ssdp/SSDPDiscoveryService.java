@@ -60,7 +60,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         .map(System::getProperty)
         .map(t -> t.replaceAll("[\\p{Space}]+", EMPTY))
         .collect(joining("/"));
-    private static final String UPNP = "UPnP/1.0";
+    private static final String UPNP = "UPnP/1.1";
 
     private static final String MULTICAST_ADDRESS = "239.255.255.250";
     private static final int MULTICAST_PORT = 1900;
@@ -144,6 +144,13 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @return  {@code bootID}
      */
     public int getBootID() { return bootID; }
+
+    /**
+     * {@code NEXTBOOTID.UPNP.ORG}
+     *
+     * @return  {@code nextBootID}
+     */
+    public int getNextBootID() { throw new UnsupportedOperationException(); }
 
     /**
      * {@code SEARCHPORT.UPNP.ORG}
@@ -429,6 +436,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             header(MAN, "\"ssdp:discover\"");
             header(MX, String.valueOf(mx));
             header(ST, st);
+            header(USER_AGENT, getServer());
         }
     }
 }
