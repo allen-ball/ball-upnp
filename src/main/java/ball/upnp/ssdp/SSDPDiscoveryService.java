@@ -28,18 +28,23 @@ import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Stream;
 import org.apache.http.ParseException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
  * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.
@@ -50,6 +55,13 @@ import static java.util.stream.Collectors.toList;
  * @version $Revision$
  */
 public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
+    private static final String OS =
+        Stream.of("os.name", "os.version")
+        .map(System::getProperty)
+        .map(t -> t.replaceAll("[\\p{Space}]+", EMPTY))
+        .collect(joining("/"));
+    private static final String UPNP = "UPnP/1.0";
+
     private static final String MULTICAST_ADDRESS = "239.255.255.250";
     private static final int MULTICAST_PORT = 1900;
 
@@ -59,6 +71,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
         new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
+    private final String server;
     private final int bootID =
         (int) MILLISECONDS.convert(System.currentTimeMillis(), SECONDS);
     private final Random random = new Random();
@@ -70,11 +83,20 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     /**
      * Sole constructor.
      *
+     * @param   product         The {@code product/version} {@link String}
+     *                          identifying this UPnP application.
+     *
      * @throws  IOException     If the underlying {@link MulticastSocket}
      *                          cannot be conditioned.
      */
-    public SSDPDiscoveryService() throws IOException {
+    public SSDPDiscoveryService(String product) throws IOException {
         super(8);
+
+        server =
+            Stream.of(OS, UPNP, product)
+            .filter(Objects::nonNull)
+            .collect(joining(SPACE));
+;
 
         random.setSeed(System.currentTimeMillis());
 
@@ -108,6 +130,13 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         submit(() -> receive(multicast));
         submit(() -> receive(unicast));
     }
+
+    /**
+     * {@code SERVER}
+     *
+     * @return  {@code SERVER}
+     */
+    public String getServer() { return server; }
 
     /**
      * {@code BOOTID.UPNP.ORG}
@@ -162,7 +191,15 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Method to queue an {@link SSDPMessage} multicast.
+     * Send multicast {@code M-SEARCH} messsage.
+     *
+     * @param   mx              The {@code MX} header value.
+     * @param   st              The {@code ST} header value.
+     */
+    public void msearch(int mx, URI st) { multicast(0, new MSearch(mx, st)); }
+
+    /**
+     * Method to queue an {@link SSDPMessage} for multicast.
      *
      * @param   delay           Time to delay (in milliseconds) before
      *                          sending.
@@ -381,6 +418,17 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         @Override
         public void sendEvent(SSDPDiscoveryService service,
                               DatagramSocket socket, SSDPMessage message) {
+        }
+    }
+
+    private class MSearch extends SSDPRequest {
+        public MSearch(int mx, URI st) {
+            super(Method.MSEARCH);
+
+            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(MAN, "\"ssdp:discover\"");
+            header(MX, String.valueOf(mx));
+            header(ST, st);
         }
     }
 }
