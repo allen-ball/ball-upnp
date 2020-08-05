@@ -32,14 +32,18 @@ import ball.util.ant.taskdefs.AnnotatedAntTask;
 import ball.util.ant.taskdefs.AntTask;
 import ball.util.ant.taskdefs.ClasspathDelegateAntTask;
 import ball.util.ant.taskdefs.ConfigurableAntTask;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentSkipListMap;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.Synchronized;
 import lombok.ToString;
@@ -67,8 +71,28 @@ public abstract class SSDPTask extends Task
                                           ClasspathDelegateAntTask,
                                           ConfigurableAntTask,
                                           SSDPDiscoveryService.Listener {
+    private static final String VERSION;
+
+    static {
+        try {
+            Properties properties = new Properties();
+            Class<?> type = SSDPTask.class;
+            String resource = type.getSimpleName() + ".properties.xml";
+
+            try (InputStream in = type.getResourceAsStream(resource)) {
+                properties.loadFromXML(in);
+            }
+
+            VERSION = properties.getProperty("version");
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+    }
+
     @Getter @Setter @Accessors(chain = true, fluent = true)
     private ClasspathUtils.Delegate delegate = null;
+    @Getter @Setter @NonNull
+    private String product = getAntTaskName() + "/" + VERSION;
 
     @Override
     public void init() throws BuildException {
@@ -121,6 +145,12 @@ public abstract class SSDPTask extends Task
                              address.getPort());
     }
 
+    private class SSDPDiscoveryServiceImpl extends SSDPDiscoveryService {
+        public SSDPDiscoveryServiceImpl() throws IOException {
+            super(getProduct());
+        }
+    }
+
     /**
      * {@link.uri http://ant.apache.org/ Ant} {@link Task} to run SSDP
      * discovery.
@@ -145,7 +175,7 @@ public abstract class SSDPTask extends Task
 
                 SSDPDiscoveryCache cache = new SSDPDiscoveryCache();
                 SSDPDiscoveryService service =
-                    new SSDPDiscoveryService()
+                    new SSDPDiscoveryServiceImpl()
                     .addListener(this)
                     .addListener(cache);
 
@@ -162,8 +192,8 @@ public abstract class SSDPTask extends Task
             }
         }
 
-        private class TableModelImpl extends ArrayListTableModel<SSDPDiscoveryCache.Value> {
-            private static final long serialVersionUID = -7515042633146116666L;
+        private class TableModelImpl extends ArrayListTableModel<SSDPMessage> {
+            private static final long serialVersionUID = 6644683980831866749L;
 
             public TableModelImpl(SSDPDiscoveryCache cache) {
                 super(cache.values(),
@@ -172,13 +202,13 @@ public abstract class SSDPTask extends Task
             }
 
             @Override
-            protected Object getValueAt(SSDPDiscoveryCache.Value row, int x) {
+            protected Object getValueAt(SSDPMessage row, int x) {
                 Object object = null;
 
                 switch (x) {
                 default:
                 case 0:
-                    object = row.getSSDPMessage().getUSN();
+                    object = row.getUSN();
                     break;
 
                 case 1:
@@ -189,7 +219,7 @@ public abstract class SSDPTask extends Task
                     break;
 
                 case 2:
-                    object = row.getSSDPMessage().getLocation();
+                    object = row.getLocation();
                     break;
                 }
 
@@ -218,7 +248,7 @@ public abstract class SSDPTask extends Task
                 Thread.currentThread().setContextClassLoader(getClassLoader());
 
                 SSDPDiscoveryService service =
-                    new SSDPDiscoveryService()
+                    new SSDPDiscoveryServiceImpl()
                     .addListener(this);
 
                 service.awaitTermination(Long.MAX_VALUE, SECONDS);
@@ -260,11 +290,11 @@ public abstract class SSDPTask extends Task
                 Thread.currentThread().setContextClassLoader(getClassLoader());
 
                 SSDPDiscoveryService service =
-                    new SSDPDiscoveryService()
+                    new SSDPDiscoveryServiceImpl()
                     .addListener(this)
                     .addListener(new MSEARCH());
 
-                service.multicast(0, SSDPRequest.msearch(getMx(), getSt()));
+                service.msearch(getMx(), getSt());
                 service.awaitTermination(getMx(), SECONDS);
 
                 log(new MapTableModel(map,
