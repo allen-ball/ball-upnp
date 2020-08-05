@@ -60,7 +60,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         .map(System::getProperty)
         .map(t -> t.replaceAll("[\\p{Space}]+", EMPTY))
         .collect(joining("/"));
-    private static final String UPNP = "UPnP/1.1";
+    private static final String UPNP = "UPnP/2.0";
 
     private static final String MULTICAST_ADDRESS = "239.255.255.250";
     private static final int MULTICAST_PORT = 1900;
@@ -103,7 +103,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         multicast = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
         multicast.setReuseAddress(true);
         multicast.setLoopbackMode(false);
-        multicast.setTimeToLive(4);
+        multicast.setTimeToLive(2);
         multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
         /*
          * Bind to an {@link.rfc 4340} ephemeral port.
@@ -126,6 +126,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         }
 
         unicast = socket;
+        unicast.setTimeToLive(2);
 
         submit(() -> receive(multicast));
         submit(() -> receive(unicast));

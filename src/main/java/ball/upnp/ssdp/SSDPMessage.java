@@ -77,7 +77,8 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
         NEXTBOOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG",
         CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG",
         SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG",
-        USER_AGENT = "USER-AGENT";
+        USER_AGENT = "USER-AGENT",
+        SECURELOCATION_UPNP_ORG = "SECURELOCATION.UPNP.ORG";
 
     /**
      * SSDP {@link #NTS} value.
