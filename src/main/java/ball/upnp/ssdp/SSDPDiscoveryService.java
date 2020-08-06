@@ -131,11 +131,11 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * {@code SERVER}
+     * {@code SERVER} and {@code USER-AGENT}
      *
-     * @return  {@code SERVER}
+     * @return  {@code SERVER} and {@code USER-AGENT}
      */
-    public String getServer() { return server; }
+    public String getUserAgent() { return server; }
 
     /**
      * {@code BOOTID.UPNP.ORG}
@@ -435,7 +435,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             header(MAN, "\"ssdp:discover\"");
             header(MX, String.valueOf(mx));
             header(ST, st);
-            header(USER_AGENT, getServer());
+            header(USER_AGENT, getUserAgent());
         }
     }
 }
