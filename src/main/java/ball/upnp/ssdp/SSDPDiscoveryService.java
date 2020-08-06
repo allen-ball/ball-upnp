@@ -72,8 +72,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
     private final String server;
-    private final int bootID =
-        (int) MILLISECONDS.convert(System.currentTimeMillis(), SECONDS);
+    private final int bootID = (int) (System.currentTimeMillis() / 1000);
     private final Random random = new Random();
     private final MulticastSocket multicast;
     private final DatagramSocket unicast;

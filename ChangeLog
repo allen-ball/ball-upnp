@@ -1,5 +1,9 @@
 2020-08-05  Allen D. Ball  <ball@hcf.dev>
 
+	* src/main/java/ball/upnp/ssdp/SSDPRequest.java,
+	src/main/java/ball/upnp/ssdp/SSDPResponse.java:
+	Added header(String,Number) method.
+
 	* Support UPnP 2.0 Discovery.
 
 	* src/main/java/ball/upnp/ant/taskdefs/SSDPTask.java:

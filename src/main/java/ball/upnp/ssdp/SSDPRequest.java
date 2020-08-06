@@ -183,6 +183,18 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     }
 
     /**
+     * {@link Number} fluent header setter.
+     *
+     * @param   name            The header name.
+     * @param   value           The header value.
+     *
+     * @return  {@link.this}
+     */
+    public SSDPRequest header(String name, Number value) {
+        return header(name, Number::toString, value);
+    }
+
+    /**
      * {@link URI} fluent header setter.
      *
      * @param   name            The header name.
