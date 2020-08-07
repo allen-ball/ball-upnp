@@ -21,6 +21,9 @@ package ball.upnp;
  * ##########################################################################
  */
 import java.net.URI;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 /**
  * {@link.uri http://www.upnp.org/ UPnP} {@link RootDevice} interface.
@@ -34,4 +37,15 @@ public interface RootDevice extends Device {
      * {@code upnp:rootdevice}
      */
     public static final URI NT = URI.create("upnp:rootdevice");
+
+    /**
+     * Method to invoke {@link BiConsumer consumer} for every {@link URI NT}
+     * / {@link URI USN} combinations representing the {@link RootDevice}
+     * with embedded {@link Service}s and {@link Device}s.
+     *
+     * @param   consumer        The {@link BiConsumer}.
+     */
+    default void notify(BiConsumer<URI,URI> consumer) {
+        getUSNMap().forEach((usn, v) -> v.forEach(nt -> consumer.accept(nt, usn)));
+    }
 }
