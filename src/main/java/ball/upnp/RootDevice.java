@@ -53,6 +53,21 @@ public interface RootDevice extends Device {
     default int getMaxAge() { return 1800; }
 
     /**
+     * {@code LOCATION}
+     *
+     * @return  Description {@link URI}
+     */
+    public URI getLocation();
+
+    /**
+     * Method to get {@link.this} {@link RootDevice}'s presentation
+     * {@code URL} (as an {@link URI}).
+     *
+     * @return  The presentation {@link URI}.
+     */
+    public URI getPresentationURL();
+
+    /**
      * Method to invoke {@link BiConsumer consumer} for every {@link URI NT}
      * / {@link URI USN} combinations representing the {@link RootDevice}
      * with embedded {@link Service}s and {@link Device}s.

@@ -70,14 +70,6 @@ public interface Device extends Description, SSDP {
     public List<? extends Device> getDeviceList();
 
     /**
-     * Method to get {@link.this} {@link Device}'s presentation
-     * {@code URL} (as an {@link URI}).
-     *
-     * @return  The presentation {@link URI}.
-     */
-    public URI getPresentationURL();
-
-    /**
      * Method to get {@link.this} {@link Device}'s UDN.
      *
      * @return  The UDN {@link URI}.

@@ -2,7 +2,7 @@
 
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
 	Added advertise(RootDevice,int,URI) method to manage NOTIFY
-	messages for root devices.
+	messages and M-SEARCH responses for root devices.
 
 	* src/main/java/ball/upnp/RootDevice.java:
 	Added getConfigId() and getMaxAge() methods.

@@ -21,6 +21,7 @@ package ball.upnp.ssdp;
  * ##########################################################################
  */
 import ball.upnp.RootDevice;
+import ball.upnp.SSDP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -31,6 +32,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -39,6 +41,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Stream;
+import lombok.ToString;
 import org.apache.http.ParseException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -130,6 +133,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
         unicast = socket;
 
+        addListener(new MSEARCH());
+
         submit(() -> receive(multicast));
         submit(() -> receive(unicast));
     }
@@ -206,14 +211,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   device          The {@link RootDevice} to advertise.
      * @param   rate            The rate (in seconds) to repeat
      *                          advertisements.
-     * @param   location        The {@link URI} to the device description.
      *
      * @return  {@link.this}
      */
     public SSDPDiscoveryService advertise(RootDevice device,
-                                          int rate, URI location) {
+                                          int rate) {
         ScheduledFuture<?> future =
-            scheduleAtFixedRate(() -> alive(device, location), 0, rate, SECONDS);
+            scheduleAtFixedRate(() -> alive(device),
+                                advertisers.size(), rate, SECONDS);
 
         future = advertisers.put(device, future);
 
@@ -224,8 +229,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         return this;
     }
 
-    private void alive(RootDevice device, URI location) {
-        device.notify((nt, usn) -> multicast(new Alive(nt, usn, device, location)));
+    private void alive(RootDevice device) {
+        device.notify((nt, usn) -> multicast(new Alive(nt, usn, device)));
     }
 
     private void byebye(RootDevice device) {
@@ -491,6 +496,60 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         }
     }
 
+    @ToString
+    private class MSEARCH extends RequestHandler {
+        public MSEARCH() { super(SSDPRequest.Method.MSEARCH); }
+
+        @Override
+        public void run(SSDPDiscoveryService service,
+                        DatagramSocket socket, SSDPRequest request) {
+            try {
+                if (isHeaderValue(request, SSDPMessage.MAN, "\"ssdp:discover\"")) {
+                    int mx = request.getMX();
+                    SocketAddress address = request.getSocketAddress();
+                    List<SSDPMessage> list = new LinkedList<>();
+                    URI st = request.getST();
+                    boolean all = SSDPMessage.SSDP_ALL.equals(st);
+
+                    advertisers.keySet()
+                        .stream()
+                        .forEach(device -> device.notify((nt, usn) -> {
+                                    if (SSDP.matches(st, nt)) {
+                                        list.add(new MSearch(service, all ? nt : st, usn, device));
+                                    }
+                                }));
+
+                    service.send(mx, address, list);
+                }
+            } catch (Exception exception) {
+                /* log.error("{}", exception.getMessage(), exception); */
+            }
+        }
+
+        private boolean isHeaderValue(SSDPRequest request,
+                                      String header, String value) {
+            return Objects.equals(request.getHeaderValue(header), value);
+        }
+
+        private class MSearch extends SSDPResponse {
+            public MSearch(SSDPDiscoveryService service,
+                           URI st, URI usn, RootDevice device) {
+                super(SC_OK, "OK");
+
+                header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());
+                header(DATE, GENERATOR.getCurrentDate());
+                header(EXT, (String) null);
+                header(LOCATION, device.getLocation());
+                header(SERVER, service.getUserAgent());
+                header(ST, st);
+                header(USN, usn);
+                header(BOOTID_UPNP_ORG, service.getBootId());
+                header(CONFIGID_UPNP_ORG, device.getConfigId());
+                header(SEARCHPORT_UPNP_ORG, service.getSearchPort());
+            }
+        }
+    }
+
     private class MSearch extends SSDPRequest {
         public MSearch(int mx, URI st) {
             super(Method.MSEARCH);
@@ -504,7 +563,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class Alive extends SSDPRequest {
-        public Alive(URI nt, URI usn, RootDevice device, URI location) {
+        public Alive(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
             header(HOST, MULTICAST_SOCKET_ADDRESS);
@@ -513,7 +572,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             header(NTS, SSDP_ALIVE);
             header(SERVER, getUserAgent());
             header(USN, usn);
-            header(LOCATION, location);
+            header(LOCATION, device.getLocation());
             header(BOOTID_UPNP_ORG, getBootId());
             header(CONFIGID_UPNP_ORG, device.getConfigId());
             header(SEARCHPORT_UPNP_ORG, getSearchPort());
@@ -534,11 +593,11 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class Update extends SSDPRequest {
-        public Update(URI nt, URI usn, RootDevice device, URI location) {
+        public Update(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
             header(HOST, MULTICAST_SOCKET_ADDRESS);
-            header(LOCATION, location);
+            header(LOCATION, device.getLocation());
             header(NT, nt);
             header(NTS, SSDP_UPDATE);
             header(USN, usn);
