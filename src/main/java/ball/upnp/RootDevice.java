@@ -39,6 +39,20 @@ public interface RootDevice extends Device {
     public static final URI NT = URI.create("upnp:rootdevice");
 
     /**
+     * {@code CONFIGID.UPNP.ORG}
+     *
+     * @return  {@code configID}
+     */
+    default int getConfigId() { return 1; }
+
+    /**
+     * {@code CACHE-CONTROL: MAX-AGE}
+     *
+     * @return  {@code MAX-AGE}
+     */
+    default int getMaxAge() { return 1800; }
+
+    /**
      * Method to invoke {@link BiConsumer consumer} for every {@link URI NT}
      * / {@link URI USN} combinations representing the {@link RootDevice}
      * with embedded {@link Service}s and {@link Device}s.

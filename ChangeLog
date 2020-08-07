@@ -1,8 +1,12 @@
+2020-08-07  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/RootDevice.java:
+	Added getConfigId() and getMaxAge() methods.
+
 2020-08-06  Allen D. Ball  <ball@hcf.dev>
 
 	* src/main/java/ball/upnp/ssdp/SSDPDiscoveryService.java:
-	Added getConfigID() method.  Added multicast() and send() "without
-	delay" variant methods.
+	Added multicast() and send() "without delay" variant methods.
 
 	* src/main/java/ball/upnp/RootDevice.java:
 	Added notify(BiConsumer<URI,URI>) default method.
