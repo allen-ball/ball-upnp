@@ -20,6 +20,7 @@ package ball.upnp.ssdp;
  * limitations under the License.
  * ##########################################################################
  */
+import ball.upnp.RootDevice;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -33,7 +34,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Stream;
 import org.apache.http.ParseException;
@@ -72,12 +75,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
 
     private final String server;
-    private final int bootID = (int) (System.currentTimeMillis() / 1000);
+    private final int bootId = (int) (System.currentTimeMillis() / 1000);
     private final Random random = new Random();
     private final MulticastSocket multicast;
     private final DatagramSocket unicast;
     private final CopyOnWriteArrayList<Listener> listeners =
         new CopyOnWriteArrayList<>();
+    private final ConcurrentHashMap<RootDevice,ScheduledFuture<?>> advertisers =
+        new ConcurrentHashMap<>();
 
     /**
      * Sole constructor.
@@ -139,23 +144,16 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     /**
      * {@code BOOTID.UPNP.ORG}
      *
-     * @return  {@code bootID}
+     * @return  {@code bootId}
      */
-    public int getBootID() { return bootID; }
+    public int getBootId() { return bootId; }
 
     /**
      * {@code NEXTBOOTID.UPNP.ORG}
      *
-     * @return  {@code nextBootID}
+     * @return  {@code nextBootId}
      */
-    public int getNextBootID() { throw new UnsupportedOperationException(); }
-
-    /**
-     * {@code CONFIGID.UPNP.ORG}
-     *
-     * @return  {@code configID}
-     */
-    public int getConfigID() { return 1; }
+    public int getNextBootId() { throw new UnsupportedOperationException(); }
 
     /**
      * {@code SEARCHPORT.UPNP.ORG}
@@ -200,6 +198,38 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
     private void fireReceiveEvent(DatagramSocket socket, SSDPMessage message) {
         listeners.stream().forEach(t -> t.receiveEvent(this, socket, message));
+    }
+
+    /**
+     * Method to add a {@link RootDevice} to advertise.
+     *
+     * @param   device          The {@link RootDevice} to advertise.
+     * @param   rate            The rate (in seconds) to repeat
+     *                          advertisements.
+     * @param   location        The {@link URI} to the device description.
+     *
+     * @return  {@link.this}
+     */
+    public SSDPDiscoveryService advertise(RootDevice device,
+                                          int rate, URI location) {
+        ScheduledFuture<?> future =
+            scheduleAtFixedRate(() -> alive(device, location), 0, rate, SECONDS);
+
+        future = advertisers.put(device, future);
+
+        if (future != null) {
+            future.cancel(true);
+        }
+
+        return this;
+    }
+
+    private void alive(RootDevice device, URI location) {
+        device.notify((nt, usn) -> multicast(new Alive(nt, usn, device, location)));
+    }
+
+    private void byebye(RootDevice device) {
+        device.notify((nt, usn) -> multicast(new ByeBye(nt, usn, device)));
     }
 
     /**
@@ -332,6 +362,15 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         return message;
     }
 
+    @Override
+    public void shutdown() {
+        advertisers.values().stream().forEach(t -> t.cancel(true));
+        advertisers.keySet().stream().forEach(t -> byebye(t));
+        advertisers.clear();
+
+        super.shutdown();
+    }
+
     /**
      * {@link SSDPDiscoveryService} listener interface definition.
      */
@@ -461,6 +500,52 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             header(MX, mx);
             header(ST, st);
             header(USER_AGENT, getUserAgent());
+        }
+    }
+
+    private class Alive extends SSDPRequest {
+        public Alive(URI nt, URI usn, RootDevice device, URI location) {
+            super(Method.NOTIFY);
+
+            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());
+            header(NT, nt);
+            header(NTS, SSDP_ALIVE);
+            header(SERVER, getUserAgent());
+            header(USN, usn);
+            header(LOCATION, location);
+            header(BOOTID_UPNP_ORG, getBootId());
+            header(CONFIGID_UPNP_ORG, device.getConfigId());
+            header(SEARCHPORT_UPNP_ORG, getSearchPort());
+        }
+    }
+
+    private class ByeBye extends SSDPRequest {
+        public ByeBye(URI nt, URI usn, RootDevice device) {
+            super(Method.NOTIFY);
+
+            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(NT, nt);
+            header(NTS, SSDP_BYEBYE);
+            header(USN, usn);
+            header(BOOTID_UPNP_ORG, getBootId());
+            header(CONFIGID_UPNP_ORG, device.getConfigId());
+        }
+    }
+
+    private class Update extends SSDPRequest {
+        public Update(URI nt, URI usn, RootDevice device, URI location) {
+            super(Method.NOTIFY);
+
+            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(LOCATION, location);
+            header(NT, nt);
+            header(NTS, SSDP_UPDATE);
+            header(USN, usn);
+            header(BOOTID_UPNP_ORG, getBootId());
+            header(CONFIGID_UPNP_ORG, device.getConfigId());
+            header(NEXTBOOTID_UPNP_ORG, getNextBootId());
+            header(SEARCHPORT_UPNP_ORG, getSearchPort());
         }
     }
 }
