@@ -135,6 +135,8 @@ public class SSDPDiscoveryCache
 
             if (Objects.equals(SSDPMessage.SSDP_ALIVE, nts)) {
                 update(request.getUSN(), request);
+            } else if (Objects.equals(SSDPMessage.SSDP_UPDATE, nts)) {
+                /* update(request.getUSN(), request); */
             } else if (Objects.equals(SSDPMessage.SSDP_BYEBYE, nts)) {
                 remove(request.getUSN());
             }
