@@ -95,7 +95,6 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             Stream.of(OS, UPNP, product)
             .filter(Objects::nonNull)
             .collect(joining(SPACE));
-;
 
         random.setSeed(System.currentTimeMillis());
 
@@ -152,6 +151,13 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public int getNextBootID() { throw new UnsupportedOperationException(); }
 
     /**
+     * {@code CONFIGID.UPNP.ORG}
+     *
+     * @return  {@code configID}
+     */
+    public int getConfigID() { return 1; }
+
+    /**
      * {@code SEARCHPORT.UPNP.ORG}
      *
      * @return  Search port.
@@ -205,7 +211,16 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     public void msearch(int mx, URI st) { multicast(0, new MSearch(mx, st)); }
 
     /**
-     * Method to queue an {@link SSDPMessage} for multicast.
+     * Method to queue an {@link SSDPMessage} for multicast without delay.
+     *
+     * @param   message         The {@link SSDPMessage} to send.
+     */
+    public void multicast(SSDPMessage message) {
+        send(0, MULTICAST_SOCKET_ADDRESS, message);
+    }
+
+    /**
+     * Method to queue an {@link SSDPMessage} for multicast with delay.
      *
      * @param   delay           Time to delay (in milliseconds) before
      *                          sending.
@@ -216,7 +231,17 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     /**
-     * Method to queue an {@link SSDPMessage} for sending.
+     * Method to queue an {@link SSDPMessage} for sending without delay.
+     *
+     * @param   address         The destination {@link SocketAddress}.
+     * @param   message         The {@link SSDPMessage} to send.
+     */
+    public void send(SocketAddress address, SSDPMessage message) {
+        send(0, address, message);
+    }
+
+    /**
+     * Method to queue an {@link SSDPMessage} for sending with delay.
      *
      * @param   delay           Time to delay (in milliseconds) before
      *                          sending.
@@ -433,7 +458,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
             header(HOST, MULTICAST_SOCKET_ADDRESS);
             header(MAN, "\"ssdp:discover\"");
-            header(MX, String.valueOf(mx));
+            header(MX, mx);
             header(ST, st);
             header(USER_AGENT, getUserAgent());
         }
