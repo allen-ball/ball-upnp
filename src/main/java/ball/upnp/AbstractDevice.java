@@ -23,6 +23,7 @@ package ball.upnp;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 
@@ -37,7 +38,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED) @EqualsAndHashCode
 public abstract class AbstractDevice implements AnnotatedDevice {
     private Map<URI,Set<URI>> map = null;
 

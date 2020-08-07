@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Synchronized;
@@ -43,7 +44,7 @@ import static lombok.AccessLevel.PROTECTED;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = PROTECTED) @EqualsAndHashCode
 public abstract class AbstractService implements AnnotatedService {
     @Getter
     private final List<? extends Action> actionList = new LinkedList<>();
