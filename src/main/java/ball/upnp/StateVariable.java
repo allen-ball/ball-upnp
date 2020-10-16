@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Data
+@Data @NoArgsConstructor
 public class StateVariable {
     private boolean sendEvents = false;
     private String name = null;
