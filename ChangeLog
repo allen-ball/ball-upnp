@@ -1,3 +1,8 @@
+2020-12-08  Allen D. Ball  <ball@hcf.dev>
+
+	* src/main/java/ball/upnp/ssdp/SSDPMulticastSocket.java:
+	Initial writing.
+
 2020-09-21  Allen D. Ball  <ball@hcf.dev>
 
 	* pom.xml: Started development of 3.0.1-SNAPSHOT.
