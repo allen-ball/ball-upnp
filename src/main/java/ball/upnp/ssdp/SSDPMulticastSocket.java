@@ -39,9 +39,9 @@ public class SSDPMulticastSocket extends MulticastSocket {
     private static final int PORT = 1900;
 
     /**
-     * SSDP IPv4 multicast {@link SocketAddress}.
+     * SSDP IPv4 multicast {@link InetSocketAddress}.
      */
-    public static final InetSocketAddress SOCKET_ADDRESS =
+    public static final InetSocketAddress INET_SOCKET_ADDRESS =
         new InetSocketAddress(ADDRESS, PORT);
 
     /**
@@ -53,6 +53,6 @@ public class SSDPMulticastSocket extends MulticastSocket {
         setReuseAddress(true);
         setLoopbackMode(false);
         setTimeToLive(2);
-        joinGroup(SOCKET_ADDRESS.getAddress());
+        joinGroup(INET_SOCKET_ADDRESS.getAddress());
     }
 }

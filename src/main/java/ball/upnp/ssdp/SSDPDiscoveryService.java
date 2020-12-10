@@ -237,7 +237,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   message         The {@link SSDPMessage} to send.
      */
     public void multicast(SSDPMessage message) {
-        send(0, SSDPMulticastSocket.SOCKET_ADDRESS, message);
+        send(0, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);
     }
 
     /**
@@ -248,7 +248,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   message         The {@link SSDPMessage} to send.
      */
     public void multicast(long delay, SSDPMessage message) {
-        send(delay, SSDPMulticastSocket.SOCKET_ADDRESS, message);
+        send(delay, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);
     }
 
     /**
@@ -540,7 +540,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public MSearch(int mx, URI st) {
             super(Method.MSEARCH);
 
-            header(HOST, SSDPMulticastSocket.SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(MAN, "\"ssdp:discover\"");
             header(MX, mx);
             header(ST, st);
@@ -552,7 +552,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public Alive(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, SSDPMulticastSocket.SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());
             header(NT, nt);
             header(NTS, SSDP_ALIVE);
@@ -569,7 +569,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public ByeBye(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, SSDPMulticastSocket.SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(NT, nt);
             header(NTS, SSDP_BYEBYE);
             header(USN, usn);
@@ -582,7 +582,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public Update(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, SSDPMulticastSocket.SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(LOCATION, device.getLocation());
             header(NT, nt);
             header(NTS, SSDP_UPDATE);
