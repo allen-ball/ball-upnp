@@ -1,4 +1,4 @@
-package ball.upnp;
+package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
@@ -20,23 +20,39 @@ package ball.upnp;
  * limitations under the License.
  * ##########################################################################
  */
-import java.util.LinkedList;
-import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import lombok.ToString;
 
 /**
- * {@link StateVariable}.
+ * SSDP discovery {@link MulticastSocket} implementation.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@Data @NoArgsConstructor
-public class StateVariable {
-    private boolean sendEvents = false;
-    private String name = null;
-    private String dataType = null;
-    private List<? extends AllowedValue> allowedValueList = new LinkedList<>();
+@ToString
+public class SSDPMulticastSocket extends MulticastSocket {
+    private static final String ADDRESS = "239.255.255.250";
+    private static final int PORT = 1900;
+
+    /**
+     * SSDP IPv4 multicast {@link InetSocketAddress}.
+     */
+    public static final InetSocketAddress INET_SOCKET_ADDRESS =
+        new InetSocketAddress(ADDRESS, PORT);
+
+    /**
+     * Sole constructor.
+     */
+    public SSDPMulticastSocket() throws IOException {
+        super(PORT);
+
+        setReuseAddress(true);
+        setLoopbackMode(false);
+        setTimeToLive(2);
+        joinGroup(INET_SOCKET_ADDRESS.getAddress());
+    }
 }
