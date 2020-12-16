@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  * @version $Revision$
  */
-@NoArgsConstructor @Data
+@Data @NoArgsConstructor
 public class Action {
     private String name = null;
     private List<? extends Argument> argumentList = new LinkedList<>();

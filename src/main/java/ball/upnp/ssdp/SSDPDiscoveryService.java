@@ -25,7 +25,6 @@ import ball.upnp.SSDP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
@@ -68,15 +67,6 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         .collect(joining("/"));
     private static final String UPNP = "UPnP/2.0";
 
-    private static final String MULTICAST_ADDRESS = "239.255.255.250";
-    private static final int MULTICAST_PORT = 1900;
-
-    /**
-     * SSDP IPv4 multicast {@link SocketAddress}.
-     */
-    public static final InetSocketAddress MULTICAST_SOCKET_ADDRESS =
-        new InetSocketAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
-
     private final String server;
     private final int bootId = (int) (System.currentTimeMillis() / 1000);
     private final Random random = new Random();
@@ -106,11 +96,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
 
         random.setSeed(System.currentTimeMillis());
 
-        multicast = new MulticastSocket(MULTICAST_SOCKET_ADDRESS.getPort());
-        multicast.setReuseAddress(true);
-        multicast.setLoopbackMode(false);
-        multicast.setTimeToLive(2);
-        multicast.joinGroup(MULTICAST_SOCKET_ADDRESS.getAddress());
+        multicast = new SSDPMulticastSocket();
         /*
          * Bind to an {@link.rfc 4340} ephemeral port.
          */
@@ -251,7 +237,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   message         The {@link SSDPMessage} to send.
      */
     public void multicast(SSDPMessage message) {
-        send(0, MULTICAST_SOCKET_ADDRESS, message);
+        send(0, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);
     }
 
     /**
@@ -262,7 +248,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   message         The {@link SSDPMessage} to send.
      */
     public void multicast(long delay, SSDPMessage message) {
-        send(delay, MULTICAST_SOCKET_ADDRESS, message);
+        send(delay, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);
     }
 
     /**
@@ -554,7 +540,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public MSearch(int mx, URI st) {
             super(Method.MSEARCH);
 
-            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(MAN, "\"ssdp:discover\"");
             header(MX, mx);
             header(ST, st);
@@ -566,7 +552,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public Alive(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());
             header(NT, nt);
             header(NTS, SSDP_ALIVE);
@@ -583,7 +569,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public ByeBye(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(NT, nt);
             header(NTS, SSDP_BYEBYE);
             header(USN, usn);
@@ -596,7 +582,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public Update(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
-            header(HOST, MULTICAST_SOCKET_ADDRESS);
+            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);
             header(LOCATION, device.getLocation());
             header(NT, nt);
             header(NTS, SSDP_UPDATE);
