@@ -4,7 +4,7 @@
   $Id$
   $HeadURL$
   %%
-  Copyright (C) 2013 - 2020 Allen D. Ball
+  Copyright (C) 2013 - 2021 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 
   <resolver:resolve>
     <dependencies>
-      <dependency coords="ball:parent:20201215.0:xml:compile"/>
+      <dependency coords="ball:parent:20210103.0:xml:compile"/>
     </dependencies>
     <properties/>
   </resolver:resolve>
