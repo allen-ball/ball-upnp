@@ -32,7 +32,7 @@
 
   <resolver:resolve>
     <dependencies>
-      <dependency coords="ball:parent:20210107-SNAPSHOT:xml:compile"/>
+      <dependency coords="ball:parent:20210218.0:xml:compile"/>
     </dependencies>
     <properties/>
   </resolver:resolve>
