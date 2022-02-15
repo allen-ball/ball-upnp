@@ -1,0 +1,9 @@
+# .gitignore
+.DS_Store
+application.properties
+build.properties
+target/
+.classpath
+.project
+.settings/
+.svn/

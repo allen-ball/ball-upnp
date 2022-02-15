@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +33,6 @@ import java.util.stream.Stream;
  * {@link.uri http://www.upnp.org/ UPnP} device interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @XmlNs("urn:schemas-upnp-org:device-1-0")
 public interface Device extends Description, SSDP {

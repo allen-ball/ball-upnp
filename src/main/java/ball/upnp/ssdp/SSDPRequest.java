@@ -2,10 +2,8 @@ package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +46,6 @@ import static org.apache.http.message.BasicLineParser.parseRequestLine;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
 
@@ -175,11 +172,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * @return  {@link.this}
      */
     public SSDPRequest header(String name, InetSocketAddress value) {
-        return header(name,
-                      t -> String.format("%s:%d",
-                                         value.getAddress().getHostAddress(),
-                                         value.getPort()),
-                      value);
+        return header(name, t -> String.format("%s:%d", value.getAddress().getHostAddress(), value.getPort()), value);
     }
 
     /**
@@ -215,8 +208,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      *
      * @return  {@link.this}
      */
-    public <T> SSDPRequest header(String name,
-                                  Function<T,String> function, T value) {
+    public <T> SSDPRequest header(String name, Function<T,String> function, T value) {
         setHeader(name, (value != null) ? function.apply(value) : null);
 
         return this;
@@ -234,8 +226,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     @Override
     public String toString() {
         String string =
-            Stream.concat(Stream.of(getRequestLine()),
-                          Stream.of(getAllHeaders()))
+            Stream.concat(Stream.of(getRequestLine()), Stream.of(getAllHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
             .collect(joining(EOL, EMPTY, EOM));

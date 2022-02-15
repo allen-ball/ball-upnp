@@ -2,10 +2,8 @@ package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +44,6 @@ import static org.apache.http.message.BasicLineParser.parseStatusLine;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
 
@@ -58,8 +55,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      *
      * @return  A new {@link SSDPResponse}.
      */
-    public static SSDPResponse from(DatagramPacket packet) {
-        return new SSDPResponse(packet);
+    public static SSDPResponse from(DatagramPacket packet) { return new SSDPResponse(packet);
     }
 
     private SocketAddress address = null;
@@ -132,11 +128,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      * @return  {@link.this}
      */
     public SSDPResponse header(String name, InetSocketAddress value) {
-        return header(name,
-                      t -> String.format("%s:%d",
-                                         value.getAddress().getHostAddress(),
-                                         value.getPort()),
-                      value);
+        return header(name, t -> String.format("%s:%d", value.getAddress().getHostAddress(), value.getPort()), value);
     }
 
     /**
@@ -172,8 +164,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      *
      * @return  {@link.this}
      */
-    public <T> SSDPResponse header(String name,
-                                   Function<T,String> function, T value) {
+    public <T> SSDPResponse header(String name, Function<T,String> function, T value) {
         setHeader(name, (value != null) ? function.apply(value) : null);
 
         return this;
@@ -191,8 +182,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     @Override
     public String toString() {
         String string =
-            Stream.concat(Stream.of(getStatusLine()),
-                          Stream.of(getAllHeaders()))
+            Stream.concat(Stream.of(getStatusLine()), Stream.of(getAllHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
             .collect(joining(EOL, EMPTY, EOM));

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ##########################################################################
-  $Id$
-  $HeadURL$
   %%
   Copyright (C) 2013 - 2022 Allen D. Ball
   %%
@@ -34,7 +32,7 @@
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
     <version>2022.0.0-SNAPSHOT</version>
-    <relativePath>../ball/parent/pom.xml</relativePath>
+    <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <inceptionYear>2013</inceptionYear>
   <licenses>

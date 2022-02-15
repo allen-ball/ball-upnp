@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--/* $Id$ */-->
 <scpd xmlns:th="http://www.thymeleaf.org" th:xmlns="${#execInfo.templateName}">
   <specVersion>
     <major>1</major>

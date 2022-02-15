@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +29,6 @@ import static ball.upnp.ssdp.SSDPMessage.SSDP_ALL;
  * SSDP "discoverable" marker interface.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface SSDP {
 
@@ -66,16 +63,13 @@ public interface SSDP {
      *          {@code false} otherwise.
      */
     public static boolean matches(URI st, URI nt) {
-        boolean matches =
-            SSDP_ALL.equals(st)
-            || st.toString().equalsIgnoreCase(nt.toString());
+        boolean matches = SSDP_ALL.equals(st) || st.toString().equalsIgnoreCase(nt.toString());
 
         if (! matches) {
             try {
                 if (! matches) {
                     if (st.getScheme().equalsIgnoreCase("uuid")) {
-                        matches |=
-                            st.toString().equalsIgnoreCase(nt.toString());
+                        matches |= st.toString().equalsIgnoreCase(nt.toString());
                     }
                 }
 
@@ -92,13 +86,10 @@ public interface SSDP {
 
                             String prefix = string.substring(0, index);
                             String stVersion = string.replace(prefix, "");
-                            String ntVersion =
-                                nt.toString().toUpperCase()
-                                .replace(prefix, "");
+                            String ntVersion = nt.toString().toUpperCase().replace(prefix, "");
 
                             if (stVersion.matches("[0-9]+") && ntVersion.matches("[0-9]+")) {
-                                matches |=
-                                    Integer.decode(stVersion) <= Integer.decode(ntVersion);
+                                matches |= Integer.decode(stVersion) <= Integer.decode(ntVersion);
                             }
                         }
                     }

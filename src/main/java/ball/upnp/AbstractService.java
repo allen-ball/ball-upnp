@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,15 +40,13 @@ import static lombok.AccessLevel.PROTECTED;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED) @EqualsAndHashCode
 public abstract class AbstractService implements AnnotatedService {
     @Getter
     private final List<? extends Action> actionList = new LinkedList<>();
     @Getter
-    private final List<? extends StateVariable> serviceStateTable =
-        new LinkedList<>();
+    private final List<? extends StateVariable> serviceStateTable = new LinkedList<>();
     private Map<URI,Set<URI>> map = null;
 
     @Synchronized

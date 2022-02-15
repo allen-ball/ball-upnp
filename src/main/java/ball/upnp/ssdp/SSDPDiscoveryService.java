@@ -2,10 +2,8 @@ package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +55,6 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     private static final String OS =
@@ -72,10 +69,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     private final Random random = new Random();
     private final MulticastSocket multicast;
     private final DatagramSocket unicast;
-    private final CopyOnWriteArrayList<Listener> listeners =
-        new CopyOnWriteArrayList<>();
-    private final ConcurrentHashMap<RootDevice,ScheduledFuture<?>> advertisers =
-        new ConcurrentHashMap<>();
+    private final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
+    private final ConcurrentHashMap<RootDevice,ScheduledFuture<?>> advertisers = new ConcurrentHashMap<>();
 
     /**
      * Sole constructor.
@@ -101,8 +96,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
          * Bind to an {@link.rfc 4340} ephemeral port.
          */
         DatagramSocket socket = null;
-        List<Integer> ports =
-            random.ints(49152, 65536).limit(256).boxed().collect(toList());
+        List<Integer> ports = random.ints(49152, 65536).limit(256).boxed().collect(toList());
 
         for (;;) {
             try {
@@ -200,11 +194,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      *
      * @return  {@link.this}
      */
-    public SSDPDiscoveryService advertise(RootDevice device,
-                                          int rate) {
-        ScheduledFuture<?> future =
-            scheduleAtFixedRate(() -> alive(device),
-                                advertisers.size(), rate, SECONDS);
+    public SSDPDiscoveryService advertise(RootDevice device, int rate) {
+        ScheduledFuture<?> future = scheduleAtFixedRate(() -> alive(device), advertisers.size(), rate, SECONDS);
 
         future = advertisers.put(device, future);
 
@@ -271,8 +262,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      */
     public void send(long delay, SocketAddress address, SSDPMessage message) {
         byte[] bytes = message.toString().getBytes(UTF_8);
-        DatagramPacket packet =
-            new DatagramPacket(bytes, 0, bytes.length, address);
+        DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, address);
 
         schedule(() -> task(message, packet), delay, MILLISECONDS);
     }
@@ -295,9 +285,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
      * @param   messages        The {@link List} of {@link SSDPMessage}s to
      *                          send.
      */
-    public void send(int mx,
-                     SocketAddress address,
-                     List<? extends SSDPMessage> messages) {
+    public void send(int mx, SocketAddress address, List<? extends SSDPMessage> messages) {
         List<Long> delays =
             messages.stream()
             .map(t -> random.nextInt((int) SECONDS.toMillis(mx)))
@@ -316,8 +304,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             for (;;) {
                 try {
                     byte[] bytes = new byte[8 * 1024];
-                    DatagramPacket packet =
-                        new DatagramPacket(bytes, bytes.length);
+                    DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
                     socket.receive(packet);
 
@@ -390,9 +377,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
          * @param       socket          The {@link DatagramSocket}.
          * @param       message         The {@link SSDPMessage}.
          */
-        public void sendEvent(SSDPDiscoveryService service,
-                              DatagramSocket socket,
-                              SSDPMessage message);
+        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message);
 
         /**
          * Callback made after receiving a {@link SSDPMessage}.
@@ -401,9 +386,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
          * @param       socket          The {@link DatagramSocket}.
          * @param       message         The {@link SSDPMessage}.
          */
-        public void receiveEvent(SSDPDiscoveryService service,
-                                 DatagramSocket socket,
-                                 SSDPMessage message);
+        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message);
     }
 
     /**
@@ -422,8 +405,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             this.method = Objects.requireNonNull(method);
         }
 
-        public abstract void run(SSDPDiscoveryService service,
-                                 DatagramSocket socket, SSDPRequest request);
+        public abstract void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPRequest request);
 
         @Override
         public void register(SSDPDiscoveryService service) { }
@@ -432,8 +414,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public void unregister(SSDPDiscoveryService service) { }
 
         @Override
-        public void receiveEvent(SSDPDiscoveryService service,
-                                 DatagramSocket socket, SSDPMessage message) {
+        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
             if (message instanceof SSDPRequest) {
                 SSDPRequest request = (SSDPRequest) message;
 
@@ -444,8 +425,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         }
 
         @Override
-        public void sendEvent(SSDPDiscoveryService service,
-                              DatagramSocket socket, SSDPMessage message) {
+        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
         }
     }
 
@@ -459,8 +439,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
          */
         protected ResponseHandler() { }
 
-        public abstract void run(SSDPDiscoveryService service,
-                                 DatagramSocket socket, SSDPResponse request);
+        public abstract void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPResponse request);
 
         @Override
         public void register(SSDPDiscoveryService service) { }
@@ -469,16 +448,14 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public void unregister(SSDPDiscoveryService service) { }
 
         @Override
-        public void receiveEvent(SSDPDiscoveryService service,
-                                 DatagramSocket socket, SSDPMessage message) {
+        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
             if (message instanceof SSDPResponse) {
                 service.submit(() -> run(service, socket, (SSDPResponse) message));
             }
         }
 
         @Override
-        public void sendEvent(SSDPDiscoveryService service,
-                              DatagramSocket socket, SSDPMessage message) {
+        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
         }
     }
 
@@ -487,8 +464,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         public MSEARCH() { super(SSDPRequest.Method.MSEARCH); }
 
         @Override
-        public void run(SSDPDiscoveryService service,
-                        DatagramSocket socket, SSDPRequest request) {
+        public void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPRequest request) {
             try {
                 if (isHeaderValue(request, SSDPMessage.MAN, "\"ssdp:discover\"")) {
                     int mx = request.getMX();
@@ -497,8 +473,7 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
                     URI st = request.getST();
                     boolean all = SSDPMessage.SSDP_ALL.equals(st);
 
-                    advertisers.keySet()
-                        .stream()
+                    advertisers.keySet().stream()
                         .forEach(device -> device.notify((nt, usn) -> {
                                     if (SSDP.matches(st, nt)) {
                                         list.add(new MSearch(service, all ? nt : st, usn, device));
@@ -512,14 +487,12 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
             }
         }
 
-        private boolean isHeaderValue(SSDPRequest request,
-                                      String header, String value) {
+        private boolean isHeaderValue(SSDPRequest request, String header, String value) {
             return Objects.equals(request.getHeaderValue(header), value);
         }
 
         private class MSearch extends SSDPResponse {
-            public MSearch(SSDPDiscoveryService service,
-                           URI st, URI usn, RootDevice device) {
+            public MSearch(SSDPDiscoveryService service, URI st, URI usn, RootDevice device) {
                 super(SC_OK, "OK");
 
                 header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());

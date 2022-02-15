@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,21 +27,18 @@ import org.springframework.core.annotation.AnnotationUtils;
  * {@link Service} support for {@link ServiceType} and related annotations.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface AnnotatedService extends Service {
     @Override
     default URI getServiceType() {
-        ServiceType annotation =
-            AnnotationUtils.findAnnotation(getClass(), ServiceType.class);
+        ServiceType annotation = AnnotationUtils.findAnnotation(getClass(), ServiceType.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : null;
     }
 
     @Override
     default URI getServiceId() {
-        ServiceId annotation =
-            AnnotationUtils.findAnnotation(getClass(), ServiceId.class);
+        ServiceId annotation = AnnotationUtils.findAnnotation(getClass(), ServiceId.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : getServiceType();
     }

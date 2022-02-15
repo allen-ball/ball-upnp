@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +25,6 @@ import org.springframework.core.annotation.AnnotationUtils;
  * {@link Description} support for {@link XmlNs} annotation.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface Description {
 
@@ -37,8 +34,7 @@ public interface Description {
      * @return  The name.
      */
     default String getXmlns() {
-        XmlNs annotation =
-            AnnotationUtils.findAnnotation(getClass(), XmlNs.class);
+        XmlNs annotation = AnnotationUtils.findAnnotation(getClass(), XmlNs.class);
 
         return (annotation != null) ? annotation.value() : null;
     }

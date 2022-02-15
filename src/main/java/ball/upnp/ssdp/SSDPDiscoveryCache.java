@@ -2,10 +2,8 @@ package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +38,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * SSDP discovery cache implementation.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor
-public class SSDPDiscoveryCache
-             extends ConcurrentSkipListMap<URI,SSDPMessage>
-             implements SSDPDiscoveryService.Listener {
+public class SSDPDiscoveryCache extends ConcurrentSkipListMap<URI,SSDPMessage> implements SSDPDiscoveryService.Listener {
     private static final long serialVersionUID = 2743071044637511801L;
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
@@ -56,15 +51,11 @@ public class SSDPDiscoveryCache
     @Override
     public void register(SSDPDiscoveryService service) {
         if (expirer == null) {
-            expirer =
-                service.scheduleAtFixedRate(() -> expirer(service),
-                                            0, 60, SECONDS);
+            expirer = service.scheduleAtFixedRate(() -> expirer(service), 0, 60, SECONDS);
         }
 
         if (msearch == null) {
-            msearch =
-                service.scheduleAtFixedRate(() -> msearch(service),
-                                            0, 300, SECONDS);
+            msearch = service.scheduleAtFixedRate(() -> msearch(service), 0, 300, SECONDS);
         }
 
         listeners.stream().forEach(t -> service.addListener(t));
@@ -86,13 +77,11 @@ public class SSDPDiscoveryCache
     }
 
     @Override
-    public void sendEvent(SSDPDiscoveryService service,
-                          DatagramSocket socket, SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
     }
 
     @Override
-    public void receiveEvent(SSDPDiscoveryService service,
-                             DatagramSocket socket, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
     }
 
     private void expirer(SSDPDiscoveryService service) {
@@ -129,8 +118,7 @@ public class SSDPDiscoveryCache
         public NOTIFY() { super(SSDPRequest.Method.NOTIFY); }
 
         @Override
-        public void run(SSDPDiscoveryService service,
-                        DatagramSocket socket, SSDPRequest request) {
+        public void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPRequest request) {
             String nts = request.getHeaderValue(SSDPMessage.NTS);
 
             if (Objects.equals(SSDPMessage.SSDP_ALIVE, nts)) {
@@ -146,8 +134,7 @@ public class SSDPDiscoveryCache
     @NoArgsConstructor @ToString
     private class MSEARCH extends SSDPDiscoveryService.ResponseHandler {
         @Override
-        public void run(SSDPDiscoveryService service,
-                        DatagramSocket socket, SSDPResponse response) {
+        public void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPResponse response) {
             update(response.getUSN(), response);
         }
     }

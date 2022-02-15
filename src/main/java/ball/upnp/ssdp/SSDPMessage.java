@@ -2,10 +2,8 @@ package ball.upnp.ssdp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +45,6 @@ import static java.util.stream.Collectors.toList;
  * SSDP {@link HttpMessage} interface definition.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface SSDPMessage extends HttpMessage, HttpStatus {
 
@@ -118,10 +115,7 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      * @return  The {@link List} of parsed lines.
      */
     public static List<String> parse(DatagramPacket packet) {
-        String string =
-            new String(packet.getData(),
-                       packet.getOffset(), packet.getLength(),
-                       UTF_8);
+        String string = new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
 
         return Pattern.compile(EOL).splitAsStream(string).collect(toList());
     }
@@ -163,8 +157,7 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      *
      * @return  The converted value or {@code null} if no header found.
      */
-    default <T> T getHeaderValue(Function<String,T> function,
-                                 String... names) {
+    default <T> T getHeaderValue(Function<String,T> function, String... names) {
         String string = getHeaderValue(names);
 
         return (string != null) ? function.apply(string) : null;
@@ -206,8 +199,7 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
      * @return  The value or {@code null} if no header/parameter combination
      *          is found.
      */
-    default <T> T getHeaderParameterValue(Function<String,T> function,
-                                          String name, String parameter) {
+    default <T> T getHeaderParameterValue(Function<String,T> function, String name, String parameter) {
         String string = getHeaderParameterValue(name, parameter);
 
         return (string != null) ? function.apply(string) : null;
@@ -259,12 +251,9 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
             expiration = date.getTime();
         }
 
-        Long maxAge =
-            message.getHeaderParameterValue(Long::decode,
-                                            CACHE_CONTROL, MAX_AGE);
+        Long maxAge = message.getHeaderParameterValue(Long::decode, CACHE_CONTROL, MAX_AGE);
 
-        expiration +=
-            MILLISECONDS.convert((maxAge != null) ? maxAge : 0, SECONDS);
+        expiration += MILLISECONDS.convert((maxAge != null) ? maxAge : 0, SECONDS);
 
         return expiration;
     }

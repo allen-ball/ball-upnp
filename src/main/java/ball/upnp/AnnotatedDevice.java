@@ -2,10 +2,8 @@ package ball.upnp;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +26,11 @@ import org.springframework.core.annotation.AnnotationUtils;
  * {@link Device} support for {@link DeviceType} and related annotations.
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 public interface AnnotatedDevice extends Device {
     @Override
     default URI getDeviceType() {
-        DeviceType annotation =
-            AnnotationUtils.findAnnotation(getClass(), DeviceType.class);
+        DeviceType annotation = AnnotationUtils.findAnnotation(getClass(), DeviceType.class);
 
         return (annotation != null) ? URI.create(annotation.value()) : null;
     }

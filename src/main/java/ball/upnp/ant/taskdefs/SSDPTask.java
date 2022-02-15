@@ -2,10 +2,8 @@ package ball.upnp.ant.taskdefs;
 /*-
  * ##########################################################################
  * UPnP/SSDP Implementation Classes
- * $Id$
- * $HeadURL$
  * %%
- * Copyright (C) 2013 - 2021 Allen D. Ball
+ * Copyright (C) 2013 - 2022 Allen D. Ball
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,14 +61,10 @@ import static lombok.AccessLevel.PROTECTED;
  * {@ant.task}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
- * @version $Revision$
  */
 @NoArgsConstructor(access = PROTECTED)
-public abstract class SSDPTask extends Task
-                               implements AnnotatedAntTask,
-                                          ClasspathDelegateAntTask,
-                                          ConfigurableAntTask,
-                                          SSDPDiscoveryService.Listener {
+public abstract class SSDPTask extends Task implements AnnotatedAntTask, ClasspathDelegateAntTask, ConfigurableAntTask,
+                                                       SSDPDiscoveryService.Listener {
     private static final String VERSION;
 
     static {
@@ -115,8 +109,7 @@ public abstract class SSDPTask extends Task
 
     @Synchronized
     @Override
-    public void sendEvent(SSDPDiscoveryService service,
-                          DatagramSocket socket, SSDPMessage message) {
+    public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
         // log(toString(socket) + " --> " /* + message.getSocketAddress() */);
         log("--- Outgoing ---");
         log(String.valueOf(message));
@@ -124,8 +117,7 @@ public abstract class SSDPTask extends Task
 
     @Synchronized
     @Override
-    public void receiveEvent(SSDPDiscoveryService service,
-                             DatagramSocket socket, SSDPMessage message) {
+    public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {
         // log(toString(socket) + " <-- " /* + message.getSocketAddress() */);
         log("--- Incoming ---");
         log(String.valueOf(message));
@@ -140,9 +132,7 @@ public abstract class SSDPTask extends Task
     }
 
     private String toString(InetSocketAddress address) {
-        return String.format("%s:%d",
-                             address.getAddress().getHostAddress(),
-                             address.getPort());
+        return String.format("%s:%d", address.getAddress().getHostAddress(), address.getPort());
     }
 
     private class SSDPDiscoveryServiceImpl extends SSDPDiscoveryService {
@@ -167,8 +157,7 @@ public abstract class SSDPTask extends Task
         public void execute() throws BuildException {
             super.execute();
 
-            ClassLoader loader =
-                Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
             try {
                 Thread.currentThread().setContextClassLoader(getClassLoader());
@@ -196,9 +185,7 @@ public abstract class SSDPTask extends Task
             private static final long serialVersionUID = 6644683980831866749L;
 
             public TableModelImpl(SSDPDiscoveryCache cache) {
-                super(cache.values(),
-                      SSDPMessage.USN,
-                      HttpHeaders.EXPIRES, SSDPMessage.LOCATION);
+                super(cache.values(), SSDPMessage.USN, HttpHeaders.EXPIRES, SSDPMessage.LOCATION);
             }
 
             @Override
@@ -212,10 +199,7 @@ public abstract class SSDPTask extends Task
                     break;
 
                 case 1:
-                    object =
-                        Duration.ofMillis(row.getExpiration()
-                                          - System.currentTimeMillis())
-                        .toString();
+                    object = Duration.ofMillis(row.getExpiration() - System.currentTimeMillis()).toString();
                     break;
 
                 case 2:
@@ -241,8 +225,7 @@ public abstract class SSDPTask extends Task
         public void execute() throws BuildException {
             super.execute();
 
-            ClassLoader loader =
-                Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
             try {
                 Thread.currentThread().setContextClassLoader(getClassLoader());
@@ -272,8 +255,7 @@ public abstract class SSDPTask extends Task
     @AntTask("ssdp-m-search")
     @NoArgsConstructor @ToString
     public static class MSearch extends SSDPTask {
-        private static final ConcurrentSkipListMap<URI,URI> map =
-            new ConcurrentSkipListMap<>();
+        private static final ConcurrentSkipListMap<URI,URI> map = new ConcurrentSkipListMap<>();
         @Getter @Setter
         private int mx = 5;
         @Getter @Setter
@@ -283,8 +265,7 @@ public abstract class SSDPTask extends Task
         public void execute() throws BuildException {
             super.execute();
 
-            ClassLoader loader =
-                Thread.currentThread().getContextClassLoader();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
             try {
                 Thread.currentThread().setContextClassLoader(getClassLoader());
@@ -297,8 +278,7 @@ public abstract class SSDPTask extends Task
                 service.msearch(getMx(), getSt());
                 service.awaitTermination(getMx(), SECONDS);
 
-                log(new MapTableModel(map,
-                                      SSDPMessage.USN, SSDPMessage.LOCATION));
+                log(new MapTableModel(map, SSDPMessage.USN, SSDPMessage.LOCATION));
             } catch (BuildException exception) {
                 throw exception;
             } catch (Throwable throwable) {
@@ -312,16 +292,14 @@ public abstract class SSDPTask extends Task
         @NoArgsConstructor @ToString
         private class MSEARCH extends SSDPDiscoveryService.ResponseHandler {
             @Override
-            public void run(SSDPDiscoveryService service,
-                            DatagramSocket socket, SSDPResponse response) {
+            public void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPResponse response) {
                 if (matches(getSt(), response.getST())) {
                     map.put(response.getUSN(), response.getLocation());
                 }
             }
 
             private boolean matches(URI st, URI nt) {
-                return (SSDPMessage.SSDP_ALL.equals(st)
-                        || st.toString().equalsIgnoreCase(nt.toString()));
+                return (SSDPMessage.SSDP_ALL.equals(st) || st.toString().equalsIgnoreCase(nt.toString()));
             }
         }
     }
