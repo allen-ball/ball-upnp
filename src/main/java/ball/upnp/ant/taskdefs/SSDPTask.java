@@ -46,7 +46,7 @@ import lombok.Setter;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.apache.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.util.ClasspathUtils;

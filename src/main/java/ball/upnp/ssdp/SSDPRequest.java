@@ -25,29 +25,30 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.apache.http.Header;
-import org.apache.http.HttpVersion;
-import org.apache.http.message.BasicHttpRequest;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.message.BasicHttpRequest;
+import org.apache.hc.core5.http.message.BasicLineParser;
+import org.apache.hc.core5.http.message.RequestLine;
+import org.apache.hc.core5.util.CharArrayBuffer;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
-import static org.apache.http.message.BasicLineParser.INSTANCE;
-import static org.apache.http.message.BasicLineParser.parseHeader;
-import static org.apache.http.message.BasicLineParser.parseRequestLine;
+import static org.apache.hc.core5.http.HttpVersion.HTTP_1_1;
 
 /**
- * SSDP {@link org.apache.http.HttpRequest} implementation.
+ * SSDP {@link org.apache.hc.core5.http.HttpRequest} implementation.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
+    private static final long serialVersionUID = -8886375187855815595L;
 
     /**
      * {@link SSDPRequest} enumerated {@link Method}s.
@@ -80,14 +81,29 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * @param   packet          The {@link DatagramPacket}.
      *
      * @return  A new {@link SSDPRequest}.
+     *
+     * @throws  ParseException  If the {@link DatagramPacket} cannot be
+     *                          parsed.
      */
-    public static SSDPRequest from(DatagramPacket packet) {
-        return new SSDPRequest(packet);
+    public static SSDPRequest from(DatagramPacket packet) throws ParseException {
+        List<CharArrayBuffer> list = SSDPMessage.parse(packet);
+        RequestLine line = BasicLineParser.INSTANCE.parseRequestLine(list.remove(0));
+        SSDPRequest request = new SSDPRequest(line.getMethod(), line.getUri());
+
+        request.setVersion(line.getProtocolVersion());
+
+        for (CharArrayBuffer buffer : list) {
+            request.addHeader(BasicLineParser.INSTANCE.parseHeader(buffer));
+        }
+
+        request.address = packet.getSocketAddress();
+
+        return request;
     }
 
-    private SocketAddress address = null;
-    private long timestamp = System.currentTimeMillis();
-    private Long expiration = null;
+    /** @serial */ private SocketAddress address = null;
+    /** @serial */ private long timestamp = System.currentTimeMillis();
+    /** @serial */ private Long expiration = null;
 
     /**
      * Sole non-private constructor.
@@ -95,27 +111,12 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * @param   method          The {@link SSDPRequest} {@link Method}.
      */
     protected SSDPRequest(Method method) {
-        super(method.toString(), "*", HttpVersion.HTTP_1_1);
+        super(method.toString(), "*");
+
+        setVersion(HTTP_1_1);
     }
 
-    private SSDPRequest(DatagramPacket packet) {
-        this(packet, SSDPMessage.parse(packet));
-    }
-
-    private SSDPRequest(DatagramPacket packet, List<String> lines) {
-        super(parseRequestLine(lines.remove(0), INSTANCE));
-
-        lines.stream().forEach(t -> addHeader(parseHeader(t, INSTANCE)));
-
-        address = packet.getSocketAddress();
-    }
-
-    /**
-     * Method to get the {@link org.apache.http.RequestLine} method.
-     *
-     * @return  The method specified on the request line.
-     */
-    public String getMethod() { return getRequestLine().getMethod(); }
+    private SSDPRequest(String method, String uri) { super(method, uri); }
 
     /**
      * Method to get the {@link SocketAddress} from the
@@ -125,6 +126,16 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
      * @return  The {@link SocketAddress}.
      */
     public SocketAddress getSocketAddress() { return address; }
+
+    public String getRequestLine() {
+        String string =
+            Stream.of(getMethod(), getPath(), getVersion())
+            .filter(Objects::nonNull)
+            .map(Object::toString)
+            .collect(joining(SPACE));
+
+        return string;
+    }
 
     /**
      * Method to get the {@code MX} header value as an {@code int}.  Returns
@@ -226,7 +237,7 @@ public class SSDPRequest extends BasicHttpRequest implements SSDPMessage {
     @Override
     public String toString() {
         String string =
-            Stream.concat(Stream.of(getRequestLine()), Stream.of(getAllHeaders()))
+            Stream.concat(Stream.of(getRequestLine()), Stream.of(getHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
             .collect(joining(EOL, EMPTY, EOM));

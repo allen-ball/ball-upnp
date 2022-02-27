@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -45,8 +45,7 @@ public class SSDPDiscoveryCache extends ConcurrentSkipListMap<URI,SSDPMessage> i
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
-    /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners =
-        List.of(new NOTIFY(), new MSEARCH());
+    /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners = List.of(new NOTIFY(), new MSEARCH());
 
     @Override
     public void register(SSDPDiscoveryService service) {

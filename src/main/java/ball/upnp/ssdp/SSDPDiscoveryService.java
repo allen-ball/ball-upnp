@@ -39,7 +39,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Stream;
 import lombok.ToString;
-import org.apache.http.ParseException;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.protocol.HttpDateGenerator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -48,6 +49,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
+import static org.apache.hc.core5.http.HttpStatus.SC_OK;
 
 /**
  * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.
@@ -492,11 +494,13 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
         }
 
         private class MSearch extends SSDPResponse {
+            private static final long serialVersionUID = -2963023442177743880L;
+
             public MSearch(SSDPDiscoveryService service, URI st, URI usn, RootDevice device) {
                 super(SC_OK, "OK");
 
                 header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());
-                header(DATE, GENERATOR.getCurrentDate());
+                header(DATE, HttpDateGenerator.INSTANCE.getCurrentDate());
                 header(EXT, (String) null);
                 header(LOCATION, device.getLocation());
                 header(SERVER, service.getUserAgent());
@@ -510,6 +514,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class MSearch extends SSDPRequest {
+        private static final long serialVersionUID = -7606319039115145787L;
+
         public MSearch(int mx, URI st) {
             super(Method.MSEARCH);
 
@@ -522,6 +528,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class Alive extends SSDPRequest {
+        private static final long serialVersionUID = 1405796530322683498L;
+
         public Alive(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
@@ -539,6 +547,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class ByeBye extends SSDPRequest {
+        private static final long serialVersionUID = -4058077320857161188L;
+
         public ByeBye(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 
@@ -552,6 +562,8 @@ public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {
     }
 
     private class Update extends SSDPRequest {
+        private static final long serialVersionUID = -3155461457458248824L;
+
         public Update(URI nt, URI usn, RootDevice device) {
             super(Method.NOTIFY);
 

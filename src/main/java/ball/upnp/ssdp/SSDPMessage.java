@@ -19,9 +19,6 @@ package ball.upnp.ssdp;
  * ##########################################################################
  */
 import java.net.DatagramPacket;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.SocketException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -29,14 +26,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpMessage;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.utils.DateUtils;
-import org.apache.http.protocol.HttpDateGenerator;
+import org.apache.hc.client5.http.utils.DateUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.HttpMessage;
+import org.apache.hc.core5.http.message.BasicHeaderValueParser;
+import org.apache.hc.core5.http.message.ParserCursor;
+import org.apache.hc.core5.util.CharArrayBuffer;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
@@ -46,12 +43,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
-public interface SSDPMessage extends HttpMessage, HttpStatus {
-
-    /**
-     * {@link HttpDateGenerator} instance.
-     */
-    public static final HttpDateGenerator GENERATOR = new HttpDateGenerator();
+public interface SSDPMessage extends HttpMessage {
 
     /**
      * SSDP message header name.
@@ -108,21 +100,55 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
 
     /**
      * Static method to parse a {@link DatagramPacket} to a {@link List} of
-     * lines ({@link String}s).
+     * lines ({@link CharArrayBuffer}s).
      *
      * @param   packet          The {@link DatagramPacket}.
      *
-     * @return  The {@link List} of parsed lines.
+     * @return  The {@link List} of parsed lines as {@link CharArrayBuffer}s.
      */
-    public static List<String> parse(DatagramPacket packet) {
-        String string = new String(packet.getData(), packet.getOffset(), packet.getLength(), UTF_8);
+    public static List<CharArrayBuffer> parse(DatagramPacket packet) {
+        CharArrayBuffer buffer = toCharArrayBuffer(packet);
+        List<CharArrayBuffer> list =
+            Pattern.compile(EOL).splitAsStream(buffer)
+            .map(SSDPMessage::toCharArrayBuffer)
+            .collect(toList());
 
-        return Pattern.compile(EOL).splitAsStream(string).collect(toList());
+        return list;
     }
 
     /**
-     * Method to get the expiration time for {@link.this}
-     * {@link SSDPMessage}.
+     * Static method to convert a {@link DatagramPacket} to a
+     * {@link CharArrayBuffer}.
+     *
+     * @param   packet          The {@link DatagramPacket}.
+     *
+     * @return  The {@link CharArrayBuffer}.
+     */
+    public static CharArrayBuffer toCharArrayBuffer(DatagramPacket packet) {
+        CharArrayBuffer buffer = new CharArrayBuffer(packet.getLength());
+
+        buffer.append(packet.getData(), packet.getOffset(), packet.getLength());
+
+        return buffer;
+    }
+
+    /**
+     * Static method to convert a {@link String} to a {@link CharArrayBuffer}.
+     *
+     * @param   string          The {@link String}.
+     *
+     * @return  The {@link CharArrayBuffer}.
+     */
+    public static CharArrayBuffer toCharArrayBuffer(String string) {
+        CharArrayBuffer buffer = new CharArrayBuffer(string.length());
+
+        buffer.append(string);
+
+        return buffer;
+    }
+
+    /**
+     * Method to get the expiration time for {@link.this} {@link SSDPMessage}.
      *
      * @return  The expiration time (milliseconds since the UNIX epoch).
      */
@@ -176,10 +202,12 @@ public interface SSDPMessage extends HttpMessage, HttpStatus {
     default String getHeaderParameterValue(String name, String parameter) {
         String value =
             Stream.of(getHeaders(name))
-            .map(t -> t.getElements())
             .filter(Objects::nonNull)
-            .flatMap(t -> Stream.of(t))
-            .filter(t -> parameter.equals(t.getName()))
+            .map(Header::getValue)
+            .map(t -> BasicHeaderValueParser.INSTANCE.parseElements(t, new ParserCursor(0, t.length())))
+            .filter(Objects::nonNull)
+            .flatMap(Stream::of)
+            .filter(t -> parameter.equalsIgnoreCase(t.getName()))
             .map(t -> t.getValue())
             .filter(Objects::nonNull)
             .findFirst().orElse(null);

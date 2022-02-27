@@ -25,63 +25,61 @@ import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.apache.http.Header;
-import org.apache.http.HttpVersion;
-import org.apache.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
+import org.apache.hc.core5.http.message.BasicLineParser;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.util.CharArrayBuffer;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.http.message.BasicLineParser.INSTANCE;
-import static org.apache.http.message.BasicLineParser.parseHeader;
-import static org.apache.http.message.BasicLineParser.parseStatusLine;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
- * SSDP {@link org.apache.http.HttpResponse} implementation.
+ * SSDP {@link org.apache.hc.core5.http.HttpResponse} implementation.
  *
  * {@bean.info}
  *
  * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}
  */
 public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
+    private static final long serialVersionUID = -5163694432470542459L;
 
     /**
-     * Method to parse a {@link SSDPResponse} from a
-     * {@link DatagramPacket}.
+     * Method to parse a {@link SSDPResponse} from a {@link DatagramPacket}.
      *
      * @param   packet          The {@link DatagramPacket}.
      *
      * @return  A new {@link SSDPResponse}.
+     *
+     * @throws  ParseException  If the {@link DatagramPacket} cannot be
+     *                          parsed.
      */
-    public static SSDPResponse from(DatagramPacket packet) { return new SSDPResponse(packet);
+    public static SSDPResponse from(DatagramPacket packet) throws ParseException {
+        List<CharArrayBuffer> list = SSDPMessage.parse(packet);
+        StatusLine line = BasicLineParser.INSTANCE.parseStatusLine(list.remove(0));
+        SSDPResponse response = new SSDPResponse(line.getStatusCode(), line.getReasonPhrase());
+
+        for (CharArrayBuffer buffer : list) {
+            response.addHeader(BasicLineParser.INSTANCE.parseHeader(buffer));
+        }
+
+        return response;
     }
 
-    private SocketAddress address = null;
-    private long timestamp = System.currentTimeMillis();
-    private Long expiration = null;
+    /** @serial */ private SocketAddress address = null;
+    /** @serial */ private long timestamp = System.currentTimeMillis();
+    /** @serial */ private Long expiration = null;
 
     /**
-     * Sole non-private constructor.
+     * Sole constructor.
      *
      * @param   code            The {@link SSDPRequest} {@code code}.
      * @param   reason          The {@link SSDPRequest} reason.
      */
     protected SSDPResponse(int code, String reason) {
-        super(HttpVersion.HTTP_1_1, code, reason);
-    }
-
-    private SSDPResponse(DatagramPacket packet) {
-        this(packet, SSDPMessage.parse(packet));
-    }
-
-    private SSDPResponse(DatagramPacket packet, List<String> lines) {
-        super(parseStatusLine(lines.remove(0), INSTANCE));
-
-        lines.stream().forEach(t -> addHeader(parseHeader(t, INSTANCE)));
-
-        address = packet.getSocketAddress();
+        super(code, reason);
     }
 
     /**
@@ -92,6 +90,16 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
      * @return  The {@link SocketAddress}.
      */
     public SocketAddress getSocketAddress() { return address; }
+
+    public String getStatusLine() {
+        String string =
+            Stream.of(getVersion(), getCode(), getReasonPhrase())
+            .filter(Objects::nonNull)
+            .map(Object::toString)
+            .collect(joining(SPACE));
+
+        return string;
+    }
 
     /**
      * {@link String} fluent header setter.
@@ -182,7 +190,7 @@ public class SSDPResponse extends BasicHttpResponse implements SSDPMessage {
     @Override
     public String toString() {
         String string =
-            Stream.concat(Stream.of(getStatusLine()), Stream.of(getAllHeaders()))
+            Stream.concat(Stream.of(getStatusLine()), Stream.of(getHeaders()))
             .filter(Objects::nonNull)
             .map(Objects::toString)
             .collect(joining(EOL, EMPTY, EOM));
