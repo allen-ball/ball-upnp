@@ -42,6 +42,9 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <scm>
+    <url>https://github.com/allen-ball/ball-upnp.git</url>
+  </scm>
   <properties>
     <jse.target>8</jse.target>
   </properties>
