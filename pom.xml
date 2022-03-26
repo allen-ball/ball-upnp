@@ -22,16 +22,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>UPnP/SSDP API</name>
-  <description></description>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>4.0.0.20220314</version>
+  <version>4.0.0.20220604</version>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>UPnP/SSDP API</description>
+  <url>https://github.com/allen-ball/ball-upnp</url>
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.0.1</version>
+    <version>2022.1.0</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <inceptionYear>2013</inceptionYear>
@@ -46,7 +47,7 @@
     <url>https://github.com/allen-ball/ball-upnp.git</url>
   </scm>
   <properties>
-    <jse.target>8</jse.target>
+    <maven.compiler.release>8</maven.compiler.release>
   </properties>
   <dependencies verbose="true">
     <dependency>

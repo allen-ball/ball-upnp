@@ -20,6 +20,7 @@ package ball.upnp.ssdp;
  */
 import java.net.DatagramSocket;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -45,7 +46,8 @@ public class SSDPDiscoveryCache extends ConcurrentSkipListMap<URI,SSDPMessage> i
 
     /** @serial */ private ScheduledFuture<?> expirer = null;
     /** @serial */ private ScheduledFuture<?> msearch = null;
-    /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners = List.of(new NOTIFY(), new MSEARCH());
+    /** @serial */ private final List<SSDPDiscoveryService.Listener> listeners =
+        Arrays.asList(new NOTIFY(), new MSEARCH());
 
     @Override
     public void register(SSDPDiscoveryService service) {
