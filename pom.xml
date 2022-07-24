@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>4.0.1.20220628</version>
+  <version>4.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>UPnP/SSDP API</description>
@@ -32,7 +32,7 @@
   <parent>
     <groupId>ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.1.1</version>
+    <version>2022.1.2-SNAPSHOT</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <inceptionYear>2013</inceptionYear>
