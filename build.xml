@@ -28,11 +28,11 @@
 
   <resolver:resolve>
     <dependencies>
-      <dependency coords="ball:parent:2022.1.2-SNAPSHOT:xml:compile"/>
+      <dependency coords="dev.hcf.ball:parent:2022.1.2-SNAPSHOT:xml:compile"/>
     </dependencies>
     <properties/>
   </resolver:resolve>
-  <import file="${ball:parent:xml}"/>
+  <import file="${dev.hcf.ball:parent:xml}"/>
 
   <target name="ssdp-discover"
           description="--> Invokes &lt;ssdp-discover/&gt; task."
