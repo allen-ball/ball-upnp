@@ -1,0 +1,655 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<main role="main">
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span><a id="line.1">package ball.upnp.ssdp;</a>
+<span class="sourceLineNo">002</span><a id="line.2">/*-</a>
+<span class="sourceLineNo">003</span><a id="line.3"> * ##########################################################################</a>
+<span class="sourceLineNo">004</span><a id="line.4"> * UPnP/SSDP Implementation Classes</a>
+<span class="sourceLineNo">005</span><a id="line.5"> * %%</a>
+<span class="sourceLineNo">006</span><a id="line.6"> * Copyright (C) 2013 - 2022 Allen D. Ball</a>
+<span class="sourceLineNo">007</span><a id="line.7"> * %%</a>
+<span class="sourceLineNo">008</span><a id="line.8"> * Licensed under the Apache License, Version 2.0 (the "License");</a>
+<span class="sourceLineNo">009</span><a id="line.9"> * you may not use this file except in compliance with the License.</a>
+<span class="sourceLineNo">010</span><a id="line.10"> * You may obtain a copy of the License at</a>
+<span class="sourceLineNo">011</span><a id="line.11"> *</a>
+<span class="sourceLineNo">012</span><a id="line.12"> *      http://www.apache.org/licenses/LICENSE-2.0</a>
+<span class="sourceLineNo">013</span><a id="line.13"> *</a>
+<span class="sourceLineNo">014</span><a id="line.14"> * Unless required by applicable law or agreed to in writing, software</a>
+<span class="sourceLineNo">015</span><a id="line.15"> * distributed under the License is distributed on an "AS IS" BASIS,</a>
+<span class="sourceLineNo">016</span><a id="line.16"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</a>
+<span class="sourceLineNo">017</span><a id="line.17"> * See the License for the specific language governing permissions and</a>
+<span class="sourceLineNo">018</span><a id="line.18"> * limitations under the License.</a>
+<span class="sourceLineNo">019</span><a id="line.19"> * ##########################################################################</a>
+<span class="sourceLineNo">020</span><a id="line.20"> */</a>
+<span class="sourceLineNo">021</span><a id="line.21">import ball.upnp.RootDevice;</a>
+<span class="sourceLineNo">022</span><a id="line.22">import ball.upnp.SSDP;</a>
+<span class="sourceLineNo">023</span><a id="line.23">import java.io.IOException;</a>
+<span class="sourceLineNo">024</span><a id="line.24">import java.net.DatagramPacket;</a>
+<span class="sourceLineNo">025</span><a id="line.25">import java.net.DatagramSocket;</a>
+<span class="sourceLineNo">026</span><a id="line.26">import java.net.MulticastSocket;</a>
+<span class="sourceLineNo">027</span><a id="line.27">import java.net.SocketAddress;</a>
+<span class="sourceLineNo">028</span><a id="line.28">import java.net.SocketException;</a>
+<span class="sourceLineNo">029</span><a id="line.29">import java.net.SocketTimeoutException;</a>
+<span class="sourceLineNo">030</span><a id="line.30">import java.net.URI;</a>
+<span class="sourceLineNo">031</span><a id="line.31">import java.util.Comparator;</a>
+<span class="sourceLineNo">032</span><a id="line.32">import java.util.LinkedList;</a>
+<span class="sourceLineNo">033</span><a id="line.33">import java.util.List;</a>
+<span class="sourceLineNo">034</span><a id="line.34">import java.util.Objects;</a>
+<span class="sourceLineNo">035</span><a id="line.35">import java.util.Random;</a>
+<span class="sourceLineNo">036</span><a id="line.36">import java.util.concurrent.ConcurrentHashMap;</a>
+<span class="sourceLineNo">037</span><a id="line.37">import java.util.concurrent.CopyOnWriteArrayList;</a>
+<span class="sourceLineNo">038</span><a id="line.38">import java.util.concurrent.ScheduledFuture;</a>
+<span class="sourceLineNo">039</span><a id="line.39">import java.util.concurrent.ScheduledThreadPoolExecutor;</a>
+<span class="sourceLineNo">040</span><a id="line.40">import java.util.stream.Stream;</a>
+<span class="sourceLineNo">041</span><a id="line.41">import lombok.ToString;</a>
+<span class="sourceLineNo">042</span><a id="line.42">import org.apache.hc.core5.http.ParseException;</a>
+<span class="sourceLineNo">043</span><a id="line.43">import org.apache.hc.core5.http.protocol.HttpDateGenerator;</a>
+<span class="sourceLineNo">044</span><a id="line.44"></a>
+<span class="sourceLineNo">045</span><a id="line.45">import static java.nio.charset.StandardCharsets.UTF_8;</a>
+<span class="sourceLineNo">046</span><a id="line.46">import static java.util.concurrent.TimeUnit.MILLISECONDS;</a>
+<span class="sourceLineNo">047</span><a id="line.47">import static java.util.concurrent.TimeUnit.SECONDS;</a>
+<span class="sourceLineNo">048</span><a id="line.48">import static java.util.stream.Collectors.joining;</a>
+<span class="sourceLineNo">049</span><a id="line.49">import static java.util.stream.Collectors.toList;</a>
+<span class="sourceLineNo">050</span><a id="line.50">import static org.apache.commons.lang3.StringUtils.EMPTY;</a>
+<span class="sourceLineNo">051</span><a id="line.51">import static org.apache.commons.lang3.StringUtils.SPACE;</a>
+<span class="sourceLineNo">052</span><a id="line.52">import static org.apache.hc.core5.http.HttpStatus.SC_OK;</a>
+<span class="sourceLineNo">053</span><a id="line.53"></a>
+<span class="sourceLineNo">054</span><a id="line.54">/**</a>
+<span class="sourceLineNo">055</span><a id="line.55"> * SSDP discovery {@link ScheduledThreadPoolExecutor} implementation.</a>
+<span class="sourceLineNo">056</span><a id="line.56"> *</a>
+<span class="sourceLineNo">057</span><a id="line.57"> * {@bean.info}</a>
+<span class="sourceLineNo">058</span><a id="line.58"> *</a>
+<span class="sourceLineNo">059</span><a id="line.59"> * @author {@link.uri mailto:ball@hcf.dev Allen D. Ball}</a>
+<span class="sourceLineNo">060</span><a id="line.60"> */</a>
+<span class="sourceLineNo">061</span><a id="line.61">public class SSDPDiscoveryService extends ScheduledThreadPoolExecutor {</a>
+<span class="sourceLineNo">062</span><a id="line.62">    private static final String OS =</a>
+<span class="sourceLineNo">063</span><a id="line.63">        Stream.of("os.name", "os.version")</a>
+<span class="sourceLineNo">064</span><a id="line.64">        .map(System::getProperty)</a>
+<span class="sourceLineNo">065</span><a id="line.65">        .map(t -&gt; t.replaceAll("[\\p{Space}]+", EMPTY))</a>
+<span class="sourceLineNo">066</span><a id="line.66">        .collect(joining("/"));</a>
+<span class="sourceLineNo">067</span><a id="line.67">    private static final String UPNP = "UPnP/2.0";</a>
+<span class="sourceLineNo">068</span><a id="line.68"></a>
+<span class="sourceLineNo">069</span><a id="line.69">    private final String server;</a>
+<span class="sourceLineNo">070</span><a id="line.70">    private final int bootId = (int) (System.currentTimeMillis() / 1000);</a>
+<span class="sourceLineNo">071</span><a id="line.71">    private final Random random = new Random();</a>
+<span class="sourceLineNo">072</span><a id="line.72">    private final MulticastSocket multicast;</a>
+<span class="sourceLineNo">073</span><a id="line.73">    private final DatagramSocket unicast;</a>
+<span class="sourceLineNo">074</span><a id="line.74">    private final CopyOnWriteArrayList&lt;Listener&gt; listeners = new CopyOnWriteArrayList&lt;&gt;();</a>
+<span class="sourceLineNo">075</span><a id="line.75">    private final ConcurrentHashMap&lt;RootDevice,ScheduledFuture&lt;?&gt;&gt; advertisers = new ConcurrentHashMap&lt;&gt;();</a>
+<span class="sourceLineNo">076</span><a id="line.76"></a>
+<span class="sourceLineNo">077</span><a id="line.77">    /**</a>
+<span class="sourceLineNo">078</span><a id="line.78">     * Sole constructor.</a>
+<span class="sourceLineNo">079</span><a id="line.79">     *</a>
+<span class="sourceLineNo">080</span><a id="line.80">     * @param   product         The {@code product/version} {@link String}</a>
+<span class="sourceLineNo">081</span><a id="line.81">     *                          identifying this UPnP application.</a>
+<span class="sourceLineNo">082</span><a id="line.82">     *</a>
+<span class="sourceLineNo">083</span><a id="line.83">     * @throws  IOException     If the underlying {@link MulticastSocket}</a>
+<span class="sourceLineNo">084</span><a id="line.84">     *                          cannot be conditioned.</a>
+<span class="sourceLineNo">085</span><a id="line.85">     */</a>
+<span class="sourceLineNo">086</span><a id="line.86">    public SSDPDiscoveryService(String product) throws IOException {</a>
+<span class="sourceLineNo">087</span><a id="line.87">        super(8);</a>
+<span class="sourceLineNo">088</span><a id="line.88"></a>
+<span class="sourceLineNo">089</span><a id="line.89">        server =</a>
+<span class="sourceLineNo">090</span><a id="line.90">            Stream.of(OS, UPNP, product)</a>
+<span class="sourceLineNo">091</span><a id="line.91">            .filter(Objects::nonNull)</a>
+<span class="sourceLineNo">092</span><a id="line.92">            .collect(joining(SPACE));</a>
+<span class="sourceLineNo">093</span><a id="line.93"></a>
+<span class="sourceLineNo">094</span><a id="line.94">        random.setSeed(System.currentTimeMillis());</a>
+<span class="sourceLineNo">095</span><a id="line.95"></a>
+<span class="sourceLineNo">096</span><a id="line.96">        multicast = new SSDPMulticastSocket();</a>
+<span class="sourceLineNo">097</span><a id="line.97">        /*</a>
+<span class="sourceLineNo">098</span><a id="line.98">         * Bind to an {@link.rfc 4340} ephemeral port.</a>
+<span class="sourceLineNo">099</span><a id="line.99">         */</a>
+<span class="sourceLineNo">100</span><a id="line.100">        DatagramSocket socket = null;</a>
+<span class="sourceLineNo">101</span><a id="line.101">        List&lt;Integer&gt; ports = random.ints(49152, 65536).limit(256).boxed().collect(toList());</a>
+<span class="sourceLineNo">102</span><a id="line.102"></a>
+<span class="sourceLineNo">103</span><a id="line.103">        for (;;) {</a>
+<span class="sourceLineNo">104</span><a id="line.104">            try {</a>
+<span class="sourceLineNo">105</span><a id="line.105">                socket = new DatagramSocket(ports.remove(0));</a>
+<span class="sourceLineNo">106</span><a id="line.106">                break;</a>
+<span class="sourceLineNo">107</span><a id="line.107">            } catch (SocketException exception) {</a>
+<span class="sourceLineNo">108</span><a id="line.108">                if (ports.isEmpty()) {</a>
+<span class="sourceLineNo">109</span><a id="line.109">                    throw exception;</a>
+<span class="sourceLineNo">110</span><a id="line.110">                } else {</a>
+<span class="sourceLineNo">111</span><a id="line.111">                    continue;</a>
+<span class="sourceLineNo">112</span><a id="line.112">                }</a>
+<span class="sourceLineNo">113</span><a id="line.113">            }</a>
+<span class="sourceLineNo">114</span><a id="line.114">        }</a>
+<span class="sourceLineNo">115</span><a id="line.115"></a>
+<span class="sourceLineNo">116</span><a id="line.116">        unicast = socket;</a>
+<span class="sourceLineNo">117</span><a id="line.117"></a>
+<span class="sourceLineNo">118</span><a id="line.118">        addListener(new MSEARCH());</a>
+<span class="sourceLineNo">119</span><a id="line.119"></a>
+<span class="sourceLineNo">120</span><a id="line.120">        submit(() -&gt; receive(multicast));</a>
+<span class="sourceLineNo">121</span><a id="line.121">        submit(() -&gt; receive(unicast));</a>
+<span class="sourceLineNo">122</span><a id="line.122">    }</a>
+<span class="sourceLineNo">123</span><a id="line.123"></a>
+<span class="sourceLineNo">124</span><a id="line.124">    /**</a>
+<span class="sourceLineNo">125</span><a id="line.125">     * {@code SERVER} and {@code USER-AGENT}</a>
+<span class="sourceLineNo">126</span><a id="line.126">     *</a>
+<span class="sourceLineNo">127</span><a id="line.127">     * @return  {@code SERVER} and {@code USER-AGENT}</a>
+<span class="sourceLineNo">128</span><a id="line.128">     */</a>
+<span class="sourceLineNo">129</span><a id="line.129">    public String getUserAgent() { return server; }</a>
+<span class="sourceLineNo">130</span><a id="line.130"></a>
+<span class="sourceLineNo">131</span><a id="line.131">    /**</a>
+<span class="sourceLineNo">132</span><a id="line.132">     * {@code BOOTID.UPNP.ORG}</a>
+<span class="sourceLineNo">133</span><a id="line.133">     *</a>
+<span class="sourceLineNo">134</span><a id="line.134">     * @return  {@code bootId}</a>
+<span class="sourceLineNo">135</span><a id="line.135">     */</a>
+<span class="sourceLineNo">136</span><a id="line.136">    public int getBootId() { return bootId; }</a>
+<span class="sourceLineNo">137</span><a id="line.137"></a>
+<span class="sourceLineNo">138</span><a id="line.138">    /**</a>
+<span class="sourceLineNo">139</span><a id="line.139">     * {@code NEXTBOOTID.UPNP.ORG}</a>
+<span class="sourceLineNo">140</span><a id="line.140">     *</a>
+<span class="sourceLineNo">141</span><a id="line.141">     * @return  {@code nextBootId}</a>
+<span class="sourceLineNo">142</span><a id="line.142">     */</a>
+<span class="sourceLineNo">143</span><a id="line.143">    public int getNextBootId() { throw new UnsupportedOperationException(); }</a>
+<span class="sourceLineNo">144</span><a id="line.144"></a>
+<span class="sourceLineNo">145</span><a id="line.145">    /**</a>
+<span class="sourceLineNo">146</span><a id="line.146">     * {@code SEARCHPORT.UPNP.ORG}</a>
+<span class="sourceLineNo">147</span><a id="line.147">     *</a>
+<span class="sourceLineNo">148</span><a id="line.148">     * @return  Search port.</a>
+<span class="sourceLineNo">149</span><a id="line.149">     */</a>
+<span class="sourceLineNo">150</span><a id="line.150">    public int getSearchPort() { return unicast.getLocalPort(); }</a>
+<span class="sourceLineNo">151</span><a id="line.151"></a>
+<span class="sourceLineNo">152</span><a id="line.152">    /**</a>
+<span class="sourceLineNo">153</span><a id="line.153">     * Method to add a {@link Listener}.</a>
+<span class="sourceLineNo">154</span><a id="line.154">     *</a>
+<span class="sourceLineNo">155</span><a id="line.155">     * @param   listener        The {@link Listener}.</a>
+<span class="sourceLineNo">156</span><a id="line.156">     *</a>
+<span class="sourceLineNo">157</span><a id="line.157">     * @return  {@link.this}</a>
+<span class="sourceLineNo">158</span><a id="line.158">     */</a>
+<span class="sourceLineNo">159</span><a id="line.159">    public SSDPDiscoveryService addListener(Listener listener) {</a>
+<span class="sourceLineNo">160</span><a id="line.160">        if ((! listeners.contains(listener)) &amp;&amp; listeners.add(listener)) {</a>
+<span class="sourceLineNo">161</span><a id="line.161">            listener.register(this);</a>
+<span class="sourceLineNo">162</span><a id="line.162">        }</a>
+<span class="sourceLineNo">163</span><a id="line.163"></a>
+<span class="sourceLineNo">164</span><a id="line.164">        return this;</a>
+<span class="sourceLineNo">165</span><a id="line.165">    }</a>
+<span class="sourceLineNo">166</span><a id="line.166"></a>
+<span class="sourceLineNo">167</span><a id="line.167">    /**</a>
+<span class="sourceLineNo">168</span><a id="line.168">     * Method to remove a {@link Listener}.</a>
+<span class="sourceLineNo">169</span><a id="line.169">     *</a>
+<span class="sourceLineNo">170</span><a id="line.170">     * @param   listener        The {@link Listener}.</a>
+<span class="sourceLineNo">171</span><a id="line.171">     *</a>
+<span class="sourceLineNo">172</span><a id="line.172">     * @return  {@link.this}</a>
+<span class="sourceLineNo">173</span><a id="line.173">     */</a>
+<span class="sourceLineNo">174</span><a id="line.174">    public SSDPDiscoveryService removeListener(Listener listener) {</a>
+<span class="sourceLineNo">175</span><a id="line.175">        if (listeners.remove(listener)) {</a>
+<span class="sourceLineNo">176</span><a id="line.176">            listener.register(this);</a>
+<span class="sourceLineNo">177</span><a id="line.177">        }</a>
+<span class="sourceLineNo">178</span><a id="line.178"></a>
+<span class="sourceLineNo">179</span><a id="line.179">        return this;</a>
+<span class="sourceLineNo">180</span><a id="line.180">    }</a>
+<span class="sourceLineNo">181</span><a id="line.181"></a>
+<span class="sourceLineNo">182</span><a id="line.182">    private void fireSendEvent(DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">183</span><a id="line.183">        listeners.stream().forEach(t -&gt; t.sendEvent(this, socket, message));</a>
+<span class="sourceLineNo">184</span><a id="line.184">    }</a>
+<span class="sourceLineNo">185</span><a id="line.185"></a>
+<span class="sourceLineNo">186</span><a id="line.186">    private void fireReceiveEvent(DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">187</span><a id="line.187">        listeners.stream().forEach(t -&gt; t.receiveEvent(this, socket, message));</a>
+<span class="sourceLineNo">188</span><a id="line.188">    }</a>
+<span class="sourceLineNo">189</span><a id="line.189"></a>
+<span class="sourceLineNo">190</span><a id="line.190">    /**</a>
+<span class="sourceLineNo">191</span><a id="line.191">     * Method to add a {@link RootDevice} to advertise.</a>
+<span class="sourceLineNo">192</span><a id="line.192">     *</a>
+<span class="sourceLineNo">193</span><a id="line.193">     * @param   device          The {@link RootDevice} to advertise.</a>
+<span class="sourceLineNo">194</span><a id="line.194">     * @param   rate            The rate (in seconds) to repeat</a>
+<span class="sourceLineNo">195</span><a id="line.195">     *                          advertisements.</a>
+<span class="sourceLineNo">196</span><a id="line.196">     *</a>
+<span class="sourceLineNo">197</span><a id="line.197">     * @return  {@link.this}</a>
+<span class="sourceLineNo">198</span><a id="line.198">     */</a>
+<span class="sourceLineNo">199</span><a id="line.199">    public SSDPDiscoveryService advertise(RootDevice device, int rate) {</a>
+<span class="sourceLineNo">200</span><a id="line.200">        ScheduledFuture&lt;?&gt; future = scheduleAtFixedRate(() -&gt; alive(device), advertisers.size(), rate, SECONDS);</a>
+<span class="sourceLineNo">201</span><a id="line.201"></a>
+<span class="sourceLineNo">202</span><a id="line.202">        future = advertisers.put(device, future);</a>
+<span class="sourceLineNo">203</span><a id="line.203"></a>
+<span class="sourceLineNo">204</span><a id="line.204">        if (future != null) {</a>
+<span class="sourceLineNo">205</span><a id="line.205">            future.cancel(true);</a>
+<span class="sourceLineNo">206</span><a id="line.206">        }</a>
+<span class="sourceLineNo">207</span><a id="line.207"></a>
+<span class="sourceLineNo">208</span><a id="line.208">        return this;</a>
+<span class="sourceLineNo">209</span><a id="line.209">    }</a>
+<span class="sourceLineNo">210</span><a id="line.210"></a>
+<span class="sourceLineNo">211</span><a id="line.211">    private void alive(RootDevice device) {</a>
+<span class="sourceLineNo">212</span><a id="line.212">        device.notify((nt, usn) -&gt; multicast(new Alive(nt, usn, device)));</a>
+<span class="sourceLineNo">213</span><a id="line.213">    }</a>
+<span class="sourceLineNo">214</span><a id="line.214"></a>
+<span class="sourceLineNo">215</span><a id="line.215">    private void byebye(RootDevice device) {</a>
+<span class="sourceLineNo">216</span><a id="line.216">        device.notify((nt, usn) -&gt; multicast(new ByeBye(nt, usn, device)));</a>
+<span class="sourceLineNo">217</span><a id="line.217">    }</a>
+<span class="sourceLineNo">218</span><a id="line.218"></a>
+<span class="sourceLineNo">219</span><a id="line.219">    /**</a>
+<span class="sourceLineNo">220</span><a id="line.220">     * Send multicast {@code M-SEARCH} messsage.</a>
+<span class="sourceLineNo">221</span><a id="line.221">     *</a>
+<span class="sourceLineNo">222</span><a id="line.222">     * @param   mx              The {@code MX} header value.</a>
+<span class="sourceLineNo">223</span><a id="line.223">     * @param   st              The {@code ST} header value.</a>
+<span class="sourceLineNo">224</span><a id="line.224">     */</a>
+<span class="sourceLineNo">225</span><a id="line.225">    public void msearch(int mx, URI st) { multicast(0, new MSearch(mx, st)); }</a>
+<span class="sourceLineNo">226</span><a id="line.226"></a>
+<span class="sourceLineNo">227</span><a id="line.227">    /**</a>
+<span class="sourceLineNo">228</span><a id="line.228">     * Method to queue an {@link SSDPMessage} for multicast without delay.</a>
+<span class="sourceLineNo">229</span><a id="line.229">     *</a>
+<span class="sourceLineNo">230</span><a id="line.230">     * @param   message         The {@link SSDPMessage} to send.</a>
+<span class="sourceLineNo">231</span><a id="line.231">     */</a>
+<span class="sourceLineNo">232</span><a id="line.232">    public void multicast(SSDPMessage message) {</a>
+<span class="sourceLineNo">233</span><a id="line.233">        send(0, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);</a>
+<span class="sourceLineNo">234</span><a id="line.234">    }</a>
+<span class="sourceLineNo">235</span><a id="line.235"></a>
+<span class="sourceLineNo">236</span><a id="line.236">    /**</a>
+<span class="sourceLineNo">237</span><a id="line.237">     * Method to queue an {@link SSDPMessage} for multicast with delay.</a>
+<span class="sourceLineNo">238</span><a id="line.238">     *</a>
+<span class="sourceLineNo">239</span><a id="line.239">     * @param   delay           Time to delay (in milliseconds) before</a>
+<span class="sourceLineNo">240</span><a id="line.240">     *                          sending.</a>
+<span class="sourceLineNo">241</span><a id="line.241">     * @param   message         The {@link SSDPMessage} to send.</a>
+<span class="sourceLineNo">242</span><a id="line.242">     */</a>
+<span class="sourceLineNo">243</span><a id="line.243">    public void multicast(long delay, SSDPMessage message) {</a>
+<span class="sourceLineNo">244</span><a id="line.244">        send(delay, SSDPMulticastSocket.INET_SOCKET_ADDRESS, message);</a>
+<span class="sourceLineNo">245</span><a id="line.245">    }</a>
+<span class="sourceLineNo">246</span><a id="line.246"></a>
+<span class="sourceLineNo">247</span><a id="line.247">    /**</a>
+<span class="sourceLineNo">248</span><a id="line.248">     * Method to queue an {@link SSDPMessage} for sending without delay.</a>
+<span class="sourceLineNo">249</span><a id="line.249">     *</a>
+<span class="sourceLineNo">250</span><a id="line.250">     * @param   address         The destination {@link SocketAddress}.</a>
+<span class="sourceLineNo">251</span><a id="line.251">     * @param   message         The {@link SSDPMessage} to send.</a>
+<span class="sourceLineNo">252</span><a id="line.252">     */</a>
+<span class="sourceLineNo">253</span><a id="line.253">    public void send(SocketAddress address, SSDPMessage message) {</a>
+<span class="sourceLineNo">254</span><a id="line.254">        send(0, address, message);</a>
+<span class="sourceLineNo">255</span><a id="line.255">    }</a>
+<span class="sourceLineNo">256</span><a id="line.256"></a>
+<span class="sourceLineNo">257</span><a id="line.257">    /**</a>
+<span class="sourceLineNo">258</span><a id="line.258">     * Method to queue an {@link SSDPMessage} for sending with delay.</a>
+<span class="sourceLineNo">259</span><a id="line.259">     *</a>
+<span class="sourceLineNo">260</span><a id="line.260">     * @param   delay           Time to delay (in milliseconds) before</a>
+<span class="sourceLineNo">261</span><a id="line.261">     *                          sending.</a>
+<span class="sourceLineNo">262</span><a id="line.262">     * @param   address         The destination {@link SocketAddress}.</a>
+<span class="sourceLineNo">263</span><a id="line.263">     * @param   message         The {@link SSDPMessage} to send.</a>
+<span class="sourceLineNo">264</span><a id="line.264">     */</a>
+<span class="sourceLineNo">265</span><a id="line.265">    public void send(long delay, SocketAddress address, SSDPMessage message) {</a>
+<span class="sourceLineNo">266</span><a id="line.266">        byte[] bytes = message.toString().getBytes(UTF_8);</a>
+<span class="sourceLineNo">267</span><a id="line.267">        DatagramPacket packet = new DatagramPacket(bytes, 0, bytes.length, address);</a>
+<span class="sourceLineNo">268</span><a id="line.268"></a>
+<span class="sourceLineNo">269</span><a id="line.269">        schedule(() -&gt; task(message, packet), delay, MILLISECONDS);</a>
+<span class="sourceLineNo">270</span><a id="line.270">    }</a>
+<span class="sourceLineNo">271</span><a id="line.271"></a>
+<span class="sourceLineNo">272</span><a id="line.272">    private void task(SSDPMessage message, DatagramPacket packet) {</a>
+<span class="sourceLineNo">273</span><a id="line.273">        try {</a>
+<span class="sourceLineNo">274</span><a id="line.274">            fireSendEvent(unicast, message);</a>
+<span class="sourceLineNo">275</span><a id="line.275">            unicast.send(packet);</a>
+<span class="sourceLineNo">276</span><a id="line.276">        } catch (IOException exception) {</a>
+<span class="sourceLineNo">277</span><a id="line.277">        }</a>
+<span class="sourceLineNo">278</span><a id="line.278">    }</a>
+<span class="sourceLineNo">279</span><a id="line.279"></a>
+<span class="sourceLineNo">280</span><a id="line.280">    /**</a>
+<span class="sourceLineNo">281</span><a id="line.281">     * Method to queue a {@link List} of {@link SSDPMessage}s for sending</a>
+<span class="sourceLineNo">282</span><a id="line.282">     * with a {@code MX} parameter.  Messages are sent in list order with</a>
+<span class="sourceLineNo">283</span><a id="line.283">     * random delays none greater that {@code MX} seconds.</a>
+<span class="sourceLineNo">284</span><a id="line.284">     *</a>
+<span class="sourceLineNo">285</span><a id="line.285">     * @param   mx              Maximum delay (in seconds) before sending.</a>
+<span class="sourceLineNo">286</span><a id="line.286">     * @param   address         The destination {@link SocketAddress}.</a>
+<span class="sourceLineNo">287</span><a id="line.287">     * @param   messages        The {@link List} of {@link SSDPMessage}s to</a>
+<span class="sourceLineNo">288</span><a id="line.288">     *                          send.</a>
+<span class="sourceLineNo">289</span><a id="line.289">     */</a>
+<span class="sourceLineNo">290</span><a id="line.290">    public void send(int mx, SocketAddress address, List&lt;? extends SSDPMessage&gt; messages) {</a>
+<span class="sourceLineNo">291</span><a id="line.291">        List&lt;Long&gt; delays =</a>
+<span class="sourceLineNo">292</span><a id="line.292">            messages.stream()</a>
+<span class="sourceLineNo">293</span><a id="line.293">            .map(t -&gt; random.nextInt((int) SECONDS.toMillis(mx)))</a>
+<span class="sourceLineNo">294</span><a id="line.294">            .map(t -&gt; SECONDS.toMillis(1) + t)</a>
+<span class="sourceLineNo">295</span><a id="line.295">            .collect(toList());</a>
+<span class="sourceLineNo">296</span><a id="line.296"></a>
+<span class="sourceLineNo">297</span><a id="line.297">        delays.sort(Comparator.naturalOrder());</a>
+<span class="sourceLineNo">298</span><a id="line.298"></a>
+<span class="sourceLineNo">299</span><a id="line.299">        messages.stream().forEach(t -&gt; send(delays.remove(0), address, t));</a>
+<span class="sourceLineNo">300</span><a id="line.300">    }</a>
+<span class="sourceLineNo">301</span><a id="line.301"></a>
+<span class="sourceLineNo">302</span><a id="line.302">    private void receive(DatagramSocket socket) {</a>
+<span class="sourceLineNo">303</span><a id="line.303">        try {</a>
+<span class="sourceLineNo">304</span><a id="line.304">            socket.setSoTimeout((int) MILLISECONDS.convert(15, SECONDS));</a>
+<span class="sourceLineNo">305</span><a id="line.305"></a>
+<span class="sourceLineNo">306</span><a id="line.306">            for (;;) {</a>
+<span class="sourceLineNo">307</span><a id="line.307">                try {</a>
+<span class="sourceLineNo">308</span><a id="line.308">                    byte[] bytes = new byte[8 * 1024];</a>
+<span class="sourceLineNo">309</span><a id="line.309">                    DatagramPacket packet = new DatagramPacket(bytes, bytes.length);</a>
+<span class="sourceLineNo">310</span><a id="line.310"></a>
+<span class="sourceLineNo">311</span><a id="line.311">                    socket.receive(packet);</a>
+<span class="sourceLineNo">312</span><a id="line.312"></a>
+<span class="sourceLineNo">313</span><a id="line.313">                    SSDPMessage message = parse(packet);</a>
+<span class="sourceLineNo">314</span><a id="line.314"></a>
+<span class="sourceLineNo">315</span><a id="line.315">                    if (message != null) {</a>
+<span class="sourceLineNo">316</span><a id="line.316">                        fireReceiveEvent(socket, message);</a>
+<span class="sourceLineNo">317</span><a id="line.317">                    }</a>
+<span class="sourceLineNo">318</span><a id="line.318">                } catch (SocketTimeoutException exception) {</a>
+<span class="sourceLineNo">319</span><a id="line.319">                }</a>
+<span class="sourceLineNo">320</span><a id="line.320">            }</a>
+<span class="sourceLineNo">321</span><a id="line.321">        } catch (IOException exception) {</a>
+<span class="sourceLineNo">322</span><a id="line.322">        }</a>
+<span class="sourceLineNo">323</span><a id="line.323">    }</a>
+<span class="sourceLineNo">324</span><a id="line.324"></a>
+<span class="sourceLineNo">325</span><a id="line.325">    private SSDPMessage parse(DatagramPacket packet) {</a>
+<span class="sourceLineNo">326</span><a id="line.326">        SSDPMessage message = null;</a>
+<span class="sourceLineNo">327</span><a id="line.327"></a>
+<span class="sourceLineNo">328</span><a id="line.328">        if (message == null) {</a>
+<span class="sourceLineNo">329</span><a id="line.329">            try {</a>
+<span class="sourceLineNo">330</span><a id="line.330">                message = SSDPResponse.from(packet);</a>
+<span class="sourceLineNo">331</span><a id="line.331">            } catch (ParseException exception) {</a>
+<span class="sourceLineNo">332</span><a id="line.332">            }</a>
+<span class="sourceLineNo">333</span><a id="line.333">        }</a>
+<span class="sourceLineNo">334</span><a id="line.334"></a>
+<span class="sourceLineNo">335</span><a id="line.335">        if (message == null) {</a>
+<span class="sourceLineNo">336</span><a id="line.336">            try {</a>
+<span class="sourceLineNo">337</span><a id="line.337">                message = SSDPRequest.from(packet);</a>
+<span class="sourceLineNo">338</span><a id="line.338">            } catch (ParseException exception) {</a>
+<span class="sourceLineNo">339</span><a id="line.339">            }</a>
+<span class="sourceLineNo">340</span><a id="line.340">        }</a>
+<span class="sourceLineNo">341</span><a id="line.341"></a>
+<span class="sourceLineNo">342</span><a id="line.342">        return message;</a>
+<span class="sourceLineNo">343</span><a id="line.343">    }</a>
+<span class="sourceLineNo">344</span><a id="line.344"></a>
+<span class="sourceLineNo">345</span><a id="line.345">    @Override</a>
+<span class="sourceLineNo">346</span><a id="line.346">    public void shutdown() {</a>
+<span class="sourceLineNo">347</span><a id="line.347">        advertisers.values().stream().forEach(t -&gt; t.cancel(true));</a>
+<span class="sourceLineNo">348</span><a id="line.348">        advertisers.keySet().stream().forEach(t -&gt; byebye(t));</a>
+<span class="sourceLineNo">349</span><a id="line.349">        advertisers.clear();</a>
+<span class="sourceLineNo">350</span><a id="line.350"></a>
+<span class="sourceLineNo">351</span><a id="line.351">        super.shutdown();</a>
+<span class="sourceLineNo">352</span><a id="line.352">    }</a>
+<span class="sourceLineNo">353</span><a id="line.353"></a>
+<span class="sourceLineNo">354</span><a id="line.354">    /**</a>
+<span class="sourceLineNo">355</span><a id="line.355">     * {@link SSDPDiscoveryService} listener interface definition.</a>
+<span class="sourceLineNo">356</span><a id="line.356">     */</a>
+<span class="sourceLineNo">357</span><a id="line.357">    public interface Listener {</a>
+<span class="sourceLineNo">358</span><a id="line.358"></a>
+<span class="sourceLineNo">359</span><a id="line.359">        /**</a>
+<span class="sourceLineNo">360</span><a id="line.360">         * Callback when a {@link Listener} is added to a</a>
+<span class="sourceLineNo">361</span><a id="line.361">         * {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">362</span><a id="line.362">         *</a>
+<span class="sourceLineNo">363</span><a id="line.363">         * @param       service         The {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">364</span><a id="line.364">         */</a>
+<span class="sourceLineNo">365</span><a id="line.365">        public void register(SSDPDiscoveryService service);</a>
+<span class="sourceLineNo">366</span><a id="line.366"></a>
+<span class="sourceLineNo">367</span><a id="line.367">        /**</a>
+<span class="sourceLineNo">368</span><a id="line.368">         * Callback when a {@link Listener} is removed from a</a>
+<span class="sourceLineNo">369</span><a id="line.369">         * {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">370</span><a id="line.370">         *</a>
+<span class="sourceLineNo">371</span><a id="line.371">         * @param       service         The {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">372</span><a id="line.372">         */</a>
+<span class="sourceLineNo">373</span><a id="line.373">        public void unregister(SSDPDiscoveryService service);</a>
+<span class="sourceLineNo">374</span><a id="line.374"></a>
+<span class="sourceLineNo">375</span><a id="line.375">        /**</a>
+<span class="sourceLineNo">376</span><a id="line.376">         * Callback made just before sending a {@link SSDPMessage}.</a>
+<span class="sourceLineNo">377</span><a id="line.377">         *</a>
+<span class="sourceLineNo">378</span><a id="line.378">         * @param       service         The {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">379</span><a id="line.379">         * @param       socket          The {@link DatagramSocket}.</a>
+<span class="sourceLineNo">380</span><a id="line.380">         * @param       message         The {@link SSDPMessage}.</a>
+<span class="sourceLineNo">381</span><a id="line.381">         */</a>
+<span class="sourceLineNo">382</span><a id="line.382">        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message);</a>
+<span class="sourceLineNo">383</span><a id="line.383"></a>
+<span class="sourceLineNo">384</span><a id="line.384">        /**</a>
+<span class="sourceLineNo">385</span><a id="line.385">         * Callback made after receiving a {@link SSDPMessage}.</a>
+<span class="sourceLineNo">386</span><a id="line.386">         *</a>
+<span class="sourceLineNo">387</span><a id="line.387">         * @param       service         The {@link SSDPDiscoveryService}.</a>
+<span class="sourceLineNo">388</span><a id="line.388">         * @param       socket          The {@link DatagramSocket}.</a>
+<span class="sourceLineNo">389</span><a id="line.389">         * @param       message         The {@link SSDPMessage}.</a>
+<span class="sourceLineNo">390</span><a id="line.390">         */</a>
+<span class="sourceLineNo">391</span><a id="line.391">        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message);</a>
+<span class="sourceLineNo">392</span><a id="line.392">    }</a>
+<span class="sourceLineNo">393</span><a id="line.393"></a>
+<span class="sourceLineNo">394</span><a id="line.394">    /**</a>
+<span class="sourceLineNo">395</span><a id="line.395">     * {@link SSDPDiscoveryService} {@link SSDPRequest} handler.</a>
+<span class="sourceLineNo">396</span><a id="line.396">     */</a>
+<span class="sourceLineNo">397</span><a id="line.397">    public static abstract class RequestHandler implements Listener {</a>
+<span class="sourceLineNo">398</span><a id="line.398">        private final SSDPRequest.Method method;</a>
+<span class="sourceLineNo">399</span><a id="line.399"></a>
+<span class="sourceLineNo">400</span><a id="line.400">        /**</a>
+<span class="sourceLineNo">401</span><a id="line.401">         * Sole constructor.</a>
+<span class="sourceLineNo">402</span><a id="line.402">         *</a>
+<span class="sourceLineNo">403</span><a id="line.403">         * @param       method          The {@link SSDPRequest.Method} to</a>
+<span class="sourceLineNo">404</span><a id="line.404">         *                              handle.</a>
+<span class="sourceLineNo">405</span><a id="line.405">         */</a>
+<span class="sourceLineNo">406</span><a id="line.406">        protected RequestHandler(SSDPRequest.Method method) {</a>
+<span class="sourceLineNo">407</span><a id="line.407">            this.method = Objects.requireNonNull(method);</a>
+<span class="sourceLineNo">408</span><a id="line.408">        }</a>
+<span class="sourceLineNo">409</span><a id="line.409"></a>
+<span class="sourceLineNo">410</span><a id="line.410">        public abstract void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPRequest request);</a>
+<span class="sourceLineNo">411</span><a id="line.411"></a>
+<span class="sourceLineNo">412</span><a id="line.412">        @Override</a>
+<span class="sourceLineNo">413</span><a id="line.413">        public void register(SSDPDiscoveryService service) { }</a>
+<span class="sourceLineNo">414</span><a id="line.414"></a>
+<span class="sourceLineNo">415</span><a id="line.415">        @Override</a>
+<span class="sourceLineNo">416</span><a id="line.416">        public void unregister(SSDPDiscoveryService service) { }</a>
+<span class="sourceLineNo">417</span><a id="line.417"></a>
+<span class="sourceLineNo">418</span><a id="line.418">        @Override</a>
+<span class="sourceLineNo">419</span><a id="line.419">        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">420</span><a id="line.420">            if (message instanceof SSDPRequest) {</a>
+<span class="sourceLineNo">421</span><a id="line.421">                SSDPRequest request = (SSDPRequest) message;</a>
+<span class="sourceLineNo">422</span><a id="line.422"></a>
+<span class="sourceLineNo">423</span><a id="line.423">                if (method.is(request.getMethod())) {</a>
+<span class="sourceLineNo">424</span><a id="line.424">                    service.submit(() -&gt; run(service, socket, request));</a>
+<span class="sourceLineNo">425</span><a id="line.425">                }</a>
+<span class="sourceLineNo">426</span><a id="line.426">            }</a>
+<span class="sourceLineNo">427</span><a id="line.427">        }</a>
+<span class="sourceLineNo">428</span><a id="line.428"></a>
+<span class="sourceLineNo">429</span><a id="line.429">        @Override</a>
+<span class="sourceLineNo">430</span><a id="line.430">        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">431</span><a id="line.431">        }</a>
+<span class="sourceLineNo">432</span><a id="line.432">    }</a>
+<span class="sourceLineNo">433</span><a id="line.433"></a>
+<span class="sourceLineNo">434</span><a id="line.434">    /**</a>
+<span class="sourceLineNo">435</span><a id="line.435">     * {@link SSDPDiscoveryService} {@link SSDPResponse} handler.</a>
+<span class="sourceLineNo">436</span><a id="line.436">     */</a>
+<span class="sourceLineNo">437</span><a id="line.437">    public static abstract class ResponseHandler implements Listener {</a>
+<span class="sourceLineNo">438</span><a id="line.438"></a>
+<span class="sourceLineNo">439</span><a id="line.439">        /**</a>
+<span class="sourceLineNo">440</span><a id="line.440">         * Sole constructor.</a>
+<span class="sourceLineNo">441</span><a id="line.441">         */</a>
+<span class="sourceLineNo">442</span><a id="line.442">        protected ResponseHandler() { }</a>
+<span class="sourceLineNo">443</span><a id="line.443"></a>
+<span class="sourceLineNo">444</span><a id="line.444">        public abstract void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPResponse request);</a>
+<span class="sourceLineNo">445</span><a id="line.445"></a>
+<span class="sourceLineNo">446</span><a id="line.446">        @Override</a>
+<span class="sourceLineNo">447</span><a id="line.447">        public void register(SSDPDiscoveryService service) { }</a>
+<span class="sourceLineNo">448</span><a id="line.448"></a>
+<span class="sourceLineNo">449</span><a id="line.449">        @Override</a>
+<span class="sourceLineNo">450</span><a id="line.450">        public void unregister(SSDPDiscoveryService service) { }</a>
+<span class="sourceLineNo">451</span><a id="line.451"></a>
+<span class="sourceLineNo">452</span><a id="line.452">        @Override</a>
+<span class="sourceLineNo">453</span><a id="line.453">        public void receiveEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">454</span><a id="line.454">            if (message instanceof SSDPResponse) {</a>
+<span class="sourceLineNo">455</span><a id="line.455">                service.submit(() -&gt; run(service, socket, (SSDPResponse) message));</a>
+<span class="sourceLineNo">456</span><a id="line.456">            }</a>
+<span class="sourceLineNo">457</span><a id="line.457">        }</a>
+<span class="sourceLineNo">458</span><a id="line.458"></a>
+<span class="sourceLineNo">459</span><a id="line.459">        @Override</a>
+<span class="sourceLineNo">460</span><a id="line.460">        public void sendEvent(SSDPDiscoveryService service, DatagramSocket socket, SSDPMessage message) {</a>
+<span class="sourceLineNo">461</span><a id="line.461">        }</a>
+<span class="sourceLineNo">462</span><a id="line.462">    }</a>
+<span class="sourceLineNo">463</span><a id="line.463"></a>
+<span class="sourceLineNo">464</span><a id="line.464">    @ToString</a>
+<span class="sourceLineNo">465</span><a id="line.465">    private class MSEARCH extends RequestHandler {</a>
+<span class="sourceLineNo">466</span><a id="line.466">        public MSEARCH() { super(SSDPRequest.Method.MSEARCH); }</a>
+<span class="sourceLineNo">467</span><a id="line.467"></a>
+<span class="sourceLineNo">468</span><a id="line.468">        @Override</a>
+<span class="sourceLineNo">469</span><a id="line.469">        public void run(SSDPDiscoveryService service, DatagramSocket socket, SSDPRequest request) {</a>
+<span class="sourceLineNo">470</span><a id="line.470">            try {</a>
+<span class="sourceLineNo">471</span><a id="line.471">                if (isHeaderValue(request, SSDPMessage.MAN, "\"ssdp:discover\"")) {</a>
+<span class="sourceLineNo">472</span><a id="line.472">                    int mx = request.getMX();</a>
+<span class="sourceLineNo">473</span><a id="line.473">                    SocketAddress address = request.getSocketAddress();</a>
+<span class="sourceLineNo">474</span><a id="line.474">                    List&lt;SSDPMessage&gt; list = new LinkedList&lt;&gt;();</a>
+<span class="sourceLineNo">475</span><a id="line.475">                    URI st = request.getST();</a>
+<span class="sourceLineNo">476</span><a id="line.476">                    boolean all = SSDPMessage.SSDP_ALL.equals(st);</a>
+<span class="sourceLineNo">477</span><a id="line.477"></a>
+<span class="sourceLineNo">478</span><a id="line.478">                    advertisers.keySet().stream()</a>
+<span class="sourceLineNo">479</span><a id="line.479">                        .forEach(device -&gt; device.notify((nt, usn) -&gt; {</a>
+<span class="sourceLineNo">480</span><a id="line.480">                                    if (SSDP.matches(st, nt)) {</a>
+<span class="sourceLineNo">481</span><a id="line.481">                                        list.add(new MSearch(service, all ? nt : st, usn, device));</a>
+<span class="sourceLineNo">482</span><a id="line.482">                                    }</a>
+<span class="sourceLineNo">483</span><a id="line.483">                                }));</a>
+<span class="sourceLineNo">484</span><a id="line.484"></a>
+<span class="sourceLineNo">485</span><a id="line.485">                    service.send(mx, address, list);</a>
+<span class="sourceLineNo">486</span><a id="line.486">                }</a>
+<span class="sourceLineNo">487</span><a id="line.487">            } catch (Exception exception) {</a>
+<span class="sourceLineNo">488</span><a id="line.488">                /* log.error("{}", exception.getMessage(), exception); */</a>
+<span class="sourceLineNo">489</span><a id="line.489">            }</a>
+<span class="sourceLineNo">490</span><a id="line.490">        }</a>
+<span class="sourceLineNo">491</span><a id="line.491"></a>
+<span class="sourceLineNo">492</span><a id="line.492">        private boolean isHeaderValue(SSDPRequest request, String header, String value) {</a>
+<span class="sourceLineNo">493</span><a id="line.493">            return Objects.equals(request.getHeaderValue(header), value);</a>
+<span class="sourceLineNo">494</span><a id="line.494">        }</a>
+<span class="sourceLineNo">495</span><a id="line.495"></a>
+<span class="sourceLineNo">496</span><a id="line.496">        private class MSearch extends SSDPResponse {</a>
+<span class="sourceLineNo">497</span><a id="line.497">            private static final long serialVersionUID = -2963023442177743880L;</a>
+<span class="sourceLineNo">498</span><a id="line.498"></a>
+<span class="sourceLineNo">499</span><a id="line.499">            public MSearch(SSDPDiscoveryService service, URI st, URI usn, RootDevice device) {</a>
+<span class="sourceLineNo">500</span><a id="line.500">                super(SC_OK, "OK");</a>
+<span class="sourceLineNo">501</span><a id="line.501"></a>
+<span class="sourceLineNo">502</span><a id="line.502">                header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());</a>
+<span class="sourceLineNo">503</span><a id="line.503">                header(DATE, HttpDateGenerator.INSTANCE.getCurrentDate());</a>
+<span class="sourceLineNo">504</span><a id="line.504">                header(EXT, (String) null);</a>
+<span class="sourceLineNo">505</span><a id="line.505">                header(LOCATION, device.getLocation());</a>
+<span class="sourceLineNo">506</span><a id="line.506">                header(SERVER, service.getUserAgent());</a>
+<span class="sourceLineNo">507</span><a id="line.507">                header(ST, st);</a>
+<span class="sourceLineNo">508</span><a id="line.508">                header(USN, usn);</a>
+<span class="sourceLineNo">509</span><a id="line.509">                header(BOOTID_UPNP_ORG, service.getBootId());</a>
+<span class="sourceLineNo">510</span><a id="line.510">                header(CONFIGID_UPNP_ORG, device.getConfigId());</a>
+<span class="sourceLineNo">511</span><a id="line.511">                header(SEARCHPORT_UPNP_ORG, service.getSearchPort());</a>
+<span class="sourceLineNo">512</span><a id="line.512">            }</a>
+<span class="sourceLineNo">513</span><a id="line.513">        }</a>
+<span class="sourceLineNo">514</span><a id="line.514">    }</a>
+<span class="sourceLineNo">515</span><a id="line.515"></a>
+<span class="sourceLineNo">516</span><a id="line.516">    private class MSearch extends SSDPRequest {</a>
+<span class="sourceLineNo">517</span><a id="line.517">        private static final long serialVersionUID = -7606319039115145787L;</a>
+<span class="sourceLineNo">518</span><a id="line.518"></a>
+<span class="sourceLineNo">519</span><a id="line.519">        public MSearch(int mx, URI st) {</a>
+<span class="sourceLineNo">520</span><a id="line.520">            super(Method.MSEARCH);</a>
+<span class="sourceLineNo">521</span><a id="line.521"></a>
+<span class="sourceLineNo">522</span><a id="line.522">            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);</a>
+<span class="sourceLineNo">523</span><a id="line.523">            header(MAN, "\"ssdp:discover\"");</a>
+<span class="sourceLineNo">524</span><a id="line.524">            header(MX, mx);</a>
+<span class="sourceLineNo">525</span><a id="line.525">            header(ST, st);</a>
+<span class="sourceLineNo">526</span><a id="line.526">            header(USER_AGENT, getUserAgent());</a>
+<span class="sourceLineNo">527</span><a id="line.527">        }</a>
+<span class="sourceLineNo">528</span><a id="line.528">    }</a>
+<span class="sourceLineNo">529</span><a id="line.529"></a>
+<span class="sourceLineNo">530</span><a id="line.530">    private class Alive extends SSDPRequest {</a>
+<span class="sourceLineNo">531</span><a id="line.531">        private static final long serialVersionUID = 1405796530322683498L;</a>
+<span class="sourceLineNo">532</span><a id="line.532"></a>
+<span class="sourceLineNo">533</span><a id="line.533">        public Alive(URI nt, URI usn, RootDevice device) {</a>
+<span class="sourceLineNo">534</span><a id="line.534">            super(Method.NOTIFY);</a>
+<span class="sourceLineNo">535</span><a id="line.535"></a>
+<span class="sourceLineNo">536</span><a id="line.536">            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);</a>
+<span class="sourceLineNo">537</span><a id="line.537">            header(CACHE_CONTROL, MAX_AGE + "=" + device.getMaxAge());</a>
+<span class="sourceLineNo">538</span><a id="line.538">            header(NT, nt);</a>
+<span class="sourceLineNo">539</span><a id="line.539">            header(NTS, SSDP_ALIVE);</a>
+<span class="sourceLineNo">540</span><a id="line.540">            header(SERVER, getUserAgent());</a>
+<span class="sourceLineNo">541</span><a id="line.541">            header(USN, usn);</a>
+<span class="sourceLineNo">542</span><a id="line.542">            header(LOCATION, device.getLocation());</a>
+<span class="sourceLineNo">543</span><a id="line.543">            header(BOOTID_UPNP_ORG, getBootId());</a>
+<span class="sourceLineNo">544</span><a id="line.544">            header(CONFIGID_UPNP_ORG, device.getConfigId());</a>
+<span class="sourceLineNo">545</span><a id="line.545">            header(SEARCHPORT_UPNP_ORG, getSearchPort());</a>
+<span class="sourceLineNo">546</span><a id="line.546">        }</a>
+<span class="sourceLineNo">547</span><a id="line.547">    }</a>
+<span class="sourceLineNo">548</span><a id="line.548"></a>
+<span class="sourceLineNo">549</span><a id="line.549">    private class ByeBye extends SSDPRequest {</a>
+<span class="sourceLineNo">550</span><a id="line.550">        private static final long serialVersionUID = -4058077320857161188L;</a>
+<span class="sourceLineNo">551</span><a id="line.551"></a>
+<span class="sourceLineNo">552</span><a id="line.552">        public ByeBye(URI nt, URI usn, RootDevice device) {</a>
+<span class="sourceLineNo">553</span><a id="line.553">            super(Method.NOTIFY);</a>
+<span class="sourceLineNo">554</span><a id="line.554"></a>
+<span class="sourceLineNo">555</span><a id="line.555">            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);</a>
+<span class="sourceLineNo">556</span><a id="line.556">            header(NT, nt);</a>
+<span class="sourceLineNo">557</span><a id="line.557">            header(NTS, SSDP_BYEBYE);</a>
+<span class="sourceLineNo">558</span><a id="line.558">            header(USN, usn);</a>
+<span class="sourceLineNo">559</span><a id="line.559">            header(BOOTID_UPNP_ORG, getBootId());</a>
+<span class="sourceLineNo">560</span><a id="line.560">            header(CONFIGID_UPNP_ORG, device.getConfigId());</a>
+<span class="sourceLineNo">561</span><a id="line.561">        }</a>
+<span class="sourceLineNo">562</span><a id="line.562">    }</a>
+<span class="sourceLineNo">563</span><a id="line.563"></a>
+<span class="sourceLineNo">564</span><a id="line.564">    private class Update extends SSDPRequest {</a>
+<span class="sourceLineNo">565</span><a id="line.565">        private static final long serialVersionUID = -3155461457458248824L;</a>
+<span class="sourceLineNo">566</span><a id="line.566"></a>
+<span class="sourceLineNo">567</span><a id="line.567">        public Update(URI nt, URI usn, RootDevice device) {</a>
+<span class="sourceLineNo">568</span><a id="line.568">            super(Method.NOTIFY);</a>
+<span class="sourceLineNo">569</span><a id="line.569"></a>
+<span class="sourceLineNo">570</span><a id="line.570">            header(HOST, SSDPMulticastSocket.INET_SOCKET_ADDRESS);</a>
+<span class="sourceLineNo">571</span><a id="line.571">            header(LOCATION, device.getLocation());</a>
+<span class="sourceLineNo">572</span><a id="line.572">            header(NT, nt);</a>
+<span class="sourceLineNo">573</span><a id="line.573">            header(NTS, SSDP_UPDATE);</a>
+<span class="sourceLineNo">574</span><a id="line.574">            header(USN, usn);</a>
+<span class="sourceLineNo">575</span><a id="line.575">            header(BOOTID_UPNP_ORG, getBootId());</a>
+<span class="sourceLineNo">576</span><a id="line.576">            header(CONFIGID_UPNP_ORG, device.getConfigId());</a>
+<span class="sourceLineNo">577</span><a id="line.577">            header(NEXTBOOTID_UPNP_ORG, getNextBootId());</a>
+<span class="sourceLineNo">578</span><a id="line.578">            header(SEARCHPORT_UPNP_ORG, getSearchPort());</a>
+<span class="sourceLineNo">579</span><a id="line.579">        }</a>
+<span class="sourceLineNo">580</span><a id="line.580">    }</a>
+<span class="sourceLineNo">581</span><a id="line.581">}</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</main>
+</body>
+</html>
