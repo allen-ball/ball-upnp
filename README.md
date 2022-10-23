@@ -8,6 +8,8 @@ Description
 Classes specific to [Universal Plug and Play (UPnP)][UPnP] (moved to
 [UPnP Developer Resources]).
 
+Javadoc is published at <https://allen-ball.github.io/ball-upnp/>.
+
 
 License
 -------
