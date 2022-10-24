@@ -28,7 +28,7 @@
 
   <resolver:resolve>
     <dependencies>
-      <dependency coords="dev.hcf.ball:parent:2022.1.2-SNAPSHOT:xml:compile"/>
+      <dependency coords="dev.hcf.ball:parent:2022.1.2:xml:compile"/>
     </dependencies>
     <properties/>
   </resolver:resolve>
