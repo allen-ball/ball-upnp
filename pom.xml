@@ -2,7 +2,7 @@
 <!--
   ##########################################################################
   %%
-  Copyright (C) 2013 - 2022 Allen D. Ball
+  Copyright (C) 2013 - 2023 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ball</groupId>
   <artifactId>ball-upnp</artifactId>
-  <version>4.0.4.20221231</version>
+  <version>4.0.5.20230201</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>UPnP/SSDP API</description>
@@ -32,7 +32,7 @@
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>parent</artifactId>
-    <version>2022.2.1</version>
+    <version>2023.0.0</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <inceptionYear>2013</inceptionYear>
