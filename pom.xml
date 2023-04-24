@@ -24,13 +24,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ball</groupId>
   <artifactId>ball-upnp-gh-pages</artifactId>
-  <version>4.0.7.20230325</version>
+  <version>4.0.8.20230424</version>
   <packaging>pom</packaging>
   <name>${javadoc.groupId}:${javadoc.artifactId} API</name>
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>javadoc-parent</artifactId>
-    <version>2023.1.1</version>
+    <version>2023.1.2</version>
     <relativePath>../ball/javadoc-parent/pom.xml</relativePath>
   </parent>
   <properties>
