@@ -24,15 +24,19 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ball</groupId>
   <artifactId>ball-upnp-gh-pages</artifactId>
-  <version>4.0.10.20230715</version>
+  <version>4.0.11.20230720</version>
   <packaging>pom</packaging>
   <name>${javadoc.groupId}:${javadoc.artifactId} API</name>
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>javadoc-parent</artifactId>
-    <version>2023.1.4</version>
+    <version>2023.1.5</version>
     <relativePath>../ball/javadoc-parent/pom.xml</relativePath>
   </parent>
+  <organization>
+    <name>Allen D. Ball</name>
+    <url>https://github.com/allen-ball</url>
+  </organization>
   <properties>
     <javadoc.groupId>${project.groupId}</javadoc.groupId>
     <javadoc.artifactId>ball-upnp</javadoc.artifactId>
