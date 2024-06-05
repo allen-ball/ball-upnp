@@ -2,7 +2,7 @@
 <!--
   ##########################################################################
   %%
-  Copyright (C) 2022, 2023 Allen D. Ball
+  Copyright (C) 2022 - 2024 Allen D. Ball
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>dev.hcf.ball</groupId>
   <artifactId>ball-upnp-gh-pages</artifactId>
-  <version>4.0.13.20231224</version>
+  <version>4.0.14.20240605</version>
   <packaging>pom</packaging>
   <name>${javadoc.groupId}:${javadoc.artifactId} API</name>
   <parent>
     <groupId>dev.hcf.ball</groupId>
     <artifactId>javadoc-parent</artifactId>
-    <version>2023.1.7</version>
+    <version>2024.0.0</version>
     <relativePath>../ball/javadoc-parent/pom.xml</relativePath>
   </parent>
   <organization>
